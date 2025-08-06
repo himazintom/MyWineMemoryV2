@@ -1,69 +1,77 @@
-# React + TypeScript + Vite
+# MyWineMemory - Wine Tasting PWA 🍷
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+MyWineMemoryは、ワイン愛好家のためのプログレッシブWebアプリケーションです。ワインのテイスティング記録、学習クイズ、ゲーミフィケーション機能を提供します。
 
-Currently, two official plugins are available:
+## 🚀 Live Demo
+**アプリURL**: https://mywinememory-4bdf9.web.app
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ✨ 主な機能
 
-## Expanding the ESLint configuration
+### 🍷 ワイン記録システム
+- **クイックモード**: 基本情報（名前、生産者、国、地域、評価）の簡単記録
+- **詳細モード**: 外観、香り、味わいの詳細分析（今後実装予定）
+- **自動下書き保存**: 30秒間隔で自動保存、最大5件の下書き管理
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 🎮 ゲーミフィケーション
+- **バッジシステム**: 記録数、連続記録、クイズ成績などで獲得
+- **レベルシステム**: XPによるレベルアップ（記録: 10-20XP、クイズ: 5XP）
+- **ストリーク機能**: 連続記録日数の追跡
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### 📚 学習クイズ
+- **5段階難易度**: 入門から仙人レベルまで
+- **幅広いカテゴリ**: ワインの基礎、品種、産地、テイスティングなど
+- **詳細解説付き**: 間違えた問題も学習できる
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### 📊 統計・分析
+- **記録統計**: 総記録数、国別・品種別分布
+- **レベル進捗**: XP、バッジ獲得状況
+- **月次グラフ**: 記録活動の可視化
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## 🛠️ 技術スタック
+
+### Frontend
+- **React 18** + **TypeScript** - モダンなUI開発
+- **Vite** - 高速ビルドツール
+- **Vite PWA Plugin** - プログレッシブWebアプリ機能
+
+### Backend & Infrastructure
+- **Firebase Authentication** - Google OAuth認証
+- **Firestore** - NoSQLデータベース
+- **Firebase Storage** - 画像ファイル保存
+- **Firebase Hosting** - 静的サイトホスティング
+
+### CI/CD
+- **GitHub Actions** - 自動デプロイメント
+- **Firebase CLI** - デプロイメント自動化
+
+## 🚀 開発・デプロイ
+
+### ローカル開発
+```bash
+# 依存関係のインストール
+npm install
+
+# 開発サーバー起動
+npm run dev
+
+# ビルド
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 環境変数設定
+`.env.example`を`.env`にコピーして、Firebase設定を記入してください。
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 自動デプロイ
+`main`ブランチへのpushで自動デプロイされます：
+- GitHub Actions → ビルド → Firebase Hostingデプロイ
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 📱 PWA機能
+- **オフライン対応**: Service Workerによるキャッシュ
+- **インストール可能**: ホーム画面に追加
+- **レスポンシブデザイン**: モバイルファースト
+
+## 🎯 今後の予定
+- [ ] 検索・フィルタリング機能強化
+- [ ] 詳細モードの完全実装
+- [ ] 1000問クイズデータベース
+- [ ] プッシュ通知機能
