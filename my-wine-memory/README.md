@@ -4,6 +4,7 @@ MyWineMemoryは、ワイン愛好家のためのプログレッシブWebアプ�
 
 ## 🚀 Live Demo
 **アプリURL**: https://mywinememory-4bdf9.web.app
+⚡ **自動デプロイ設定完了！** mainブランチへのpushで自動更新されます
 
 ## ✨ 主な機能
 
