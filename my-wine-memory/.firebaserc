@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "mywinememory-4bdf9"
+  },
+  "targets": {
+    "mywinememory-4bdf9": {
+      "hosting": {
+        "production": [
+          "mywinememory-4bdf9"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

@@ -1,0 +1,55 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can only access their own user document
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // User stats - only the owner can read/write
+    match /user_stats/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Wine records - only the owner can read/write their records
+    match /wines/{wineId} {
+      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
+    // Public wine records - anyone can read public wines, only owners can write
+    match /wines/{wineId} {
+      allow read: if resource.data.isPublic == true;
+    }
+    
+    // Drafts - only the owner can access
+    match /drafts/{draftId} {
+      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
+    // User badges - only the owner can read, system can write
+    match /user_badges/{badgeId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
+    // Daily goals - only the owner can access
+    match /daily_goals/{goalId} {
+      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
+    // Quiz progress - only the owner can access
+    match /quiz_progress/{progressId} {
+      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
+    // Deleted items with TTL - only the owner can access
+    match /deleted_items/{itemId} {
+      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null;
+    }
+  }
+}
