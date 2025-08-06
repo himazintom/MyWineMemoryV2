@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create:*)",
+      "Bash(mkdir:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tailwindcss init:*)",
+      "Bash(touch:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npx create-react-app:*)",
+      "Bash(npx create-vite:*)",
+      "Bash(rm:*)",
+      "Bash(ls:*)",
+      "Bash(npm run build:*)",
+      "Bash(find:*)",
+      "Bash(firebase --version)",
+      "Bash(firebase deploy:*)",
+      "Bash(git reset:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": []
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -Command \"if (git rev-parse --git-dir 2>$null) { git add -A; $branch = git branch --show-current; if ($branch -notin @('main','master','production','prod')) { git commit -m 'Claude Code: Auto-commit'; git push origin $branch } else { Write-Host 'Protected branch - skipping push' } }\""
+          }
+        ]
+      }
+    ]
+  }
+}
