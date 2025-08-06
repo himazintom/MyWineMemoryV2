@@ -5,6 +5,9 @@ import { wineService, draftService } from '../services/wineService';
 import { goalService } from '../services/userService';
 import type { WineRecord, WineDraft, DailyGoal } from '../types';
 import WineCard from '../components/WineCard';
+import LoadingSpinner from '../components/LoadingSpinner';
+import ErrorMessage from '../components/ErrorMessage';
+import { useAsyncOperation } from '../hooks/useAsyncOperation';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -12,7 +15,7 @@ const Home: React.FC = () => {
   const [recentWines, setRecentWines] = useState<WineRecord[]>([]);
   const [drafts, setDrafts] = useState<WineDraft[]>([]);
   const [dailyGoal, setDailyGoal] = useState<DailyGoal | null>(null);
-  const [loading, setLoading] = useState(false);
+  const { loading, error, execute: executeLoadHome } = useAsyncOperation<void>();
 
   useEffect(() => {
     if (currentUser) {
@@ -24,20 +27,19 @@ const Home: React.FC = () => {
     if (!currentUser) return;
     
     try {
-      setLoading(true);
-      const [wines, userDrafts, goal] = await Promise.all([
-        wineService.getUserWineRecords(currentUser.uid, 'date'),
-        draftService.getUserDrafts(currentUser.uid),
-        goalService.initializeTodayGoal(currentUser.uid)
-      ]);
-      
-      setRecentWines(wines.slice(0, 3)); // Show only 3 most recent
-      setDrafts(userDrafts);
-      setDailyGoal(goal);
+      await executeLoadHome(async () => {
+        const [wines, userDrafts, goal] = await Promise.all([
+          wineService.getUserWineRecords(currentUser.uid, 'date'),
+          draftService.getUserDrafts(currentUser.uid),
+          goalService.initializeTodayGoal(currentUser.uid)
+        ]);
+        
+        setRecentWines(wines.slice(0, 3)); // Show only 3 most recent
+        setDrafts(userDrafts);
+        setDailyGoal(goal);
+      });
     } catch (error) {
       console.error('Failed to load home data:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -109,7 +111,14 @@ const Home: React.FC = () => {
         <div className="recent-activity">
           <h2>最近の記録</h2>
           {loading ? (
-            <p>読み込み中...</p>
+            <LoadingSpinner size="small" message="最近の記録を読み込み中..." />
+          ) : error ? (
+            <ErrorMessage
+              title="データの読み込みに失敗しました"
+              message={error}
+              onRetry={loadHomeData}
+              showIcon={false}
+            />
           ) : recentWines.length > 0 ? (
             <>
               {recentWines.map(wine => (

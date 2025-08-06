@@ -3,6 +3,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { wineService } from '../services/wineService';
 import type { WineRecord } from '../types';
 import WineCard from '../components/WineCard';
+import LoadingSpinner from '../components/LoadingSpinner';
+import ErrorMessage from '../components/ErrorMessage';
+import { useAsyncOperation } from '../hooks/useAsyncOperation';
 
 const Records: React.FC = () => {
   const { currentUser } = useAuth();
@@ -10,13 +13,11 @@ const Records: React.FC = () => {
   const [filteredWines, setFilteredWines] = useState<WineRecord[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'date' | 'rating' | 'name'>('date');
-  const [loading, setLoading] = useState(true);
+  const { loading, error, execute: executeLoadWines } = useAsyncOperation<WineRecord[]>();
 
   useEffect(() => {
     if (currentUser) {
       loadWineRecords();
-    } else {
-      setLoading(false);
     }
   }, [currentUser, sortBy]);
 
@@ -28,13 +29,12 @@ const Records: React.FC = () => {
     if (!currentUser) return;
     
     try {
-      setLoading(true);
-      const records = await wineService.getUserWineRecords(currentUser.uid, sortBy);
+      const records = await executeLoadWines(() => 
+        wineService.getUserWineRecords(currentUser.uid, sortBy)
+      );
       setWines(records);
     } catch (error) {
       console.error('Failed to load wine records:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -105,7 +105,17 @@ const Records: React.FC = () => {
         
         <div className="records-list">
           {loading ? (
-            <p className="loading-message">読み込み中...</p>
+            <div className="page-loading">
+              <LoadingSpinner message="ワイン記録を読み込み中..." />
+            </div>
+          ) : error ? (
+            <div className="page-error">
+              <ErrorMessage
+                title="データの読み込みに失敗しました"
+                message={error}
+                onRetry={loadWineRecords}
+              />
+            </div>
           ) : filteredWines.length > 0 ? (
             filteredWines.map(wine => (
               <WineCard 
