@@ -1502,3 +1502,257 @@ body {
     transform: translateX(-50%) translateY(0);
   }
 }
+
+/* Records Page Styles */
+.records-content {
+  padding: 1rem;
+}
+
+.search-bar {
+  margin-bottom: 1rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  transition: border-color 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #722F37;
+  box-shadow: 0 0 0 2px rgba(114, 47, 55, 0.1);
+}
+
+.controls-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.sort-options {
+  display: flex;
+  align-items: center;
+}
+
+.sort-select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.filter-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-toggle {
+  background: #722F37;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-toggle:hover {
+  background: #8B4513;
+}
+
+.filter-toggle.active {
+  background: #2E7D32;
+}
+
+.clear-filters {
+  background: #f0f0f0;
+  color: #666;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clear-filters:hover {
+  background: #e0e0e0;
+  color: #333;
+}
+
+/* Filter Panel */
+.filter-panel {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-group label {
+  font-weight: 600;
+  color: #722F37;
+  font-size: 0.9rem;
+}
+
+.filter-select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #722F37;
+  box-shadow: 0 0 0 2px rgba(114, 47, 55, 0.1);
+}
+
+/* Range Filters */
+.range-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.range-input {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #ddd;
+  outline: none;
+  cursor: pointer;
+}
+
+.range-input::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #722F37;
+  cursor: pointer;
+}
+
+.range-input::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #722F37;
+  cursor: pointer;
+  border: none;
+}
+
+.range-labels {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Vintage Filter */
+.vintage-input {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  width: 100px;
+  text-align: center;
+}
+
+.vintage-input:focus {
+  outline: none;
+  border-color: #722F37;
+  box-shadow: 0 0 0 2px rgba(114, 47, 55, 0.1);
+}
+
+.range-separator {
+  align-self: center;
+  margin: 0 0.5rem;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Records List */
+.records-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.no-results {
+  text-align: center;
+  color: #666;
+  padding: 2rem;
+  font-size: 1rem;
+}
+
+.empty-state {
+  text-align: center;
+  color: #666;
+  padding: 3rem 1rem;
+  font-size: 1.1rem;
+}
+
+.login-message {
+  text-align: center;
+  color: #666;
+  padding: 3rem 1rem;
+  font-size: 1.1rem;
+}
+
+/* Responsive Filter Styles */
+@media (min-width: 768px) {
+  .filter-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .controls-section {
+    margin-bottom: 1.5rem;
+  }
+  
+  .range-filter {
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .vintage-input {
+    width: 80px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .filter-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .records-content {
+    padding: 0;
+  }
+}
