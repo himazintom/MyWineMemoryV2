@@ -16,7 +16,8 @@
       "Bash(firebase --version)",
       "Bash(firebase deploy:*)",
       "Bash(git reset:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git push:*)"
     ],
     "deny": []
   },
