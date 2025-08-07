@@ -11,11 +11,13 @@ import { useAsyncOperation } from '../hooks/useAsyncOperation';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
+  const { currentUser, signInWithGoogle } = useAuth();
   const [recentWines, setRecentWines] = useState<WineRecord[]>([]);
   const [drafts, setDrafts] = useState<WineDraft[]>([]);
   const [dailyGoal, setDailyGoal] = useState<DailyGoal | null>(null);
+  const [authError, setAuthError] = useState<string>('');
   const { loading, error, execute: executeLoadHome } = useAsyncOperation<void>();
+  const { loading: authLoading, execute: executeAuth } = useAsyncOperation<void>();
 
   useEffect(() => {
     if (currentUser) {
@@ -52,6 +54,17 @@ const Home: React.FC = () => {
     navigate('/add-wine', { state: { draftData: draft } });
   };
 
+  const handleGoogleSignIn = async () => {
+    setAuthError('');
+    try {
+      await executeAuth(async () => {
+        await signInWithGoogle();
+      });
+    } catch (error: any) {
+      setAuthError(error.message || 'ログインに失敗しました');
+    }
+  };
+
   return (
     <div className="page-container">
       <header className="page-header">
@@ -60,18 +73,49 @@ const Home: React.FC = () => {
       </header>
       
       <main className="home-content">
-        <div className="quick-actions">
-          <button className="action-button primary" onClick={() => navigate('/add-wine')}>
-            🍷 ワインを記録する
-          </button>
-          <button 
-            className="action-button secondary" 
-            onClick={() => navigate('/quiz')}
-            disabled={drafts.length === 0}
-          >
-            {drafts.length > 0 ? `📝 下書きを続ける (${drafts.length})` : '📝 下書きなし'}
-          </button>
-        </div>
+        {!currentUser ? (
+          <div className="login-section">
+            <h2>ようこそ MyWineMemory へ</h2>
+            <p>あなたのワイン体験を記録して、学習しましょう</p>
+            
+            {authError && (
+              <ErrorMessage
+                title="ログインエラー"
+                message={authError}
+                onRetry={handleGoogleSignIn}
+                showIcon={true}
+              />
+            )}
+            
+            <button 
+              className="google-signin-button"
+              onClick={handleGoogleSignIn}
+              disabled={authLoading}
+            >
+              {authLoading ? (
+                <LoadingSpinner size="small" message="ログイン中..." />
+              ) : (
+                <>
+                  <span className="google-icon">🔍</span>
+                  Googleでログイン
+                </>
+              )}
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="quick-actions">
+              <button className="action-button primary" onClick={() => navigate('/add-wine')}>
+                🍷 ワインを記録する
+              </button>
+              <button 
+                className="action-button secondary" 
+                onClick={() => navigate('/quiz')}
+                disabled={drafts.length === 0}
+              >
+                {drafts.length > 0 ? `📝 下書きを続ける (${drafts.length})` : '📝 下書きなし'}
+              </button>
+            </div>
         
         <div className="daily-goals">
           <h2>今日の目標</h2>
@@ -176,6 +220,8 @@ const Home: React.FC = () => {
               )}
             </div>
           </div>
+        )}
+          </>
         )}
       </main>
     </div>
