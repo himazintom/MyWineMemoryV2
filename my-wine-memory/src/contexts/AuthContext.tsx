@@ -30,15 +30,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
+    provider.addScope('profile');
+    provider.addScope('email');
+    
     try {
       const result = await signInWithPopup(auth, provider);
       
       // Create or update user profile in Firestore
       const userProfile = await userService.createOrUpdateUser(result.user);
       setUserProfile(userProfile);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Google sign-in error:', error);
-      throw error;
+      
+      // Provide more detailed error information
+      if (error.code === 'auth/popup-closed-by-user') {
+        throw new Error('サインインがキャンセルされました');
+      } else if (error.code === 'auth/popup-blocked') {
+        throw new Error('ポップアップがブロックされています。ポップアップブロッカーを無効にしてください');
+      } else if (error.code === 'auth/cancelled-popup-request') {
+        throw new Error('サインイン要求がキャンセルされました');
+      } else if (error.code === 'auth/unauthorized-domain') {
+        throw new Error('このドメインは認証が許可されていません');
+      } else {
+        throw new Error(`サインインエラー: ${error.message}`);
+      }
     }
   };
 
