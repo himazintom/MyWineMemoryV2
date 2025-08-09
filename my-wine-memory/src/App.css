@@ -1843,6 +1843,135 @@ body {
   font-size: 1.2rem;
 }
 
+/* Guest Notice Styles */
+.guest-notice {
+  background: #fff3cd;
+  border: 1px solid #ffecb5;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.guest-notice p {
+  margin-bottom: 1rem;
+  color: #856404;
+}
+
+.guest-notice p:last-of-type {
+  margin-bottom: 1.5rem;
+}
+
+.login-suggestion-button {
+  background: #722F37;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0 auto;
+}
+
+.login-suggestion-button:hover:not(:disabled) {
+  background: #8B4513;
+  transform: translateY(-1px);
+}
+
+/* Login Prompt Modal Styles */
+.login-prompt-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.login-prompt-modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.login-prompt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.login-prompt-header h2 {
+  color: #722F37;
+  font-size: 1.3rem;
+  margin: 0;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #666;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.close-button:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.login-prompt-content {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.login-prompt-content p {
+  margin-bottom: 1.5rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+.login-prompt-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.cancel-button {
+  background: #f0f0f0;
+  color: #666;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-button:hover {
+  background: #e0e0e0;
+  color: #333;
+}
+
 /* Responsive Login Styles */
 @media (max-width: 767px) {
   .login-section {
@@ -1857,6 +1986,15 @@ body {
   .google-signin-button {
     padding: 0.75rem 1.5rem;
     font-size: 0.95rem;
+  }
+  
+  .login-prompt-modal {
+    width: 95%;
+  }
+  
+  .login-prompt-header,
+  .login-prompt-content {
+    padding: 1rem;
   }
 }
 
