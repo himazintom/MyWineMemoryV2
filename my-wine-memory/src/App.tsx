@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import Home from './pages/Home';
-import Records from './pages/Records';
 import Quiz from './pages/Quiz';
 import Stats from './pages/Stats';
 import Profile from './pages/Profile';
@@ -18,7 +17,6 @@ function App() {
           <main className="main-content">
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/records" element={<Records />} />
               <Route path="/add-wine" element={<AddWine />} />
               <Route path="/quiz" element={<Quiz />} />
               <Route path="/quiz/play/:difficulty" element={<QuizGame />} />
