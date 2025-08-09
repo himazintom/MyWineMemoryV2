@@ -6,7 +6,6 @@ const BottomNavigation: React.FC = () => {
   
   const navItems = [
     { path: '/', icon: '🏠', label: 'ホーム' },
-    { path: '/records', icon: '📝', label: '記録' },
     { path: '/quiz', icon: '🧠', label: 'クイズ' },
     { path: '/stats', icon: '📊', label: '統計' },
     { path: '/profile', icon: '👤', label: 'プロフィール' },
