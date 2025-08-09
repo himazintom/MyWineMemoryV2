@@ -1,3 +1,401 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';\nimport { wineMasterService } from '../services/wineMasterService';\nimport { tastingRecordService } from '../services/tastingRecordService';\nimport { userService, goalService } from '../services/userService';\nimport { guestDataService } from '../services/guestDataService';\nimport type { WineMaster, TastingRecord } from '../types';\nimport LoadingSpinner from '../components/LoadingSpinner';\nimport ErrorMessage from '../components/ErrorMessage';\nimport LoginPrompt from '../components/LoginPrompt';\nimport { useAsyncOperation } from '../hooks/useAsyncOperation';\n\nconst AddTastingRecord: React.FC = () => {\n  const navigate = useNavigate();\n  const { wineId } = useParams<{ wineId: string }>();\n  const location = useLocation();\n  const { currentUser } = useAuth();\n  \n  const [wine, setWine] = useState<WineMaster | null>(null);\n  const [recordMode, setRecordMode] = useState<'quick' | 'detailed'>('quick');\n  const [showLoginPrompt, setShowLoginPrompt] = useState(false);\n  const [pendingSave, setPendingSave] = useState(false);\n  \n  const { loading: wineLoading, error: wineError, execute: executeLoadWine } = useAsyncOperation<WineMaster | null>();\n  const { loading: saveLoading, error: saveError, execute: executeSave } = useAsyncOperation<void>();\n\n  const [formData, setFormData] = useState({\n    overallRating: 5.0,\n    notes: '',\n    price: '',\n    purchaseLocation: '',\n    tastingDate: new Date().toISOString().split('T')[0],\n    images: [] as File[]\n  });\n\n  // New wine data from location state (if creating new wine)\n  const newWineData = location.state?.newWineData;\n\n  useEffect(() => {\n    if (wineId && wineId !== 'new') {\n      loadWineData();\n    } else if (newWineData) {\n      // Creating new wine - set up temporary wine data\n      setWine({\n        id: 'new',\n        ...newWineData,\n        createdAt: new Date(),\n        createdBy: '',\n        referenceCount: 0,\n        updatedAt: new Date()\n      } as WineMaster);\n    } else {\n      navigate('/select-wine');\n    }\n  }, [wineId, newWineData]);\n\n  const loadWineData = async () => {\n    if (!wineId || wineId === 'new') return;\n    \n    try {\n      const wineData = await executeLoadWine(() => wineMasterService.getWineMaster(wineId));\n      setWine(wineData);\n    } catch (error) {\n      console.error('Failed to load wine data:', error);\n    }\n  };\n\n  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {\n    const { name, value } = e.target;\n    setFormData(prev => ({ ...prev, [name]: value }));\n  };\n\n  const handleRatingChange = (rating: number) => {\n    setFormData(prev => ({ ...prev, overallRating: rating }));\n  };\n\n  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {\n    if (e.target.files) {\n      setFormData(prev => ({ \n        ...prev, \n        images: Array.from(e.target.files || []) \n      }));\n    }\n  };\n\n  const handleSubmit = async (e: React.FormEvent) => {\n    e.preventDefault();\n    \n    if (!currentUser) {\n      setPendingSave(true);\n      setShowLoginPrompt(true);\n      return;\n    }\n\n    await saveTastingRecord();\n  };\n\n  const saveTastingRecord = async () => {\n    if (!wine || !currentUser) return;\n\n    try {\n      await executeSave(async () => {\n        let finalWineId = wine.id;\n\n        // If creating new wine, create wine master first\n        if (wine.id === 'new' && newWineData) {\n          finalWineId = await wineMasterService.createOrFindWineMaster(\n            {\n              wineName: wine.wineName,\n              producer: wine.producer,\n              country: wine.country,\n              region: wine.region,\n              vintage: wine.vintage,\n              wineType: wine.wineType,\n              grapeVarieties: wine.grapeVarieties,\n              alcoholContent: wine.alcoholContent\n            },\n            currentUser.uid\n          );\n        }\n\n        // Upload images if any\n        const imageUrls: string[] = [];\n        for (const image of formData.images) {\n          if (image) {\n            const url = await tastingRecordService.uploadWineImage(image, currentUser.uid);\n            imageUrls.push(url);\n          }\n        }\n\n        // Create tasting record\n        const tastingData: Omit<TastingRecord, 'id' | 'userId' | 'createdAt' | 'updatedAt'> = {\n          wineId: finalWineId,\n          overallRating: formData.overallRating,\n          tastingDate: new Date(formData.tastingDate),\n          recordMode,\n          notes: formData.notes || undefined,\n          price: formData.price ? parseFloat(formData.price) : undefined,\n          purchaseLocation: formData.purchaseLocation || undefined,\n          images: imageUrls.length > 0 ? imageUrls : undefined,\n          isPublic: false // Default to private\n        };\n\n        await tastingRecordService.createTastingRecord(currentUser.uid, tastingData);\n\n        // Update user stats and add XP\n        await userService.updateStatsAfterWineRecord(currentUser.uid, {\n          wineName: wine.wineName,\n          producer: wine.producer,\n          country: wine.country,\n          region: wine.region,\n          overallRating: formData.overallRating,\n          recordMode,\n          createdAt: new Date(),\n          updatedAt: new Date()\n        } as any);\n        \n        const xpToAdd = recordMode === 'detailed' ? 20 : 10;\n        await userService.addXP(currentUser.uid, xpToAdd);\n        \n        // Update daily goal progress\n        await goalService.updateGoalProgress(currentUser.uid, 'wine');\n      });\n\n      alert('テイスティング記録が保存されました！');\n      navigate('/records');\n    } catch (error) {\n      console.error('Failed to save tasting record:', error);\n    }\n  };\n\n  const handleLoginSuccess = async () => {\n    setShowLoginPrompt(false);\n    if (pendingSave) {\n      setPendingSave(false);\n      await saveTastingRecord();\n    }\n  };\n\n  const isFormValid = formData.overallRating > 0;\n\n  if (wineLoading) {\n    return (\n      <div className=\"page-container\">\n        <LoadingSpinner size=\"large\" message=\"ワイン情報を読み込み中...\" />\n      </div>\n    );\n  }\n\n  if (wineError || !wine) {\n    return (\n      <div className=\"page-container\">\n        <ErrorMessage\n          title=\"ワイン情報の読み込みに失敗しました\"\n          message={wineError || 'ワイン情報が見つかりませんでした'}\n          onRetry={loadWineData}\n        />\n      </div>\n    );\n  }\n\n  return (\n    <div className=\"page-container\">\n      <header className=\"page-header\">\n        <button className=\"back-button\" onClick={() => navigate(-1)}>\n          ← 戻る\n        </button>\n        <h1>テイスティング記録</h1>\n        \n        <div className=\"mode-toggle\">\n          <button \n            className={`mode-button ${recordMode === 'quick' ? 'active' : ''}`}\n            onClick={() => setRecordMode('quick')}\n          >\n            クイック\n          </button>\n          <button \n            className={`mode-button ${recordMode === 'detailed' ? 'active' : ''}`}\n            onClick={() => setRecordMode('detailed')}\n          >\n            詳細\n          </button>\n        </div>\n      </header>\n      \n      <main className=\"add-tasting-content\">\n        {/* Wine Information Display */}\n        <div className=\"selected-wine-info\">\n          <h2>選択されたワイン</h2>\n          <div className=\"wine-card\">\n            <h3>{wine.wineName}</h3>\n            <p><strong>生産者:</strong> {wine.producer}</p>\n            <p><strong>産地:</strong> {wine.country} - {wine.region}</p>\n            {wine.vintage && <p><strong>年:</strong> {wine.vintage}</p>}\n            {wine.wineType && <p><strong>タイプ:</strong> {wine.wineType}</p>}\n          </div>\n        </div>\n\n        <form onSubmit={handleSubmit} className=\"tasting-form\">\n          {/* Required Fields */}\n          <div className=\"form-section\">\n            <h3>テイスティング記録 <span className=\"required\">*必須</span></h3>\n            \n            <div className=\"form-group\">\n              <label htmlFor=\"tastingDate\">テイスティング日 *</label>\n              <input\n                id=\"tastingDate\"\n                name=\"tastingDate\"\n                type=\"date\"\n                value={formData.tastingDate}\n                onChange={handleInputChange}\n                max={new Date().toISOString().split('T')[0]}\n                required\n              />\n            </div>\n\n            {/* Rating Slider */}\n            <div className=\"form-group\">\n              <label>総合評価 * ({formData.overallRating.toFixed(1)}/10)</label>\n              <div className=\"rating-container\">\n                <div className=\"rating-slider-container\">\n                  <input\n                    type=\"range\"\n                    className=\"rating-slider\"\n                    min=\"0\"\n                    max=\"10\"\n                    step=\"0.1\"\n                    value={formData.overallRating}\n                    onChange={(e) => handleRatingChange(parseFloat(e.target.value))}\n                  />\n                  <div className=\"rating-labels\">\n                    <span>0.0</span>\n                    <span>5.0</span>\n                    <span>10.0</span>\n                  </div>\n                </div>\n                <div className=\"rating-display\">\n                  <span className=\"rating-value\">{formData.overallRating.toFixed(1)}</span>\n                  <span className=\"rating-scale\">/10</span>\n                </div>\n              </div>\n            </div>\n          </div>\n\n          {/* Optional Fields */}\n          <div className=\"form-section\">\n            <h3>追加情報</h3>\n            \n            <div className=\"form-row\">\n              <div className=\"form-group\">\n                <label htmlFor=\"price\">購入価格（円）</label>\n                <input\n                  id=\"price\"\n                  name=\"price\"\n                  type=\"number\"\n                  value={formData.price}\n                  onChange={handleInputChange}\n                  placeholder=\"3000\"\n                  min=\"0\"\n                />\n              </div>\n              \n              <div className=\"form-group\">\n                <label htmlFor=\"purchaseLocation\">購入場所</label>\n                <input\n                  id=\"purchaseLocation\"\n                  name=\"purchaseLocation\"\n                  type=\"text\"\n                  value={formData.purchaseLocation}\n                  onChange={handleInputChange}\n                  placeholder=\"例: 〇〇酒店\"\n                />\n              </div>\n            </div>\n            \n            <div className=\"form-group\">\n              <label htmlFor=\"notes\">テイスティングメモ</label>\n              <textarea\n                id=\"notes\"\n                name=\"notes\"\n                value={formData.notes}\n                onChange={handleInputChange}\n                placeholder=\"香り、味わい、印象など自由に記入してください\"\n                rows={4}\n              />\n            </div>\n            \n            <div className=\"form-group\">\n              <label htmlFor=\"images\">写真</label>\n              <input\n                id=\"images\"\n                name=\"images\"\n                type=\"file\"\n                accept=\"image/*\"\n                multiple\n                onChange={handleImageChange}\n              />\n              {formData.images.length > 0 && (\n                <div className=\"image-preview\">\n                  <p>{formData.images.length}枚の画像が選択されています</p>\n                </div>\n              )}\n            </div>\n          </div>\n\n          {/* Detailed Mode Fields */}\n          {recordMode === 'detailed' && (\n            <div className=\"form-section\">\n              <h3>詳細分析</h3>\n              <p className=\"coming-soon\">詳細分析機能は今後実装予定です</p>\n            </div>\n          )}\n\n          {/* Save Buttons */}\n          <div className=\"form-actions\">\n            <button \n              type=\"button\" \n              className=\"btn-secondary\"\n              onClick={() => navigate(-1)}\n            >\n              キャンセル\n            </button>\n            <button \n              type=\"submit\" \n              className=\"btn-primary\"\n              disabled={!isFormValid || saveLoading}\n            >\n              {saveLoading ? (\n                <LoadingSpinner size=\"small\" message=\"保存中...\" />\n              ) : (\n                '記録を保存'\n              )}\n            </button>\n          </div>\n\n          {saveError && (\n            <ErrorMessage\n              title=\"保存エラー\"\n              message={saveError}\n              onRetry={saveTastingRecord}\n              showIcon={false}\n            />\n          )}\n        </form>\n      </main>\n      \n      <LoginPrompt\n        isOpen={showLoginPrompt}\n        onClose={() => {\n          setShowLoginPrompt(false);\n          setPendingSave(false);\n        }}\n        onLoginSuccess={handleLoginSuccess}\n        title=\"記録を保存するにはログインが必要です\"\n        message=\"Googleアカウントでログインして、テイスティング記録を保存しましょう。\"\n      />\n    </div>\n  );\n};\n\nexport default AddTastingRecord;
+import { useAuth } from '../contexts/AuthContext';
+import { wineMasterService } from '../services/wineMasterService';
+import { tastingRecordService } from '../services/tastingRecordService';
+import { userService, goalService } from '../services/userService';
+import type { WineMaster, TastingRecord } from '../types';
+import LoadingSpinner from '../components/LoadingSpinner';
+import ErrorMessage from '../components/ErrorMessage';
+import LoginPrompt from '../components/LoginPrompt';
+import { useAsyncOperation } from '../hooks/useAsyncOperation';
+
+const AddTastingRecord: React.FC = () => {
+  const navigate = useNavigate();
+  const { wineId } = useParams<{ wineId: string }>();
+  const location = useLocation();
+  const { currentUser } = useAuth();
+  
+  const [wine, setWine] = useState<WineMaster | null>(null);
+  const [recordMode, setRecordMode] = useState<'quick' | 'detailed'>('quick');
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [pendingSave, setPendingSave] = useState(false);
+  
+  const { loading: wineLoading, error: wineError, execute: executeLoadWine } = useAsyncOperation<WineMaster | null>();
+  const { loading: saveLoading, error: saveError, execute: executeSave } = useAsyncOperation<void>();
+
+  const [formData, setFormData] = useState({
+    overallRating: 5.0,
+    notes: '',
+    price: '',
+    purchaseLocation: '',
+    tastingDate: new Date().toISOString().split('T')[0],
+    images: [] as File[]
+  });
+
+  // New wine data from location state (if creating new wine)
+  const newWineData = location.state?.newWineData;
+
+  useEffect(() => {
+    if (wineId && wineId !== 'new') {
+      loadWineData();
+    } else if (newWineData) {
+      // Creating new wine - set up temporary wine data
+      setWine({
+        id: 'new',
+        ...newWineData,
+        createdAt: new Date(),
+        createdBy: '',
+        referenceCount: 0,
+        updatedAt: new Date()
+      } as WineMaster);
+    } else {
+      navigate('/select-wine');
+    }
+  }, [wineId, newWineData]);
+
+  const loadWineData = async () => {
+    if (!wineId || wineId === 'new') return;
+    
+    try {
+      const wineData = await executeLoadWine(() => wineMasterService.getWineMaster(wineId));
+      setWine(wineData);
+    } catch (error) {
+      console.error('Failed to load wine data:', error);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleRatingChange = (rating: number) => {
+    setFormData(prev => ({ ...prev, overallRating: rating }));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setFormData(prev => ({ 
+        ...prev, 
+        images: Array.from(e.target.files || []) 
+      }));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!currentUser) {
+      setPendingSave(true);
+      setShowLoginPrompt(true);
+      return;
+    }
+
+    await saveTastingRecord();
+  };
+
+  const saveTastingRecord = async () => {
+    if (!wine || !currentUser) return;
+
+    try {
+      await executeSave(async () => {
+        let finalWineId = wine.id;
+
+        // If creating new wine, create wine master first
+        if (wine.id === 'new' && newWineData) {
+          finalWineId = await wineMasterService.createOrFindWineMaster(
+            {
+              wineName: wine.wineName,
+              producer: wine.producer,
+              country: wine.country,
+              region: wine.region,
+              vintage: wine.vintage,
+              wineType: wine.wineType,
+              grapeVarieties: wine.grapeVarieties,
+              alcoholContent: wine.alcoholContent
+            },
+            currentUser.uid
+          );
+        }
+
+        // Upload images if any
+        const imageUrls: string[] = [];
+        for (const image of formData.images) {
+          if (image) {
+            const url = await tastingRecordService.uploadWineImage(image, currentUser.uid);
+            imageUrls.push(url);
+          }
+        }
+
+        // Create tasting record
+        const tastingData: Omit<TastingRecord, 'id' | 'userId' | 'createdAt' | 'updatedAt'> = {
+          wineId: finalWineId,
+          overallRating: formData.overallRating,
+          tastingDate: new Date(formData.tastingDate),
+          recordMode,
+          notes: formData.notes || undefined,
+          price: formData.price ? parseFloat(formData.price) : undefined,
+          purchaseLocation: formData.purchaseLocation || undefined,
+          images: imageUrls.length > 0 ? imageUrls : undefined,
+          isPublic: false // Default to private
+        };
+
+        await tastingRecordService.createTastingRecord(currentUser.uid, tastingData);
+
+        // Update user stats and add XP
+        await userService.updateStatsAfterWineRecord(currentUser.uid, {
+          wineName: wine.wineName,
+          producer: wine.producer,
+          country: wine.country,
+          region: wine.region,
+          overallRating: formData.overallRating,
+          recordMode,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        } as any);
+        
+        const xpToAdd = recordMode === 'detailed' ? 20 : 10;
+        await userService.addXP(currentUser.uid, xpToAdd);
+        
+        // Update daily goal progress
+        await goalService.updateGoalProgress(currentUser.uid, 'wine');
+      });
+
+      alert('テイスティング記録が保存されました！');
+      navigate('/records');
+    } catch (error) {
+      console.error('Failed to save tasting record:', error);
+    }
+  };
+
+  const handleLoginSuccess = async () => {
+    setShowLoginPrompt(false);
+    if (pendingSave) {
+      setPendingSave(false);
+      await saveTastingRecord();
+    }
+  };
+
+  const isFormValid = formData.overallRating > 0;
+
+  if (wineLoading) {
+    return (
+      <div className="page-container">
+        <LoadingSpinner size="large" message="ワイン情報を読み込み中..." />
+      </div>
+    );
+  }
+
+  if (wineError || !wine) {
+    return (
+      <div className="page-container">
+        <ErrorMessage
+          title="ワイン情報の読み込みに失敗しました"
+          message={wineError || 'ワイン情報が見つかりませんでした'}
+          onRetry={loadWineData}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="page-container">
+      <header className="page-header">
+        <button className="back-button" onClick={() => navigate(-1)}>
+          ← 戻る
+        </button>
+        <h1>テイスティング記録</h1>
+        
+        <div className="mode-toggle">
+          <button 
+            className={`mode-button ${recordMode === 'quick' ? 'active' : ''}`}
+            onClick={() => setRecordMode('quick')}
+          >
+            クイック
+          </button>
+          <button 
+            className={`mode-button ${recordMode === 'detailed' ? 'active' : ''}`}
+            onClick={() => setRecordMode('detailed')}
+          >
+            詳細
+          </button>
+        </div>
+      </header>
+      
+      <main className="add-tasting-content">
+        {/* Wine Information Display */}
+        <div className="selected-wine-info">
+          <h2>選択されたワイン</h2>
+          <div className="wine-card">
+            <h3>{wine.wineName}</h3>
+            <p><strong>生産者:</strong> {wine.producer}</p>
+            <p><strong>産地:</strong> {wine.country} - {wine.region}</p>
+            {wine.vintage && <p><strong>年:</strong> {wine.vintage}</p>}
+            {wine.wineType && <p><strong>タイプ:</strong> {wine.wineType}</p>}
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="tasting-form">
+          {/* Required Fields */}
+          <div className="form-section">
+            <h3>テイスティング記録 <span className="required">*必須</span></h3>
+            
+            <div className="form-group">
+              <label htmlFor="tastingDate">テイスティング日 *</label>
+              <input
+                id="tastingDate"
+                name="tastingDate"
+                type="date"
+                value={formData.tastingDate}
+                onChange={handleInputChange}
+                max={new Date().toISOString().split('T')[0]}
+                required
+              />
+            </div>
+
+            {/* Rating Slider */}
+            <div className="form-group">
+              <label>総合評価 * ({formData.overallRating.toFixed(1)}/10)</label>
+              <div className="rating-container">
+                <div className="rating-slider-container">
+                  <input
+                    type="range"
+                    className="rating-slider"
+                    min="0"
+                    max="10"
+                    step="0.1"
+                    value={formData.overallRating}
+                    onChange={(e) => handleRatingChange(parseFloat(e.target.value))}
+                  />
+                  <div className="rating-labels">
+                    <span>0.0</span>
+                    <span>5.0</span>
+                    <span>10.0</span>
+                  </div>
+                </div>
+                <div className="rating-display">
+                  <span className="rating-value">{formData.overallRating.toFixed(1)}</span>
+                  <span className="rating-scale">/10</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Optional Fields */}
+          <div className="form-section">
+            <h3>追加情報</h3>
+            
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="price">購入価格（円）</label>
+                <input
+                  id="price"
+                  name="price"
+                  type="number"
+                  value={formData.price}
+                  onChange={handleInputChange}
+                  placeholder="3000"
+                  min="0"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="purchaseLocation">購入場所</label>
+                <input
+                  id="purchaseLocation"
+                  name="purchaseLocation"
+                  type="text"
+                  value={formData.purchaseLocation}
+                  onChange={handleInputChange}
+                  placeholder="例: 〇〇酒店"
+                />
+              </div>
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="notes">テイスティングメモ</label>
+              <textarea
+                id="notes"
+                name="notes"
+                value={formData.notes}
+                onChange={handleInputChange}
+                placeholder="香り、味わい、印象など自由に記入してください"
+                rows={4}
+              />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="images">写真</label>
+              <input
+                id="images"
+                name="images"
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageChange}
+              />
+              {formData.images.length > 0 && (
+                <div className="image-preview">
+                  <p>{formData.images.length}枚の画像が選択されています</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Detailed Mode Fields */}
+          {recordMode === 'detailed' && (
+            <div className="form-section">
+              <h3>詳細分析</h3>
+              <p className="coming-soon">詳細分析機能は今後実装予定です</p>
+            </div>
+          )}
+
+          {/* Save Buttons */}
+          <div className="form-actions">
+            <button 
+              type="button" 
+              className="btn-secondary"
+              onClick={() => navigate(-1)}
+            >
+              キャンセル
+            </button>
+            <button 
+              type="submit" 
+              className="btn-primary"
+              disabled={!isFormValid || saveLoading}
+            >
+              {saveLoading ? (
+                <LoadingSpinner size="small" message="保存中..." />
+              ) : (
+                '記録を保存'
+              )}
+            </button>
+          </div>
+
+          {saveError && (
+            <ErrorMessage
+              title="保存エラー"
+              message={saveError}
+              onRetry={saveTastingRecord}
+              showIcon={false}
+            />
+          )}
+        </form>
+      </main>
+      
+      <LoginPrompt
+        isOpen={showLoginPrompt}
+        onClose={() => {
+          setShowLoginPrompt(false);
+          setPendingSave(false);
+        }}
+        onLoginSuccess={handleLoginSuccess}
+        title="記録を保存するにはログインが必要です"
+        message="Googleアカウントでログインして、テイスティング記録を保存しましょう。"
+      />
+    </div>
+  );
+};
+
+export default AddTastingRecord;

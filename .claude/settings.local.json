@@ -20,7 +20,9 @@
       "Bash(git push:*)",
       "Bash(cp:*)",
       "Bash(git commit:*)",
-      "Bash(npm outdated)"
+      "Bash(npm outdated)",
+      "Bash(grep:*)",
+      "Bash(taskkill:*)"
     ],
     "deny": []
   },

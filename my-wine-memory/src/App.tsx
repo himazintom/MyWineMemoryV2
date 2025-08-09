@@ -8,7 +8,6 @@ import Records from './pages/Records';
 import SelectWine from './pages/SelectWine';
 import AddTastingRecord from './pages/AddTastingRecord';
 import WineDetail from './pages/WineDetail';
-import AddWine from './pages/AddWine';
 import QuizGame from './pages/QuizGame';
 import BottomNavigation from './components/BottomNavigation';
 import './App.css';
@@ -26,7 +25,6 @@ function App() {
               <Route path="/add-tasting-record/:wineId" element={<AddTastingRecord />} />
               <Route path="/edit-tasting-record/:recordId" element={<AddTastingRecord />} />
               <Route path="/wine-detail/:wineId" element={<WineDetail />} />
-              <Route path="/add-wine" element={<AddWine />} />
               <Route path="/quiz" element={<Quiz />} />
               <Route path="/quiz/play/:difficulty" element={<QuizGame />} />
               <Route path="/stats" element={<Stats />} />

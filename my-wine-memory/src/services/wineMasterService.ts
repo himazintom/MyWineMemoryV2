@@ -13,7 +13,7 @@ import {
   Timestamp,
   writeBatch
 } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { db } from './firebase';
 import type { WineMaster } from '../types';
 
 class WineMasterService {

@@ -11,10 +11,9 @@ import {
   orderBy, 
   limit as limitQuery,
   Timestamp,
-  writeBatch
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../config/firebase';
+import { db, storage } from './firebase';
 import type { TastingRecord, WineRecord } from '../types';
 import { wineMasterService } from './wineMasterService';
 
