@@ -8,9 +8,9 @@ MyWineMemory is a PWA (Progressive Web App) for wine enthusiasts to record tasti
 
 **Live URL**: my-wine-memory.himazi.com
 
-## Technology Stack (Planned)
+## Technology Stack
 
-- **Frontend**: React with PWA capabilities
+- **Frontend**: React 18 with TypeScript and Vite
 - **Backend**: Firebase
 - **Database**: Firebase Firestore
 - **Authentication**: Firebase Authentication (Google OAuth)
@@ -26,10 +26,27 @@ The application follows a modular architecture with these core domains:
 ### 1. User Management
 - Google OAuth authentication only
 - Profile management with badges and statistics
+- Guest mode with local storage for temporary data
 - No password reset (delegated to Google)
 
-### 2. Wine Recording System
-- **Quick Mode**: Essential fields only (name, producer, country, region, rating)
+### 2. Wine Recording System (New Three-Step Workflow)
+
+**New Workflow**: ①ワイン選択/追加 → ②記録保存 → ③日付ごとの記録確認
+
+#### Database Structure (Separated Architecture):
+- **WineMaster**: Shared wine data to prevent duplicates
+  - wineName, producer, country, region, vintage
+  - grapeVarieties, wineType, alcoholContent, winemaker
+  - referenceCount (tracks how many users recorded this wine)
+  
+- **TastingRecord**: Individual user experiences
+  - Links to WineMaster via wineId
+  - overallRating (0.0-10.0 scale), tastingDate, recordMode
+  - notes, price, purchaseLocation, images
+  - User-specific data and personal evaluation
+
+#### Recording Modes:
+- **Quick Mode**: Essential fields only (rating, notes, date)
 - **Detailed Mode**: Comprehensive wine analysis including:
   - Visual analysis (color, clarity, viscosity)
   - Aroma analysis (staged: first impression, after swirling, categorized)
@@ -54,11 +71,12 @@ The application follows a modular architecture with these core domains:
 - **Draft System**: Auto-save every 30 seconds, max 5 drafts
 - **Soft Delete**: 3-day trash retention with auto-cleanup
 - **Privacy**: Global public/private toggle for all records
+- **Guest Mode**: Local storage for temporary data before login
 
 ## Development Guidelines
 
 ### Project Status
-This repository currently contains only specification documents. No code has been implemented yet.
+The application has been fully implemented with the new three-step workflow and responsive design.
 
 ### Development Phases
 1. **MVP**: Basic wine recording, authentication, record listing
@@ -78,19 +96,42 @@ This repository currently contains only specification documents. No code has bee
 - Performance: 3-second initial load target
 - Browser support: Chrome (primary), Safari (supported), Edge (unsupported)
 
-## File Structure (To Be Implemented)
+## File Structure (Implemented)
 
-Expected structure based on React + Firebase:
+Current structure based on React + Firebase:
 ```
-src/
+my-wine-memory/src/
 ├── components/          # Reusable UI components
-├── pages/              # Route components (Home, Records, Quiz, Stats, Profile)
+│   ├── BottomNavigation.tsx
+│   ├── WineCard.tsx
+│   ├── LoadingSpinner.tsx
+│   └── ErrorMessage.tsx
+├── pages/              # Route components
+│   ├── Home.tsx        # Dashboard with quick actions
+│   ├── SelectWine.tsx  # Step 1: Wine selection/creation
+│   ├── AddTastingRecord.tsx  # Step 2: Tasting record input
+│   ├── Records.tsx     # Step 3: Date-based record viewing
+│   ├── WineDetail.tsx  # Individual wine with chronological records
+│   ├── Quiz.tsx
+│   ├── QuizGame.tsx
+│   ├── Stats.tsx
+│   ├── Profile.tsx
+│   └── AddWine.tsx     # Legacy page (to be removed)
 ├── hooks/              # Custom React hooks
+│   └── useAsyncOperation.ts
 ├── services/           # Firebase services, API calls
-├── utils/              # Helper functions
+│   ├── wineMasterService.ts     # WineMaster CRUD operations
+│   ├── tastingRecordService.ts  # TastingRecord CRUD operations
+│   ├── wineService.ts          # Legacy service
+│   ├── userService.ts
+│   └── guestDataService.ts
 ├── contexts/           # React contexts for global state
-├── assets/             # Images, icons, static files
-└── types/              # TypeScript type definitions
+│   └── AuthContext.tsx
+├── types/              # TypeScript type definitions
+│   └── index.ts        # WineMaster, TastingRecord interfaces
+├── App.tsx             # Main routing component
+├── App.css             # Global styles with full-width responsive design
+└── main.tsx            # Application entry point
 ```
 
 ## Important Notes
@@ -100,6 +141,82 @@ src/
 - **Data Privacy**: All user data is private by default with opt-in sharing
 - **Image Handling**: Multiple image uploads per wine record, WebP optimization required
 - **Offline Support**: Limited to draft data storage only
+- **Responsive Design**: Full-width (100vw) layout for all screen sizes
+- **Workflow**: Three-step process for wine recording
+
+## Application Workflow (Implemented)
+
+### Three-Step Wine Recording Process:
+
+1. **Step 1: Wine Selection (`/select-wine`)**
+   - Search existing wines in the WineMaster database
+   - Display popular wines and recent additions
+   - Create new wine if not found (adds to WineMaster collection)
+   - Navigate to `/add-tasting-record/{wineId}`
+
+2. **Step 2: Tasting Record Input (`/add-tasting-record/:wineId`)**
+   - Display selected wine information from WineMaster
+   - Collect user's personal tasting experience data
+   - Support both Quick and Detailed recording modes
+   - Save to TastingRecord collection linked to WineMaster
+   - Navigate back to Records or Wine Detail page
+
+3. **Step 3: Record Viewing (`/records` and `/wine-detail/:wineId`)**
+   - **Records Page**: Groups TastingRecords by WineMaster with statistics
+   - **Wine Detail Page**: Shows individual wine with chronological tasting history
+   - Edit existing records via `/edit-tasting-record/:recordId`
+   - Delete records with confirmation
+
+### Navigation Structure:
+
+```
+/ (Home)
+├── /select-wine                     # Step 1: Wine selection
+├── /add-tasting-record/:wineId      # Step 2: New tasting record
+├── /edit-tasting-record/:recordId   # Edit existing record
+├── /records                         # Step 3: Record overview
+├── /wine-detail/:wineId            # Individual wine details
+├── /quiz                           # Quiz system
+├── /quiz/play/:difficulty          # Quiz game
+├── /stats                          # User statistics
+├── /profile                        # User profile
+└── /add-wine                       # Legacy page (to be removed)
+```
+
+### Database Collections:
+
+1. **wineMasters** - Shared wine data
+   ```typescript
+   {
+     id: string,
+     wineName: string,
+     producer: string,
+     country: string,
+     region: string,
+     vintage?: number,
+     grapeVarieties?: string[],
+     wineType?: 'red' | 'white' | 'rose' | 'sparkling' | 'dessert' | 'fortified',
+     referenceCount: number,
+     createdAt: Date,
+     createdBy: string
+   }
+   ```
+
+2. **tastingRecords** - Individual user experiences
+   ```typescript
+   {
+     id: string,
+     userId: string,
+     wineId: string,
+     overallRating: number,  // 0.0-10.0 scale
+     tastingDate: Date,
+     recordMode: 'quick' | 'detailed',
+     notes?: string,
+     price?: number,
+     purchaseLocation?: string,
+     images?: string[]
+   }
+   ```
 
 ## Future Considerations
 

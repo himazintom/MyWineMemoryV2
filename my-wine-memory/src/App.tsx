@@ -4,6 +4,10 @@ import Home from './pages/Home';
 import Quiz from './pages/Quiz';
 import Stats from './pages/Stats';
 import Profile from './pages/Profile';
+import Records from './pages/Records';
+import SelectWine from './pages/SelectWine';
+import AddTastingRecord from './pages/AddTastingRecord';
+import WineDetail from './pages/WineDetail';
 import AddWine from './pages/AddWine';
 import QuizGame from './pages/QuizGame';
 import BottomNavigation from './components/BottomNavigation';
@@ -17,6 +21,11 @@ function App() {
           <main className="main-content">
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/records" element={<Records />} />
+              <Route path="/select-wine" element={<SelectWine />} />
+              <Route path="/add-tasting-record/:wineId" element={<AddTastingRecord />} />
+              <Route path="/edit-tasting-record/:recordId" element={<AddTastingRecord />} />
+              <Route path="/wine-detail/:wineId" element={<WineDetail />} />
               <Route path="/add-wine" element={<AddWine />} />
               <Route path="/quiz" element={<Quiz />} />
               <Route path="/quiz/play/:difficulty" element={<QuizGame />} />

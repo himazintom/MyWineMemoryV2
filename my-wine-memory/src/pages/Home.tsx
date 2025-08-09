@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { wineService, draftService } from '../services/wineService';
+import { tastingRecordService } from '../services/tastingRecordService';
+import { draftService } from '../services/wineService';
 import { goalService } from '../services/userService';
 import { guestDataService } from '../services/guestDataService';
 import type { WineRecord, WineDraft, DailyGoal } from '../types';
@@ -30,7 +31,7 @@ const Home: React.FC = () => {
         if (currentUser) {
           // Load authenticated user data
           const [wines, userDrafts, goal] = await Promise.all([
-            wineService.getUserWineRecords(currentUser.uid, 'date'),
+            tastingRecordService.getUserTastingRecordsWithWineInfo(currentUser.uid, 'date'),
             draftService.getUserDrafts(currentUser.uid),
             goalService.initializeTodayGoal(currentUser.uid)
           ]);
@@ -56,8 +57,8 @@ const Home: React.FC = () => {
   };
 
   const handleDraftClick = (draft: WineDraft) => {
-    // TODO: Navigate to add-wine with draft data pre-filled
-    navigate('/add-wine', { state: { draftData: draft } });
+    // TODO: Navigate to select-wine with draft data pre-filled
+    navigate('/select-wine', { state: { draftData: draft } });
   };
 
   const handleGoogleSignIn = async () => {
@@ -80,7 +81,7 @@ const Home: React.FC = () => {
       
       <main className="home-content">
         <div className="quick-actions">
-          <button className="action-button primary" onClick={() => navigate('/add-wine')}>
+          <button className="action-button primary" onClick={() => navigate('/select-wine')}>
             🍷 ワインを記録する
           </button>
           <button className="action-button secondary" onClick={() => navigate('/quiz')}>
@@ -169,7 +170,7 @@ const Home: React.FC = () => {
                 <WineCard 
                   key={wine.id} 
                   wine={wine} 
-                  onClick={() => navigate(`/wine/${wine.id}`)}
+                  onClick={() => navigate(`/wine-detail/${wine.id}`)}
                 />
               ))}
               <button 
@@ -184,7 +185,7 @@ const Home: React.FC = () => {
               <p>{currentUser ? 'まだワインの記録がありません' : 'まだワインの記録がありません（ゲストモード）'}</p>
               <button 
                 className="get-started-button"
-                onClick={() => navigate('/add-wine')}
+                onClick={() => navigate('/select-wine')}
               >
                 最初の1本を記録する 🍷
               </button>
