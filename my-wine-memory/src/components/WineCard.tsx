@@ -15,17 +15,13 @@ const WineCard: React.FC<WineCardProps> = ({ wine, onClick }) => {
     });
   };
 
-  const renderStars = (rating: number) => {
-    return '★'.repeat(rating) + '☆'.repeat(10 - rating);
-  };
-
   return (
     <div className="wine-card" onClick={onClick}>
       <div className="wine-card-header">
         <h3 className="wine-name">{wine.wineName}</h3>
         <div className="wine-rating">
-          <span className="stars">{renderStars(wine.overallRating)}</span>
-          <span className="rating-number">{wine.overallRating}/10</span>
+          <span className="rating-score">{wine.overallRating.toFixed(1)}</span>
+          <span className="rating-scale">/10</span>
         </div>
       </div>
       

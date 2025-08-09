@@ -22,7 +22,7 @@ const AddWine: React.FC = () => {
     producer: '',
     country: '',
     region: '',
-    overallRating: 5,
+    overallRating: 5.0,
     notes: '',
     vintage: '',
     price: '',
@@ -272,19 +272,27 @@ const AddWine: React.FC = () => {
           <div className="form-section">
             <h3>総合評価 *</h3>
             <div className="rating-container">
-              <div className="star-rating">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
-                  <button
-                    key={star}
-                    type="button"
-                    className={`star ${star <= formData.overallRating ? 'active' : ''}`}
-                    onClick={() => handleRatingChange(star)}
-                  >
-                    ★
-                  </button>
-                ))}
+              <div className="rating-slider-container">
+                <input
+                  type="range"
+                  id="rating-slider"
+                  className="rating-slider"
+                  min="0"
+                  max="10"
+                  step="0.1"
+                  value={formData.overallRating}
+                  onChange={(e) => handleRatingChange(parseFloat(e.target.value))}
+                />
+                <div className="rating-labels">
+                  <span>0.0</span>
+                  <span>5.0</span>
+                  <span>10.0</span>
+                </div>
               </div>
-              <span className="rating-text">{formData.overallRating}/10</span>
+              <div className="rating-display">
+                <span className="rating-value">{formData.overallRating.toFixed(1)}</span>
+                <span className="rating-scale">/10</span>
+              </div>
             </div>
           </div>
 
