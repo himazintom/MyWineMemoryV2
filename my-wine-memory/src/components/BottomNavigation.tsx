@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import ThemeToggle from './ThemeToggle';
 
 const BottomNavigation: React.FC = () => {
   const location = useLocation();
@@ -24,6 +25,10 @@ const BottomNavigation: React.FC = () => {
           <span className="nav-label">{item.label}</span>
         </Link>
       ))}
+      <div className="nav-item theme-toggle-container">
+        <ThemeToggle />
+        <span className="nav-label">テーマ</span>
+      </div>
     </nav>
   );
 };
