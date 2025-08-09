@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { wineService, draftService } from '../services/wineService';
 import { goalService } from '../services/userService';
+import { guestDataService } from '../services/guestDataService';
 import type { WineRecord, WineDraft, DailyGoal } from '../types';
 import WineCard from '../components/WineCard';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -20,25 +21,30 @@ const Home: React.FC = () => {
   const { loading: authLoading, execute: executeAuth } = useAsyncOperation<void>();
 
   useEffect(() => {
-    if (currentUser) {
-      loadHomeData();
-    }
+    loadHomeData();
   }, [currentUser]);
 
   const loadHomeData = async () => {
-    if (!currentUser) return;
-    
     try {
       await executeLoadHome(async () => {
-        const [wines, userDrafts, goal] = await Promise.all([
-          wineService.getUserWineRecords(currentUser.uid, 'date'),
-          draftService.getUserDrafts(currentUser.uid),
-          goalService.initializeTodayGoal(currentUser.uid)
-        ]);
-        
-        setRecentWines(wines.slice(0, 3)); // Show only 3 most recent
-        setDrafts(userDrafts);
-        setDailyGoal(goal);
+        if (currentUser) {
+          // Load authenticated user data
+          const [wines, userDrafts, goal] = await Promise.all([
+            wineService.getUserWineRecords(currentUser.uid, 'date'),
+            draftService.getUserDrafts(currentUser.uid),
+            goalService.initializeTodayGoal(currentUser.uid)
+          ]);
+          
+          setRecentWines(wines.slice(0, 3));
+          setDrafts(userDrafts);
+          setDailyGoal(goal);
+        } else {
+          // Load guest data
+          const guestWines = guestDataService.getGuestWineRecordsAsWineRecords();
+          setRecentWines(guestWines.slice(0, 3));
+          setDrafts([]);
+          setDailyGoal(null);
+        }
       });
     } catch (error) {
       console.error('Failed to load home data:', error);
@@ -73,22 +79,21 @@ const Home: React.FC = () => {
       </header>
       
       <main className="home-content">
-        {!currentUser ? (
-          <div className="login-section">
-            <h2>ようこそ MyWineMemory へ</h2>
-            <p>あなたのワイン体験を記録して、学習しましょう</p>
-            
-            {authError && (
-              <ErrorMessage
-                title="ログインエラー"
-                message={authError}
-                onRetry={handleGoogleSignIn}
-                showIcon={true}
-              />
-            )}
-            
+        <div className="quick-actions">
+          <button className="action-button primary" onClick={() => navigate('/add-wine')}>
+            🍷 ワインを記録する
+          </button>
+          <button className="action-button secondary" onClick={() => navigate('/quiz')}>
+            🧠 クイズに挑戦する
+          </button>
+        </div>
+
+        {!currentUser && (
+          <div className="guest-notice">
+            <p>💡 <strong>ゲストモード</strong>で体験中です</p>
+            <p>記録やクイズ結果を保存するにはログインが必要です</p>
             <button 
-              className="google-signin-button"
+              className="login-suggestion-button"
               onClick={handleGoogleSignIn}
               disabled={authLoading}
             >
@@ -101,21 +106,16 @@ const Home: React.FC = () => {
                 </>
               )}
             </button>
+            {authError && (
+              <ErrorMessage
+                title="ログインエラー"
+                message={authError}
+                onRetry={handleGoogleSignIn}
+                showIcon={true}
+              />
+            )}
           </div>
-        ) : (
-          <>
-            <div className="quick-actions">
-              <button className="action-button primary" onClick={() => navigate('/add-wine')}>
-                🍷 ワインを記録する
-              </button>
-              <button 
-                className="action-button secondary" 
-                onClick={() => navigate('/quiz')}
-                disabled={drafts.length === 0}
-              >
-                {drafts.length > 0 ? `📝 下書きを続ける (${drafts.length})` : '📝 下書きなし'}
-              </button>
-            </div>
+        )}
         
         <div className="daily-goals">
           <h2>今日の目標</h2>
@@ -179,9 +179,9 @@ const Home: React.FC = () => {
                 すべての記録を見る →
               </button>
             </>
-          ) : currentUser ? (
+          ) : (
             <div className="empty-state">
-              <p>まだワインの記録がありません</p>
+              <p>{currentUser ? 'まだワインの記録がありません' : 'まだワインの記録がありません（ゲストモード）'}</p>
               <button 
                 className="get-started-button"
                 onClick={() => navigate('/add-wine')}
@@ -189,8 +189,6 @@ const Home: React.FC = () => {
                 最初の1本を記録する 🍷
               </button>
             </div>
-          ) : (
-            <p>ログインして記録を表示しましょう</p>
           )}
         </div>
 
@@ -220,8 +218,6 @@ const Home: React.FC = () => {
               )}
             </div>
           </div>
-        )}
-          </>
         )}
       </main>
     </div>

@@ -3,7 +3,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { wineService } from '../services/wineService';
 import { userService, goalService } from '../services/userService';
+import { guestDataService } from '../services/guestDataService';
 import { useAutoSave } from '../hooks/useAutoSave';
+import LoginPrompt from '../components/LoginPrompt';
 import type { WineDraft } from '../types';
 
 const AddWine: React.FC = () => {
@@ -12,6 +14,8 @@ const AddWine: React.FC = () => {
   const { currentUser } = useAuth();
   const [mode, setMode] = useState<'quick' | 'detailed'>('quick');
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [pendingSave, setPendingSave] = useState(false);
   
   const [formData, setFormData] = useState({
     wineName: '',
@@ -95,19 +99,17 @@ const AddWine: React.FC = () => {
     e.preventDefault();
     
     if (!currentUser) {
-      alert('ログインが必要です');
+      // Show login prompt for guests
+      setPendingSave(true);
+      setShowLoginPrompt(true);
       return;
     }
 
-    try {
-      let imageUrl = '';
-      
-      // Upload image if provided
-      if (formData.image) {
-        imageUrl = await wineService.uploadWineImage(formData.image, currentUser.uid);
-      }
+    await saveWineRecord();
+  };
 
-      // Prepare wine data
+  const saveWineRecord = async () => {
+    try {
       const wineData = {
         wineName: formData.wineName,
         producer: formData.producer,
@@ -117,28 +119,54 @@ const AddWine: React.FC = () => {
         vintage: formData.vintage ? parseInt(formData.vintage) : undefined,
         price: formData.price ? parseFloat(formData.price) : undefined,
         grapeVarieties: formData.grapeVarieties.filter(v => v.trim()),
-        images: imageUrl ? [imageUrl] : [],
+        images: [] as string[],
         recordMode: mode,
         isPublic: false,
-        notes: formData.notes
+        notes: formData.notes,
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
 
-      // Save to Firestore
-      await wineService.createWineRecord(currentUser.uid, wineData);
-      
-      // Update user stats and add XP
-      await userService.updateStatsAfterWineRecord(currentUser.uid, wineData);
-      const xpToAdd = mode === 'detailed' ? 20 : 10;
-      await userService.addXP(currentUser.uid, xpToAdd);
-      
-      // Update daily goal progress
-      await goalService.updateGoalProgress(currentUser.uid, 'wine');
+      if (currentUser) {
+        // Authenticated user - save to Firestore
+        let imageUrl = '';
+        
+        // Upload image if provided
+        if (formData.image) {
+          imageUrl = await wineService.uploadWineImage(formData.image, currentUser.uid);
+          wineData.images = imageUrl ? [imageUrl] : [];
+        }
 
-      alert('ワインの記録が保存されました！');
+        // Save to Firestore
+        await wineService.createWineRecord(currentUser.uid, wineData);
+        
+        // Update user stats and add XP
+        await userService.updateStatsAfterWineRecord(currentUser.uid, wineData);
+        const xpToAdd = mode === 'detailed' ? 20 : 10;
+        await userService.addXP(currentUser.uid, xpToAdd);
+        
+        // Update daily goal progress
+        await goalService.updateGoalProgress(currentUser.uid, 'wine');
+
+        alert('ワインの記録が保存されました！');
+      } else {
+        // Guest user - save to localStorage
+        guestDataService.saveGuestWineRecord(wineData);
+        alert('ワインの記録をローカルに保存しました！\nログインすると、すべての記録がアカウントに移行されます。');
+      }
+
       navigate('/records');
     } catch (error) {
       console.error('Failed to save wine record:', error);
       alert('保存に失敗しました。もう一度お試しください。');
+    }
+  };
+
+  const handleLoginSuccess = async () => {
+    setShowLoginPrompt(false);
+    if (pendingSave) {
+      setPendingSave(false);
+      await saveWineRecord();
     }
   };
 
@@ -377,6 +405,17 @@ const AddWine: React.FC = () => {
           )}
         </form>
       </main>
+      
+      <LoginPrompt
+        isOpen={showLoginPrompt}
+        onClose={() => {
+          setShowLoginPrompt(false);
+          setPendingSave(false);
+        }}
+        onLoginSuccess={handleLoginSuccess}
+        title="記録を保存するにはログインが必要です"
+        message="Googleアカウントでログインして、ワインの記録を保存しましょう。既存のゲストデータも一緒に移行されます。"
+      />
     </div>
   );
 };
