@@ -2036,26 +2036,24 @@ body {
 
 .wine-rating {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.25rem;
   flex-shrink: 0;
-  min-width: 80px;
+  min-width: 60px;
 }
 
-.stars {
-  color: #FFD700;
-  font-size: 1rem;
+.rating-score {
+  color: #722F37;
+  font-size: 1.2rem;
+  font-weight: 600;
   line-height: 1;
-  letter-spacing: 1px;
-  overflow: hidden;
-  white-space: nowrap;
-  margin-bottom: 0.25rem;
 }
 
-.rating-number {
+.rating-scale {
   color: #666;
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .wine-info {
@@ -2121,15 +2119,14 @@ body {
   .wine-rating {
     align-items: flex-start;
     min-width: auto;
-    width: 100%;
   }
   
   .wine-name {
     font-size: 1.1rem;
   }
   
-  .stars {
-    font-size: 0.9rem;
+  .rating-score {
+    font-size: 1.1rem;
   }
   
   .wine-card-footer {
@@ -2162,7 +2159,111 @@ body {
     font-size: 1.3rem;
   }
   
-  .stars {
-    font-size: 1.1rem;
+  .rating-score {
+    font-size: 1.3rem;
+  }
+}
+
+/* Rating Slider Styles */
+.rating-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.rating-slider-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.rating-slider {
+  width: 100%;
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.rating-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #722F37;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.rating-slider::-webkit-slider-thumb:hover {
+  background: #8B4513;
+  transform: scale(1.1);
+}
+
+.rating-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #722F37;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.rating-slider::-moz-range-thumb:hover {
+  background: #8B4513;
+  transform: scale(1.1);
+}
+
+.rating-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.rating-display {
+  text-align: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 2px solid #722F37;
+}
+
+.rating-value {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #722F37;
+}
+
+.rating-display .rating-scale {
+  font-size: 1.2rem;
+  color: #666;
+  margin-left: 0.25rem;
+}
+
+/* Responsive Rating Styles */
+@media (max-width: 767px) {
+  .rating-slider-container {
+    margin: 1rem 0;
+  }
+  
+  .rating-display {
+    padding: 0.75rem;
+  }
+  
+  .rating-value {
+    font-size: 1.5rem;
+  }
+  
+  .rating-display .rating-scale {
+    font-size: 1rem;
   }
 }
