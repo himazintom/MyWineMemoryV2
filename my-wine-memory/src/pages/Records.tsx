@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { tastingRecordService } from '../services/tastingRecordService';
 import { wineMasterService } from '../services/wineMasterService';
-import type { WineRecord, WineMaster, TastingRecord } from '../types';
+import type { WineMaster, TastingRecord } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import { useAsyncOperation } from '../hooks/useAsyncOperation';
