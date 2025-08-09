@@ -14,59 +14,94 @@ export interface User {
   updatedAt: Date;
 }
 
-// Wine recording types
-export interface WineRecord {
+// Wine Master Data (shared across users)
+export interface WineMaster {
   id: string;
-  userId: string;
   
-  // Basic information (required in quick mode)
+  // Basic wine information (required)
   wineName: string;
   producer: string;
   country: string;
   region: string;
-  overallRating: number; // 1-10
   
-  // Optional basic info
+  // Optional wine information
   vintage?: number;
-  price?: number;
   grapeVarieties?: string[];
+  wineType?: 'red' | 'white' | 'rose' | 'sparkling' | 'dessert' | 'fortified';
   alcoholContent?: number;
-  notes?: string;
   
-  // Detailed analysis (detailed mode)
-  appearance?: {
-    color: string;
-    intensity: number; // 1-5
-    clarity: string;
-    viscosity: string;
-  };
+  // Technical wine info
+  soilInfo?: string;
+  climate?: string;
+  wineHistory?: string;
+  winemaker?: string;
   
-  aroma?: {
-    firstImpression: { intensity: number; notes: string };
-    afterSwirling: { intensity: number; notes: string };
-    categories: {
-      fruity: number;
-      floral: number;
-      spicy: number;
-      herbal: number;
-      earthy: number;
-      woody: number;
-      other: number;
+  // Metadata
+  createdAt: Date;
+  createdBy: string; // user ID who first added this wine
+  referenceCount: number; // how many users have tasted this wine
+  updatedAt: Date;
+}
+
+// Individual tasting records (user-specific experiences)
+export interface TastingRecord {
+  id: string;
+  userId: string;
+  wineId: string; // reference to WineMaster
+  
+  // Required tasting info
+  overallRating: number; // 0.0-10.0
+  tastingDate: Date;
+  recordMode: 'quick' | 'detailed';
+  
+  // Optional tasting-specific info
+  price?: number; // price at time of purchase
+  purchaseLocation?: string;
+  notes?: string; // personal notes and impressions
+  
+  // Detailed analysis (detailed mode only)
+  detailedAnalysis?: {
+    appearance?: {
+      color: string;
+      intensity: number; // 1-5
+      clarity: string;
+      viscosity: string;
     };
-    specificAromas: string[];
-  };
-  
-  taste?: {
-    attack: { intensity: number; notes: string };
-    development: { complexity: number; notes: string };
-    finish: { length: number; seconds?: number; notes: string };
-  };
-  
-  structure?: {
-    acidity: { intensity: number; type?: string[] };
-    tannins: { intensity: number; texture?: string[] };
-    sweetness: number; // 1-5 (dry to very sweet)
-    body: number; // 1-5 (light to full)
+    
+    aroma?: {
+      firstImpression: { intensity: number; notes: string };
+      afterSwirling: { intensity: number; notes: string };
+      categories: {
+        fruity: number;
+        floral: number;
+        spicy: number;
+        herbal: number;
+        earthy: number;
+        woody: number;
+        other: number;
+      };
+      specificAromas: string[];
+    };
+    
+    taste?: {
+      attack: { intensity: number; notes: string };
+      development: { complexity: number; notes: string };
+      finish: { length: number; seconds?: number; notes: string };
+    };
+    
+    structure?: {
+      acidity: { intensity: number; type?: string[] };
+      tannins: { intensity: number; texture?: string[] };
+      sweetness: number; // 1-5 (dry to very sweet)
+      body: number; // 1-5 (light to full)
+    };
+    
+    // Time-based changes
+    timeBasedNotes?: {
+      time: string;
+      temperature?: number;
+      notes: string;
+    }[];
   };
   
   // Environment and context
@@ -85,24 +120,38 @@ export interface WineRecord {
   referenceUrls?: string[];
   
   // Metadata
-  recordMode: 'quick' | 'detailed';
   isPublic: boolean;
   createdAt: Date;
   updatedAt: Date;
-  
-  // Time-based changes
-  timeBasedNotes?: {
-    time: string;
-    temperature?: number;
-    notes: string;
-  }[];
 }
 
-// Draft type (for auto-save functionality)
+// Legacy WineRecord type for backward compatibility
+export interface WineRecord extends TastingRecord {
+  // Include wine master data for easy access
+  wineName: string;
+  producer: string;
+  country: string;
+  region: string;
+  vintage?: number;
+  grapeVarieties?: string[];
+  wineType?: string;
+  alcoholContent?: number;
+}
+
+// Draft types (for auto-save functionality)
 export interface WineDraft {
   id: string;
   userId: string;
   data: Partial<WineRecord>;
+  lastSaved: Date;
+}
+
+export interface TastingDraft {
+  id: string;
+  userId: string;
+  wineId?: string; // if wine is already selected
+  wineMasterData?: Partial<WineMaster>; // if creating new wine
+  tastingData: Partial<TastingRecord>;
   lastSaved: Date;
 }
 
