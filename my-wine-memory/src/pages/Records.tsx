@@ -135,16 +135,23 @@ const Records: React.FC = () => {
   if (!currentUser) {
     return (
       <div className="page-container">
-        <div className="login-message">
-          <h2>ログインが必要です</h2>
-          <p>記録を確認するには、Googleアカウントでログインしてください。</p>
-          <button 
-            className="google-signin-button"
-            onClick={() => navigate('/')}
-          >
-            ホームに戻る
-          </button>
-        </div>
+        <header className="page-header">
+          <h1>記録一覧</h1>
+        </header>
+        <main className="records-content">
+          <div className="empty-state welcome-message">
+            <div className="welcome-icon">🍷</div>
+            <h2>まだワインを記録していませんね</h2>
+            <p>初めの一本を記録しましょう！</p>
+            <p className="sub-message">ワインの記録を始めて、あなたの味覚の旅を保存しましょう。</p>
+            <button 
+              className="get-started-button primary"
+              onClick={() => navigate('/select-wine')}
+            >
+              🍷 ワインを記録する
+            </button>
+          </div>
+        </main>
       </div>
     );
   }

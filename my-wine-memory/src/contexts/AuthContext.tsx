@@ -19,9 +19,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const provider = new GoogleAuthProvider();
     provider.addScope('profile');
     provider.addScope('email');
+    // Remove custom parameters that might interfere with popup
     provider.setCustomParameters({
-      redirect_uri: window.location.origin,
-      popup: 'true'
+      prompt: 'select_account'
     });
     
     try {

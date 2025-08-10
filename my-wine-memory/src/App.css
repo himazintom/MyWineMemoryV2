@@ -4216,3 +4216,96 @@ h1, h2, h3, h4, h5, h6 {
 .setting-checkbox:checked::before {
   transform: translateX(22px);
 }
+
+/* Dark theme for settings */
+[data-theme="dark"] .settings {
+  background: #2D2D2D;
+  color: #E0E0E0;
+}
+
+[data-theme="dark"] .settings h3 {
+  color: #B8860B;
+}
+
+[data-theme="dark"] .setting-item {
+  background: #3A3A3A;
+}
+
+[data-theme="dark"] .setting-label span {
+  color: #E0E0E0;
+}
+
+[data-theme="dark"] .setting-checkbox {
+  background: #555;
+}
+
+[data-theme="dark"] .setting-checkbox:checked {
+  background: #B8860B;
+}
+
+/* Welcome Message Styles */
+.welcome-message {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 2rem 0;
+}
+
+.welcome-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.welcome-message h2 {
+  color: #722F37;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.welcome-message p {
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.welcome-message .sub-message {
+  font-size: 0.9rem;
+  color: #888;
+  margin-bottom: 2rem;
+}
+
+.get-started-button.primary {
+  background: linear-gradient(135deg, #722F37, #8B4513);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.get-started-button.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(114, 47, 55, 0.3);
+}
+
+/* Dark theme for welcome message */
+[data-theme="dark"] .welcome-message {
+  background: #2D2D2D;
+  color: #E0E0E0;
+}
+
+[data-theme="dark"] .welcome-message h2 {
+  color: #B8860B;
+}
+
+[data-theme="dark"] .welcome-message p {
+  color: #B0B0B0;
+}
+
+[data-theme="dark"] .welcome-message .sub-message {
+  color: #888;
+}
