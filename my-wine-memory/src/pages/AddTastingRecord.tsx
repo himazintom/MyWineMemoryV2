@@ -198,11 +198,22 @@ const AddTastingRecord: React.FC = () => {
 
         // Upload images if any
         const imageUrls: string[] = [];
-        for (const image of formData.images) {
-          if (image) {
-            const url = await tastingRecordService.uploadWineImage(image, currentUser.uid);
-            imageUrls.push(url);
+        try {
+          for (const image of formData.images) {
+            if (image) {
+              // Check file size (max 5MB)
+              if (image.size > 5 * 1024 * 1024) {
+                console.warn(`Image ${image.name} is too large (${(image.size / 1024 / 1024).toFixed(2)}MB), skipping`);
+                continue;
+              }
+              
+              const url = await tastingRecordService.uploadWineImage(image, currentUser.uid);
+              imageUrls.push(url);
+            }
           }
+        } catch (imageError) {
+          console.warn('Failed to upload some images, proceeding without them:', imageError);
+          // Continue with record creation even if image upload fails
         }
 
         // Create tasting record

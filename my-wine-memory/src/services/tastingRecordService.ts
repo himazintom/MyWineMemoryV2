@@ -222,21 +222,62 @@ class TastingRecordService {
     }
   }
 
+  // Helper function to retry operations
+  private async retry<T>(operation: () => Promise<T>, maxRetries: number = 3, delay: number = 1000): Promise<T> {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        return await operation();
+      } catch (error) {
+        if (attempt === maxRetries) {
+          throw error;
+        }
+        
+        console.warn(`Upload attempt ${attempt} failed, retrying in ${delay}ms...`, error);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        delay *= 2; // Exponential backoff
+      }
+    }
+    throw new Error('Max retries exceeded');
+  }
+
   // Upload wine image
   async uploadWineImage(imageFile: File, userId: string): Promise<string> {
-    try {
+    return this.retry(async () => {
       const timestamp = Date.now();
-      const fileName = `wine-images/${userId}/${timestamp}_${imageFile.name}`;
+      // Sanitize filename to avoid special characters
+      const sanitizedFileName = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const fileName = `wine-images/${userId}/${timestamp}_${sanitizedFileName}`;
       const storageRef = ref(storage, fileName);
       
-      const snapshot = await uploadBytes(storageRef, imageFile);
+      // Add metadata to help with CORS
+      const metadata = {
+        contentType: imageFile.type,
+        customMetadata: {
+          'uploadedBy': userId,
+          'uploadedAt': new Date().toISOString()
+        }
+      };
+      
+      const snapshot = await uploadBytes(storageRef, imageFile, metadata);
       const downloadURL = await getDownloadURL(snapshot.ref);
       
       return downloadURL;
-    } catch (error) {
-      console.error('Error uploading wine image:', error);
-      throw new Error('画像のアップロードに失敗しました');
-    }
+    }).catch((error) => {
+      console.error('Error uploading wine image after retries:', error);
+      
+      // More specific error handling
+      if (error instanceof Error) {
+        if (error.message.includes('CORS')) {
+          throw new Error('画像のアップロードでCORSエラーが発生しました。しばらく待ってから再度お試しください。');
+        } else if (error.message.includes('network')) {
+          throw new Error('ネットワークエラーが発生しました。インターネット接続を確認してください。');
+        } else if (error.message.includes('permission')) {
+          throw new Error('画像アップロードの権限がありません。ログインし直してください。');
+        }
+      }
+      
+      throw new Error('画像のアップロードに失敗しました。ファイルサイズが大きすぎるか、一時的な問題が発生している可能性があります。');
+    });
   }
 
   // Get tasting statistics for user
