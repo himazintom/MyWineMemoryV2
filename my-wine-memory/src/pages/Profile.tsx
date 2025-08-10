@@ -60,8 +60,14 @@ const Profile: React.FC = () => {
     if (!currentUser || !userProfile) return;
     
     try {
+      const currentSettings = userProfile.privacySettings || {
+        defaultRecordVisibility: 'private' as const,
+        allowPublicProfile: false,
+        pushNotifications: false
+      };
+      
       const updatedSettings = {
-        ...userProfile.privacySettings,
+        ...currentSettings,
         [setting]: value
       };
       
