@@ -63,7 +63,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,woff,ttf}'],
-        navigateFallbackDenylist: [/^\/__\/.*$/], // Exclude Firebase reserved paths
+        navigateFallbackDenylist: [/^\/__\/.*$/, /^\/google\.firestore\.v1\.Firestore/], // Exclude Firebase paths
         runtimeCaching: [
           // Firebase Storage images
           {
@@ -101,7 +101,15 @@ export default defineConfig({
               }
             }
           },
-          // API routes (Firebase functions)
+          // Firestore API - NetworkOnly to avoid WebChannel issues
+          {
+            urlPattern: /^https:\/\/firestore\.googleapis\.com\/.*/i,
+            handler: 'NetworkOnly',
+            options: {
+              cacheName: 'firestore-api'
+            }
+          },
+          // Other Firebase APIs
           {
             urlPattern: /^https:\/\/.*\.googleapis\.com\/.*/i,
             handler: 'NetworkFirst',

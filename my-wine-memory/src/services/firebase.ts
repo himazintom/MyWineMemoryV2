@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, enableNetwork, disableNetwork } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
@@ -19,5 +19,22 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+
+// Handle Service Worker interference with Firestore
+if (typeof window !== 'undefined') {
+  // Listen for service worker updates
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('controllerchange', async () => {
+      // Re-enable network after service worker update
+      try {
+        await disableNetwork(db);
+        await enableNetwork(db);
+        console.log('Firestore network restarted after service worker update');
+      } catch (error) {
+        console.warn('Failed to restart Firestore network:', error);
+      }
+    });
+  }
+}
 
 export default app;
