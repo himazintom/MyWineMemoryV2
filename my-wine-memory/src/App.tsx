@@ -1,10 +1,21 @@
-import React, { Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { Suspense, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import BottomNavigation from './components/BottomNavigation';
 import LoadingSpinner from './components/LoadingSpinner';
 import './App.css';
+
+// スクロール位置をリセットするコンポーネント
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
 
 // Lazy load page components
 const Home = React.lazy(() => import('./pages/Home'));
@@ -22,6 +33,7 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <Router>
+          <ScrollToTop />
           <div className="app">
             <main className="main-content">
               <Suspense fallback={

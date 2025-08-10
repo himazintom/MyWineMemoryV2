@@ -36,10 +36,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -Command \"if (git rev-parse --git-dir 2>$null) { git add -A; $branch = git branch --show-current; if ($branch -notin @('main','master','production','prod')) { git commit -m 'Claude Code: Auto-commit'; git push origin $branch } else { Write-Host 'Protected branch - skipping push' } }\""
+            "command": "node $CLAUDE_PROJECT_DIR/.claude/hooks/check-dark-mode.js"
           }
         ]
       }
+      
     ]
   }
 }
