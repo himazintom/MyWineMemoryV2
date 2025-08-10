@@ -12,12 +12,16 @@ export default defineConfig({
       includeAssets: ['logo-icon.svg', 'playstore-icon.png'],
       manifest: {
         name: 'MyWineMemory',
-        short_name: 'WineMemory',
+        short_name: 'WineMemory', 
         description: 'あなたのワイン体験を記録し、学習するアプリ',
         theme_color: '#722F37',
         background_color: '#FFF8E1',
         display: 'standalone',
+        orientation: 'portrait',
         start_url: '/',
+        scope: '/',
+        lang: 'ja',
+        categories: ['food', 'lifestyle', 'education'],
         icons: [
           {
             src: 'android/mipmap-mdpi/ic_launcher.png',

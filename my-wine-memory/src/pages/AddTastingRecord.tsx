@@ -146,6 +146,7 @@ const AddTastingRecord: React.FC = () => {
     }));
   };
 
+
   const handleRatingChange = (rating: number) => {
     setFormData(prev => ({ ...prev, overallRating: rating }));
   };
