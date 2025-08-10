@@ -8,6 +8,7 @@ import type { WineMaster, TastingRecord } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import LoginPrompt from '../components/LoginPrompt';
+import DrawingCanvas from '../components/DrawingCanvas';
 import { useAsyncOperation } from '../hooks/useAsyncOperation';
 
 const AddTastingRecord: React.FC = () => {
@@ -27,10 +28,11 @@ const AddTastingRecord: React.FC = () => {
   const [formData, setFormData] = useState({
     overallRating: 5.0,
     notes: '',
-    price: '',
+    price: '3000',
     purchaseLocation: '',
     tastingDate: new Date().toISOString().split('T')[0],
     images: [] as File[],
+    drawingDataUrl: '' as string,
     // Detailed analysis fields
     visualAnalysis: {
       color: '',
@@ -146,6 +148,62 @@ const AddTastingRecord: React.FC = () => {
     }));
   };
 
+  const handleImageUpload = (files: FileList | null) => {
+    if (!files) return;
+    
+    const newFiles: File[] = [];
+    const maxFiles = 4;
+    const maxFileSize = 5 * 1024 * 1024; // 5MB
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (formData.images.length + newFiles.length >= maxFiles) {
+        alert(`最大${maxFiles}枚まで登録できます`);
+        break;
+      }
+      
+      if (file.size > maxFileSize) {
+        alert(`ファイルサイズが大きすぎます（最大5MB）: ${file.name}`);
+        continue;
+      }
+      
+      if (!file.type.startsWith('image/')) {
+        alert(`画像ファイルのみアップロードできます: ${file.name}`);
+        continue;
+      }
+      
+      newFiles.push(file);
+    }
+    
+    if (newFiles.length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        images: [...prev.images, ...newFiles]
+      }));
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleDrawingSave = (dataUrl: string) => {
+    setFormData(prev => ({
+      ...prev,
+      drawingDataUrl: dataUrl
+    }));
+  };
+
+  const clearDrawing = () => {
+    setFormData(prev => ({
+      ...prev,
+      drawingDataUrl: ''
+    }));
+  };
+
 
   const handleRatingChange = (rating: number) => {
     setFormData(prev => ({ ...prev, overallRating: rating }));
@@ -196,9 +254,10 @@ const AddTastingRecord: React.FC = () => {
           );
         }
 
-        // Upload images if any
+        // Upload images if any (including drawing)
         const imageUrls: string[] = [];
         try {
+          // Upload regular images
           for (const image of formData.images) {
             if (image) {
               // Check file size (max 5MB)
@@ -209,6 +268,21 @@ const AddTastingRecord: React.FC = () => {
               
               const url = await tastingRecordService.uploadWineImage(image, currentUser.uid);
               imageUrls.push(url);
+            }
+          }
+
+          // Upload drawing if exists
+          if (formData.drawingDataUrl) {
+            try {
+              // Convert base64 to File object
+              const response = await fetch(formData.drawingDataUrl);
+              const blob = await response.blob();
+              const drawingFile = new File([blob], `sketch-${Date.now()}.png`, { type: 'image/png' });
+              
+              const drawingUrl = await tastingRecordService.uploadWineImage(drawingFile, currentUser.uid);
+              imageUrls.push(drawingUrl);
+            } catch (drawingError) {
+              console.warn('Failed to upload drawing, proceeding without it:', drawingError);
             }
           }
         } catch (imageError) {
@@ -479,40 +553,87 @@ const AddTastingRecord: React.FC = () => {
             </div>
             
             <div className="form-group">
-              <label htmlFor="images">写真</label>
-              <input
-                id="images"
-                name="images"
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleImageChange}
-              />
+              <label>写真登録 (最大4枚)</label>
+              <div className="image-suggestion-text">
+                <p className="text-muted">
+                  おすすめ：お店の雰囲気、ペアリングした料理、一緒に楽しんだ人との記念写真など
+                </p>
+              </div>
+              
+              <div className="image-gallery">
+                {formData.images.map((image, index) => (
+                  <div key={index} className="image-gallery-item">
+                    <img 
+                      src={URL.createObjectURL(image)}
+                      alt={`アップロード画像 ${index + 1}`}
+                      className="gallery-image"
+                    />
+                    <button 
+                      type="button"
+                      className="remove-image-button"
+                      onClick={() => removeImage(index)}
+                      aria-label={`画像 ${index + 1} を削除`}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+                
+                {formData.images.length < 4 && (
+                  <div className="image-gallery-add">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => handleImageUpload(e.target.files)}
+                      className="image-input"
+                      id="image-upload"
+                    />
+                    <label htmlFor="image-upload" className="image-add-button">
+                      <div className="add-icon">+</div>
+                      <span>写真を追加</span>
+                    </label>
+                  </div>
+                )}
+              </div>
+              
               {formData.images.length > 0 && (
-                <div className="image-preview">
-                  <p>{formData.images.length}枚の画像が選択されています</p>
-                  <div className="image-preview-grid">
-                    {formData.images.map((image, index) => (
-                      <div key={index} className="image-preview-item">
-                        <img 
-                          src={URL.createObjectURL(image)}
-                          alt={`Preview ${index + 1}`}
-                          className="preview-image"
-                        />
-                        <button 
-                          type="button"
-                          className="remove-image-btn"
-                          onClick={() => {
-                            const newImages = formData.images.filter((_, i) => i !== index);
-                            setFormData(prev => ({ ...prev, images: newImages }));
-                          }}
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
+                <p className="image-count">
+                  {formData.images.length}/4枚の画像を選択中
+                </p>
+              )}
+            </div>
+
+            {/* Drawing Section */}
+            <div className="form-group">
+              <label>手書きメモ・スケッチ</label>
+              <p className="text-muted" style={{fontSize: '0.9rem', marginBottom: '1rem'}}>
+                テイスティングの印象をスケッチしたり、手書きでメモを残すことができます
+              </p>
+              
+              {formData.drawingDataUrl ? (
+                <div className="drawing-preview">
+                  <img 
+                    src={formData.drawingDataUrl} 
+                    alt="手書きスケッチ" 
+                    className="drawing-preview-image"
+                  />
+                  <div className="drawing-preview-actions">
+                    <button
+                      type="button"
+                      onClick={clearDrawing}
+                      className="btn-secondary small"
+                    >
+                      削除
+                    </button>
                   </div>
                 </div>
+              ) : (
+                <DrawingCanvas 
+                  onSave={handleDrawingSave}
+                  width={400}
+                  height={300}
+                />
               )}
             </div>
           </div>
@@ -844,7 +965,7 @@ const AddTastingRecord: React.FC = () => {
           )}
 
           {/* Save Buttons */}
-          <div className="form-actions">
+          <div className="form-action">
             <button 
               type="button" 
               className="btn-secondary"
