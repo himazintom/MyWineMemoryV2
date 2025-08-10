@@ -86,14 +86,10 @@ const QuizGame: React.FC = () => {
 
     setShowExplanation(true);
 
-    // Auto move to next question after 3 seconds
-    setTimeout(() => {
-      if (hearts <= 1 && !correct) {
-        setGameStatus('finished');
-      } else {
-        nextQuestion();
-      }
-    }, 3000);
+    // Check if game should end due to no hearts remaining
+    if (hearts <= 1 && !correct) {
+      setTimeout(() => setGameStatus('finished'), 1000);
+    }
   };
 
   const restartQuiz = () => {
@@ -222,6 +218,12 @@ const QuizGame: React.FC = () => {
                 {isCorrect ? '✅ 正解！' : '❌ 不正解'}
               </div>
               <p className="explanation-text">{currentQuestion.explanation}</p>
+              <button 
+                className="next-button"
+                onClick={nextQuestion}
+              >
+                {currentQuestionIndex + 1 >= questions.length ? '結果を見る' : '次の問題へ →'}
+              </button>
             </div>
           )}
         </div>

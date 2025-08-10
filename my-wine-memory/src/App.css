@@ -1063,6 +1063,32 @@ body {
   font-style: italic;
 }
 
+/* Quiz Game Styles - Next Button */
+.next-button {
+  background: var(--wine-primary, #722F37);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.next-button:hover {
+  background: var(--wine-secondary, #8b4513);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.next-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 /* Quiz Game Styles */
 .quiz-header {
   background: linear-gradient(135deg, #722F37, #8B4513);
