@@ -143,33 +143,47 @@ class TastingRecordService {
   ): Promise<WineRecord[]> {
     try {
       const tastingRecords = await this.getUserTastingRecords(userId, sortBy, limit);
+      
+      // Return empty array if no records found (not an error)
+      if (tastingRecords.length === 0) {
+        return [];
+      }
+
       const wineRecords: WineRecord[] = [];
 
       // Get wine master info for each tasting record
       for (const record of tastingRecords) {
-        const wineMaster = await wineMasterService.getWineMaster(record.wineId);
-        
-        if (wineMaster) {
-          const wineRecord: WineRecord = {
-            ...record,
-            // Wine master data
-            wineName: wineMaster.wineName,
-            producer: wineMaster.producer,
-            country: wineMaster.country,
-            region: wineMaster.region,
-            vintage: wineMaster.vintage,
-            grapeVarieties: wineMaster.grapeVarieties,
-            wineType: wineMaster.wineType,
-            alcoholContent: wineMaster.alcoholContent
-          };
-          wineRecords.push(wineRecord);
+        try {
+          const wineMaster = await wineMasterService.getWineMaster(record.wineId);
+          
+          if (wineMaster) {
+            const wineRecord: WineRecord = {
+              ...record,
+              // Wine master data
+              wineName: wineMaster.wineName,
+              producer: wineMaster.producer,
+              country: wineMaster.country,
+              region: wineMaster.region,
+              vintage: wineMaster.vintage,
+              grapeVarieties: wineMaster.grapeVarieties,
+              wineType: wineMaster.wineType,
+              alcoholContent: wineMaster.alcoholContent
+            };
+            wineRecords.push(wineRecord);
+          } else {
+            console.warn(`Wine master not found for record ${record.id}, wineId: ${record.wineId}`);
+          }
+        } catch (wineError) {
+          console.warn(`Failed to get wine master for record ${record.id}:`, wineError);
+          // Continue processing other records instead of failing completely
         }
       }
 
       return wineRecords;
     } catch (error) {
       console.error('Error getting user tasting records with wine info:', error);
-      throw new Error('ワイン情報付きテイスティング記録の取得に失敗しました');
+      // Return empty array instead of throwing error to prevent UI crashes
+      return [];
     }
   }
 
@@ -243,9 +257,13 @@ class TastingRecordService {
       // Get wine info to calculate country distribution
       const winesByCountry: { [country: string]: number } = {};
       for (const record of allRecords) {
-        const wineMaster = await wineMasterService.getWineMaster(record.wineId);
-        if (wineMaster?.country) {
-          winesByCountry[wineMaster.country] = (winesByCountry[wineMaster.country] || 0) + 1;
+        try {
+          const wineMaster = await wineMasterService.getWineMaster(record.wineId);
+          if (wineMaster?.country) {
+            winesByCountry[wineMaster.country] = (winesByCountry[wineMaster.country] || 0) + 1;
+          }
+        } catch (wineError) {
+          console.warn(`Failed to get wine info for statistics, record ${record.id}:`, wineError);
         }
       }
 
@@ -259,7 +277,13 @@ class TastingRecordService {
       };
     } catch (error) {
       console.error('Error getting tasting statistics:', error);
-      throw new Error('統計情報の取得に失敗しました');
+      // Return empty statistics instead of throwing error
+      return {
+        totalRecords: 0,
+        averageRating: 0,
+        winesByCountry: {},
+        recentActivity: []
+      };
     }
   }
 
@@ -314,28 +338,35 @@ class TastingRecordService {
       // Get wine master info for each record
       const wineRecords: WineRecord[] = [];
       for (const record of filteredRecords) {
-        const wineMaster = await wineMasterService.getWineMaster(record.wineId);
-        
-        if (wineMaster) {
-          const wineRecord: WineRecord = {
-            ...record,
-            wineName: wineMaster.wineName,
-            producer: wineMaster.producer,
-            country: wineMaster.country,
-            region: wineMaster.region,
-            vintage: wineMaster.vintage,
-            grapeVarieties: wineMaster.grapeVarieties,
-            wineType: wineMaster.wineType,
-            alcoholContent: wineMaster.alcoholContent
-          };
-          wineRecords.push(wineRecord);
+        try {
+          const wineMaster = await wineMasterService.getWineMaster(record.wineId);
+          
+          if (wineMaster) {
+            const wineRecord: WineRecord = {
+              ...record,
+              wineName: wineMaster.wineName,
+              producer: wineMaster.producer,
+              country: wineMaster.country,
+              region: wineMaster.region,
+              vintage: wineMaster.vintage,
+              grapeVarieties: wineMaster.grapeVarieties,
+              wineType: wineMaster.wineType,
+              alcoholContent: wineMaster.alcoholContent
+            };
+            wineRecords.push(wineRecord);
+          } else {
+            console.warn(`Wine master not found for search result ${record.id}, wineId: ${record.wineId}`);
+          }
+        } catch (wineError) {
+          console.warn(`Failed to get wine master for search result ${record.id}:`, wineError);
         }
       }
 
       return wineRecords;
     } catch (error) {
       console.error('Error searching tasting records:', error);
-      throw new Error('テイスティング記録の検索に失敗しました');
+      // Return empty array instead of throwing error
+      return [];
     }
   }
 }
