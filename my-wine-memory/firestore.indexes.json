@@ -83,7 +83,7 @@
           "order": "DESCENDING"
         }
       ]
-    }
+    },
     {
       "collectionGroup": "tasting_records",
       "queryScope": "COLLECTION",
