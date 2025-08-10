@@ -127,9 +127,13 @@ const Records: React.FC = () => {
   };
 
   const getRatingColor = (rating: number) => {
-    if (rating >= 8) return '#28a745';
-    if (rating >= 6) return '#ffc107';
-    return '#6c757d';
+    const successColor = getComputedStyle(document.documentElement).getPropertyValue('--success-text') || '#28a745';
+    const warningColor = getComputedStyle(document.documentElement).getPropertyValue('--warning-text') || '#ffc107';
+    const mutedColor = getComputedStyle(document.documentElement).getPropertyValue('--text-muted') || '#6c757d';
+    
+    if (rating >= 8) return successColor;
+    if (rating >= 6) return warningColor;
+    return mutedColor;
   };
 
   if (!currentUser) {

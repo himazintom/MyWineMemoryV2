@@ -61,8 +61,8 @@ const TastingAnalysisCharts: React.FC<TastingAnalysisChartsProps> = ({ record })
         borderColor: 'rgba(114, 47, 55, 1)',
         borderWidth: 2,
         pointBackgroundColor: 'rgba(114, 47, 55, 1)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
+        pointBorderColor: getComputedStyle(document.documentElement).getPropertyValue('--btn-primary-text') || '#fff',
+        pointHoverBackgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--btn-primary-text') || '#fff',
         pointHoverBorderColor: 'rgba(114, 47, 55, 1)',
       },
     ],
@@ -77,7 +77,7 @@ const TastingAnalysisCharts: React.FC<TastingAnalysisChartsProps> = ({ record })
       title: {
         display: true,
         text: '成分バランス分析',
-        color: '#722F37',
+        color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary') || '#722F37',
         font: {
           size: 16,
           weight: 'bold' as const
@@ -152,7 +152,7 @@ const TastingAnalysisCharts: React.FC<TastingAnalysisChartsProps> = ({ record })
       title: {
         display: true,
         text: '香りカテゴリー分析',
-        color: '#722F37',
+        color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary') || '#722F37',
         font: {
           size: 16,
           weight: 'bold' as const
@@ -197,7 +197,7 @@ const TastingAnalysisCharts: React.FC<TastingAnalysisChartsProps> = ({ record })
         fill: true,
         tension: 0.4,
         pointBackgroundColor: 'rgba(114, 47, 55, 1)',
-        pointBorderColor: '#fff',
+        pointBorderColor: getComputedStyle(document.documentElement).getPropertyValue('--btn-primary-text') || '#fff',
         pointBorderWidth: 2,
         pointRadius: 6,
         pointHoverRadius: 8,
@@ -214,7 +214,7 @@ const TastingAnalysisCharts: React.FC<TastingAnalysisChartsProps> = ({ record })
       title: {
         display: true,
         text: '味わいの展開',
-        color: '#722F37',
+        color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary') || '#722F37',
         font: {
           size: 16,
           weight: 'bold' as const
