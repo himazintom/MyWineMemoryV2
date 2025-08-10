@@ -46,8 +46,13 @@ class WineMasterService {
         updatedAt: new Date()
       };
 
+      // Remove undefined fields before sending to Firestore
+      const cleanedData = Object.fromEntries(
+        Object.entries(wineMasterData).filter(([_, value]) => value !== undefined)
+      );
+
       const docRef = await addDoc(collection(db, this.collection), {
-        ...wineMasterData,
+        ...cleanedData,
         createdAt: Timestamp.fromDate(wineMasterData.createdAt),
         updatedAt: Timestamp.fromDate(wineMasterData.updatedAt)
       });
@@ -287,8 +292,13 @@ class WineMasterService {
         updatedAt: new Date()
       };
 
+      // Remove undefined fields before sending to Firestore
+      const cleanedData = Object.fromEntries(
+        Object.entries(wineMasterData).filter(([_, value]) => value !== undefined)
+      );
+
       const docRef = await addDoc(collection(db, this.collection), {
-        ...wineMasterData,
+        ...cleanedData,
         createdAt: Timestamp.fromDate(wineMasterData.createdAt),
         updatedAt: Timestamp.fromDate(wineMasterData.updatedAt)
       });

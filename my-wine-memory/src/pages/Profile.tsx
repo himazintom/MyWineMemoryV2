@@ -10,6 +10,7 @@ const Profile: React.FC = () => {
   const [badges, setBadges] = useState<(Badge & { earnedAt: Date })[]>([]);
   const [stats, setStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(false);
+  const [localPrivacySettings, setLocalPrivacySettings] = useState(userProfile?.privacySettings);
 
   const loadUserData = useCallback(async () => {
     if (!currentUser) return;
@@ -36,6 +37,10 @@ const Profile: React.FC = () => {
     }
   }, [currentUser, loadUserData]);
 
+  useEffect(() => {
+    setLocalPrivacySettings(userProfile?.privacySettings);
+  }, [userProfile?.privacySettings]);
+
   const handleGoogleSignIn = async () => {
     try {
       await signInWithGoogle();
@@ -57,10 +62,10 @@ const Profile: React.FC = () => {
   };
 
   const handlePrivacySettingChange = async (setting: string, value: boolean | string) => {
-    if (!currentUser || !userProfile) return;
+    if (!currentUser) return;
     
     try {
-      const currentSettings = userProfile.privacySettings || {
+      const currentSettings = localPrivacySettings || {
         defaultRecordVisibility: 'private' as const,
         allowPublicProfile: false,
         pushNotifications: false
@@ -71,13 +76,16 @@ const Profile: React.FC = () => {
         [setting]: value
       };
       
+      // Update local state immediately for responsive UI
+      setLocalPrivacySettings(updatedSettings);
+      
+      // Update database
       await userService.updateUserPrivacySettings(currentUser.uid, updatedSettings);
       
-      // Note: This is a simple approach. In a real app, you'd want to update the context
-      // or use a proper state management solution to reflect changes immediately
-      loadUserData();
     } catch (error) {
       console.error('Failed to update privacy settings:', error);
+      // Revert local state on error
+      setLocalPrivacySettings(userProfile?.privacySettings);
       alert('プライバシー設定の更新に失敗しました。');
     }
   };
@@ -191,7 +199,7 @@ const Profile: React.FC = () => {
               <span>プッシュ通知</span>
               <input 
                 type="checkbox" 
-                checked={userProfile?.privacySettings?.pushNotifications ?? false}
+                checked={localPrivacySettings?.pushNotifications ?? false}
                 onChange={(e) => handlePrivacySettingChange('pushNotifications', e.target.checked)}
                 className="setting-checkbox"
               />
@@ -203,7 +211,7 @@ const Profile: React.FC = () => {
               <span>記録をデフォルトで公開する</span>
               <input 
                 type="checkbox" 
-                checked={userProfile?.privacySettings?.defaultRecordVisibility === 'public'}
+                checked={localPrivacySettings?.defaultRecordVisibility === 'public'}
                 onChange={(e) => handlePrivacySettingChange('defaultRecordVisibility', e.target.checked ? 'public' : 'private')}
                 className="setting-checkbox"
               />
@@ -215,7 +223,7 @@ const Profile: React.FC = () => {
               <span>プロフィールを公開する</span>
               <input 
                 type="checkbox" 
-                checked={userProfile?.privacySettings?.allowPublicProfile ?? false}
+                checked={localPrivacySettings?.allowPublicProfile ?? false}
                 onChange={(e) => handlePrivacySettingChange('allowPublicProfile', e.target.checked)}
                 className="setting-checkbox"
               />

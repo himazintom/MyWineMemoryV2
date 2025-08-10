@@ -258,7 +258,7 @@ const SelectWine: React.FC = () => {
                       name="vintage"
                       type="number"
                       placeholder="2020"
-                      min="1900"
+                      min="2020"
                       max={new Date().getFullYear()}
                     />
                   </div>

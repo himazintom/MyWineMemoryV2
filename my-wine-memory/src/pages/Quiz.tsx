@@ -10,6 +10,21 @@ const Quiz: React.FC = () => {
     navigate(`/quiz/play/${difficulty}`);
   };
 
+  const startGeneralQuiz = () => {
+    // Start with difficulty 1 for general quiz
+    navigate('/quiz/play/1');
+  };
+
+  const startPersonalRecordQuiz = () => {
+    // For now, show an alert about upcoming feature
+    alert('あなたの記録に基づくクイズ機能は準備中です。\n一般クイズをお楽しみください！');
+  };
+
+  const startReviewQuiz = () => {
+    // For now, show an alert about upcoming feature
+    alert('復習クイズ機能は準備中です。\n一般クイズをお楽しみください！');
+  };
+
   return (
     <div className="page-container">
       <header className="page-header">
@@ -54,13 +69,13 @@ const Quiz: React.FC = () => {
         
         <div className="quiz-modes">
           <h2>クイズモード</h2>
-          <button className="mode-button">
+          <button className="mode-button" onClick={startGeneralQuiz}>
             📚 一般クイズ
           </button>
-          <button className="mode-button">
+          <button className="mode-button" onClick={startPersonalRecordQuiz}>
             🍷 あなたの記録クイズ
           </button>
-          <button className="mode-button">
+          <button className="mode-button" onClick={startReviewQuiz}>
             🔄 復習クイズ
           </button>
         </div>
