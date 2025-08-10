@@ -17,7 +17,7 @@ import brandLogo from '../assets/images/logo-icon/logo-icon.svg';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const { currentUser, signInWithGoogle } = useAuth();
+  const { currentUser, signInWithGoogle, loading: authInitializing } = useAuth();
   const { theme } = useTheme();
   const [isMobile, setIsMobile] = useState<boolean>(() =>
     typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(max-width: 767px)').matches : false
@@ -30,20 +30,45 @@ const Home: React.FC = () => {
   const { loading: authLoading, execute: executeAuth } = useAsyncOperation<void>();
 
   const loadHomeData = useCallback(async () => {
+    // Don't load data while auth is initializing
+    if (authInitializing) {
+      console.log('Auth still initializing, waiting...');
+      return;
+    }
+
     try {
       await executeLoadHome(async () => {
-        if (currentUser) {
+        if (currentUser && !currentUser.isAnonymous) {
+          console.log('Loading data for authenticated user:', currentUser.uid);
+          
+          // Add extra check to ensure user is fully authenticated
+          const token = await currentUser.getIdToken(false);
+          if (!token) {
+            console.warn('User token not available, skipping data load');
+            return;
+          }
+          
           // Load authenticated user data
           const [wines, userDrafts, goal] = await Promise.all([
-            tastingRecordService.getUserTastingRecordsWithWineInfo(currentUser.uid, 'date'),
-            draftService.getUserDrafts(currentUser.uid),
-            goalService.initializeTodayGoal(currentUser.uid)
+            tastingRecordService.getUserTastingRecordsWithWineInfo(currentUser.uid, 'date', 5).catch(error => {
+              console.error('Failed to load wines:', error);
+              return [];
+            }),
+            draftService.getUserDrafts(currentUser.uid).catch(error => {
+              console.error('Failed to load drafts:', error);
+              return [];
+            }),
+            goalService.initializeTodayGoal(currentUser.uid).catch(error => {
+              console.error('Failed to load goal:', error);
+              return null;
+            })
           ]);
           
           setRecentWines(wines.slice(0, 3));
           setDrafts(userDrafts);
           setDailyGoal(goal);
         } else {
+          console.log('No authenticated user, loading guest data');
           // Load guest data
           const guestWines = guestDataService.getGuestWineRecordsAsWineRecords();
           setRecentWines(guestWines.slice(0, 3));
@@ -54,7 +79,7 @@ const Home: React.FC = () => {
     } catch (error) {
       console.error('Failed to load home data:', error);
     }
-  }, [currentUser, executeLoadHome]);
+  }, [currentUser, authInitializing, executeLoadHome]);
 
   useEffect(() => {
     loadHomeData();

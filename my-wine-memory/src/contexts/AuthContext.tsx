@@ -148,6 +148,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (user) {
         try {
+          // Wait a moment to ensure token is fully available
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
           // Fetch user profile from Firestore
           const profile = await userService.getUserProfile(user.uid);
           setUserProfile(profile);
