@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthHooks';
 import type { QuizQuestion } from '../types';
 import { getRandomQuestions } from '../data/sampleQuestions';
 
@@ -31,18 +31,22 @@ const QuizGame: React.FC = () => {
     setQuestions(quizQuestions);
   }, [currentUser, difficulty, navigate]);
 
-  useEffect(() => {
-    if (gameStatus === 'playing' && timeLeft > 0) {
-      const timer = setTimeout(() => {
-        setTimeLeft(timeLeft - 1);
-      }, 1000);
-      return () => clearTimeout(timer);
-    } else if (timeLeft === 0 && gameStatus === 'playing') {
-      handleTimeUp();
+  const nextQuestion = useCallback(() => {
+    if (currentQuestionIndex + 1 >= questions.length) {
+      setGameStatus('finished');
+    } else {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setSelectedAnswer(null);
+      setShowExplanation(false);
+      setIsCorrect(null);
+      setTimeLeft(30);
+      if (gameStatus === 'timeup') {
+        setGameStatus('playing');
+      }
     }
-  }, [timeLeft, gameStatus]);
+  }, [currentQuestionIndex, questions.length, gameStatus]);
 
-  const handleTimeUp = () => {
+  const handleTimeUp = useCallback(() => {
     setGameStatus('timeup');
     setHearts(hearts - 1);
     if (hearts <= 1) {
@@ -53,7 +57,18 @@ const QuizGame: React.FC = () => {
         nextQuestion();
       }, 2000);
     }
-  };
+  }, [hearts, nextQuestion]);
+
+  useEffect(() => {
+    if (gameStatus === 'playing' && timeLeft > 0) {
+      const timer = setTimeout(() => {
+        setTimeLeft(timeLeft - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else if (timeLeft === 0 && gameStatus === 'playing') {
+      handleTimeUp();
+    }
+  }, [timeLeft, gameStatus, handleTimeUp]);
 
   const handleAnswerSelect = (answerIndex: number) => {
     if (selectedAnswer !== null || showExplanation) return;
@@ -79,21 +94,6 @@ const QuizGame: React.FC = () => {
         nextQuestion();
       }
     }, 3000);
-  };
-
-  const nextQuestion = () => {
-    if (currentQuestionIndex + 1 >= questions.length) {
-      setGameStatus('finished');
-    } else {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setSelectedAnswer(null);
-      setShowExplanation(false);
-      setIsCorrect(null);
-      setTimeLeft(30);
-      if (gameStatus === 'timeup') {
-        setGameStatus('playing');
-      }
-    }
   };
 
   const restartQuiz = () => {

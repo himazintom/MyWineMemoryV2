@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import type { User as FirebaseUser } from 'firebase/auth';
 import { auth } from '../services/firebase';
@@ -6,27 +6,9 @@ import type { User } from '../types';
 import { userService } from '../services/userService';
 import { guestDataService } from '../services/guestDataService';
 import { wineService } from '../services/wineService';
+import type { AuthContextType } from './AuthTypes';
 
-interface AuthContextType {
-  currentUser: FirebaseUser | null;
-  userProfile: User | null;
-  loading: boolean;
-  signInWithGoogle: () => Promise<void>;
-  signInWithGoogleAndMigrateData: () => Promise<void>;
-  logout: () => Promise<void>;
-  hasGuestData: () => boolean;
-  getGuestDataSummary: () => { wineRecords: number; quizResults: number; totalXP: number };
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
@@ -44,20 +26,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Create or update user profile in Firestore
       const userProfile = await userService.createOrUpdateUser(result.user);
       setUserProfile(userProfile);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Google sign-in error:', error);
       
       // Provide more detailed error information
-      if (error.code === 'auth/popup-closed-by-user') {
-        throw new Error('サインインがキャンセルされました');
-      } else if (error.code === 'auth/popup-blocked') {
-        throw new Error('ポップアップがブロックされています。ポップアップブロッカーを無効にしてください');
-      } else if (error.code === 'auth/cancelled-popup-request') {
-        throw new Error('サインイン要求がキャンセルされました');
-      } else if (error.code === 'auth/unauthorized-domain') {
-        throw new Error('このドメインは認証が許可されていません');
+      if (error && typeof error === 'object' && 'code' in error) {
+        const authError = error as { code: string; message?: string };
+        if (authError.code === 'auth/popup-closed-by-user') {
+          throw new Error('サインインがキャンセルされました');
+        } else if (authError.code === 'auth/popup-blocked') {
+          throw new Error('ポップアップがブロックされています。ポップアップブロッカーを無効にしてください');
+        } else if (authError.code === 'auth/cancelled-popup-request') {
+          throw new Error('サインイン要求がキャンセルされました');
+        } else if (authError.code === 'auth/unauthorized-domain') {
+          throw new Error('このドメインは認証が許可されていません');
+        } else {
+          throw new Error(`サインインエラー: ${authError.message || 'Unknown error'}`);
+        }
       } else {
-        throw new Error(`サインインエラー: ${error.message}`);
+        throw new Error('サインインに失敗しました');
       }
     }
   };
@@ -87,7 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           ...guestRecord,
           createdAt: new Date(guestRecord.createdAt)
         };
-        delete (wineRecord as any).tempId;
+        delete (wineRecord as { [key: string]: unknown }).tempId;
         await wineService.createWineRecord(currentUser.uid, wineRecord);
       }
 

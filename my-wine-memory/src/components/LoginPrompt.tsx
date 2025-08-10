@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthHooks';
 import LoadingSpinner from './LoadingSpinner';
 import ErrorMessage from './ErrorMessage';
 import { useAsyncOperation } from '../hooks/useAsyncOperation';
@@ -30,8 +30,8 @@ const LoginPrompt: React.FC<LoginPromptProps> = ({
         await signInWithGoogle();
       });
       onLoginSuccess();
-    } catch (error: any) {
-      setAuthError(error.message || 'ログインに失敗しました');
+    } catch (error: unknown) {
+      setAuthError(error instanceof Error ? error.message : 'ログインに失敗しました');
     }
   };
 

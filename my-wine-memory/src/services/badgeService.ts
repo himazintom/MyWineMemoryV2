@@ -194,9 +194,10 @@ export const badgeService = {
     switch (badge.category) {
       case 'recording':
         return Math.min(100, (userStats.totalRecords / badge.requirement) * 100);
-      case 'streak':
+      case 'streak': {
         const maxStreak = Math.max(userStats.currentStreak, userStats.longestStreak);
         return Math.min(100, (maxStreak / badge.requirement) * 100);
+      }
       case 'quiz':
         return Math.min(100, (userStats.totalQuizzes / badge.requirement) * 100);
       case 'exploration':

@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthHooks';
 import { wineMasterService } from '../services/wineMasterService';
 import { tastingRecordService } from '../services/tastingRecordService';
 import type { WineMaster, TastingRecord } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
+import TastingAnalysisCharts from '../components/TastingAnalysisCharts';
 import { useAsyncOperation } from '../hooks/useAsyncOperation';
 
 const WineDetail: React.FC = () => {
@@ -16,20 +17,12 @@ const WineDetail: React.FC = () => {
   const [wine, setWine] = useState<WineMaster | null>(null);
   const [tastingRecords, setTastingRecords] = useState<TastingRecord[]>([]);
   const [selectedRecord, setSelectedRecord] = useState<TastingRecord | null>(null);
+  const [activeTab, setActiveTab] = useState<'overview' | 'records' | 'analysis'>('overview');
   
   const { loading: wineLoading, error: wineError, execute: executeLoadWine } = useAsyncOperation<WineMaster | null>();
   const { loading: recordsLoading, error: recordsError, execute: executeLoadRecords } = useAsyncOperation<TastingRecord[]>();
 
-  useEffect(() => {
-    if (wineId) {
-      loadWineData();
-      if (currentUser) {
-        loadTastingRecords();
-      }
-    }
-  }, [wineId, currentUser]);
-
-  const loadWineData = async () => {
+  const loadWineData = useCallback(async () => {
     if (!wineId) return;
     
     try {
@@ -38,9 +31,9 @@ const WineDetail: React.FC = () => {
     } catch (error) {
       console.error('Failed to load wine data:', error);
     }
-  };
+  }, [wineId, executeLoadWine]);
 
-  const loadTastingRecords = async () => {
+  const loadTastingRecords = useCallback(async () => {
     if (!wineId || !currentUser) return;
     
     try {
@@ -51,7 +44,16 @@ const WineDetail: React.FC = () => {
     } catch (error) {
       console.error('Failed to load tasting records:', error);
     }
-  };
+  }, [wineId, currentUser, executeLoadRecords]);
+
+  useEffect(() => {
+    if (wineId) {
+      loadWineData();
+      if (currentUser) {
+        loadTastingRecords();
+      }
+    }
+  }, [wineId, currentUser, loadWineData, loadTastingRecords]);
 
   const handleAddTasting = () => {
     if (wineId) {
@@ -93,6 +95,14 @@ const WineDetail: React.FC = () => {
   const calculateAverageRating = () => {
     if (tastingRecords.length === 0) return 0;
     return tastingRecords.reduce((sum, record) => sum + record.overallRating, 0) / tastingRecords.length;
+  };
+
+  const getDetailedRecords = () => {
+    return tastingRecords.filter(record => record.detailedAnalysis);
+  };
+
+  const hasDetailedAnalysis = () => {
+    return getDetailedRecords().length > 0;
   };
 
   if (wineLoading) {
@@ -193,155 +203,281 @@ const WineDetail: React.FC = () => {
           </div>
         </div>
 
-        {/* Tasting Statistics */}
-        {tastingRecords.length > 0 && (
-          <div className="tasting-stats-section">
-            <h3>あなたのテイスティング統計</h3>
-            <div className="stats-grid">
-              <div className="stat-card">
-                <div className="stat-value">{tastingRecords.length}</div>
-                <div className="stat-label">記録数</div>
+        {/* Tab Navigation */}
+        <div className="tab-navigation">
+          <button 
+            className={`tab-button ${activeTab === 'overview' ? 'active' : ''}`}
+            onClick={() => setActiveTab('overview')}
+          >
+            概要
+          </button>
+          <button 
+            className={`tab-button ${activeTab === 'records' ? 'active' : ''}`}
+            onClick={() => setActiveTab('records')}
+          >
+            記録一覧 ({tastingRecords.length})
+          </button>
+          {hasDetailedAnalysis() && (
+            <button 
+              className={`tab-button ${activeTab === 'analysis' ? 'active' : ''}`}
+              onClick={() => setActiveTab('analysis')}
+            >
+              詳細分析 ({getDetailedRecords().length})
+            </button>
+          )}
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === 'overview' && (
+          <div className="tab-content">
+            {/* Tasting Statistics */}
+            {tastingRecords.length > 0 && (
+              <div className="tasting-stats-section">
+                <h3>あなたのテイスティング統計</h3>
+                <div className="stats-grid">
+                  <div className="stat-card">
+                    <div className="stat-value">{tastingRecords.length}</div>
+                    <div className="stat-label">記録数</div>
+                  </div>
+                  <div className="stat-card">
+                    <div 
+                      className="stat-value"
+                      style={{ color: getRatingColor(averageRating) }}
+                    >
+                      {averageRating.toFixed(1)}
+                    </div>
+                    <div className="stat-label">平均評価</div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-value">
+                      {Math.max(...tastingRecords.map(r => r.overallRating)).toFixed(1)}
+                    </div>
+                    <div className="stat-label">最高評価</div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-value">
+                      {formatDate(new Date(Math.max(...tastingRecords.map(r => r.tastingDate.getTime()))))}
+                    </div>
+                    <div className="stat-label">最新記録</div>
+                  </div>
+                </div>
               </div>
-              <div className="stat-card">
-                <div 
-                  className="stat-value"
-                  style={{ color: getRatingColor(averageRating) }}
+            )}
+
+            {/* Recent Records Summary */}
+            {tastingRecords.length > 0 && (
+              <div className="recent-records-section">
+                <h3>最新の記録</h3>
+                <div className="recent-records-list">
+                  {tastingRecords.slice(0, 3).map((record) => (
+                    <div key={record.id} className="recent-record-item">
+                      <div className="recent-record-date">
+                        {formatDate(record.tastingDate)}
+                      </div>
+                      <div 
+                        className="recent-record-rating"
+                        style={{ color: getRatingColor(record.overallRating) }}
+                      >
+                        {record.overallRating.toFixed(1)}/10
+                      </div>
+                      <div className="recent-record-mode">
+                        {record.recordMode === 'quick' ? 'クイック' : '詳細'}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {tastingRecords.length > 3 && (
+                  <button 
+                    className="view-all-records-button"
+                    onClick={() => setActiveTab('records')}
+                  >
+                    全ての記録を見る ({tastingRecords.length}件)
+                  </button>
+                )}
+              </div>
+            )}
+
+            {tastingRecords.length === 0 && (
+              <div className="no-records">
+                <p>まだこのワインの記録がありません</p>
+                <button 
+                  className="add-first-record-button"
+                  onClick={handleAddTasting}
                 >
-                  {averageRating.toFixed(1)}
-                </div>
-                <div className="stat-label">平均評価</div>
+                  🍷 最初の記録を追加
+                </button>
               </div>
-              <div className="stat-card">
-                <div className="stat-value">
-                  {Math.max(...tastingRecords.map(r => r.overallRating)).toFixed(1)}
+            )}
+          </div>
+        )}
+
+        {activeTab === 'records' && (
+          <div className="tab-content">
+            <div className="tasting-records-section">
+              <h3>テイスティング記録一覧</h3>
+              
+              {recordsLoading && <LoadingSpinner message="記録を読み込み中..." />}
+              
+              {recordsError && (
+                <ErrorMessage
+                  title="記録の読み込みに失敗しました"
+                  message={recordsError}
+                  onRetry={loadTastingRecords}
+                />
+              )}
+
+              {!recordsLoading && !recordsError && tastingRecords.length > 0 && (
+                <div className="records-list">
+                  {tastingRecords.map((record) => (
+                    <div 
+                      key={record.id} 
+                      className="tasting-record-card"
+                      onClick={() => setSelectedRecord(selectedRecord?.id === record.id ? null : record)}
+                    >
+                      <div className="record-header">
+                        <div className="record-date">
+                          {formatDate(record.tastingDate)}
+                        </div>
+                        <div 
+                          className="record-rating"
+                          style={{ color: getRatingColor(record.overallRating) }}
+                        >
+                          {record.overallRating.toFixed(1)}/10
+                        </div>
+                        <div className="record-mode-badge">
+                          {record.recordMode === 'quick' ? 'クイック' : '詳細'}
+                        </div>
+                      </div>
+
+                      {selectedRecord?.id === record.id && (
+                        <div className="record-details">
+                          {record.notes && (
+                            <div className="detail-section">
+                              <h4>テイスティングメモ</h4>
+                              <p>{record.notes}</p>
+                            </div>
+                          )}
+                          
+                          {record.price && (
+                            <div className="detail-section">
+                              <h4>購入価格</h4>
+                              <p>¥{record.price.toLocaleString()}</p>
+                            </div>
+                          )}
+                          
+                          {record.purchaseLocation && (
+                            <div className="detail-section">
+                              <h4>購入場所</h4>
+                              <p>{record.purchaseLocation}</p>
+                            </div>
+                          )}
+
+                          {record.images && record.images.length > 0 && (
+                            <div className="detail-section">
+                              <h4>写真</h4>
+                              <div className="record-images">
+                                {record.images.map((imageUrl, index) => (
+                                  <img 
+                                    key={index}
+                                    src={imageUrl} 
+                                    alt={`テイスティング写真 ${index + 1}`}
+                                    className="record-image"
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          <div className="record-actions">
+                            <button 
+                              className="edit-record-button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditRecord(record.id);
+                              }}
+                            >
+                              ✏️ 編集
+                            </button>
+                            <button 
+                              className="delete-record-button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteRecord(record.id);
+                              }}
+                            >
+                              🗑️ 削除
+                            </button>
+                            {record.detailedAnalysis && (
+                              <button 
+                                className="view-analysis-button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedRecord(record);
+                                  setActiveTab('analysis');
+                                }}
+                              >
+                                📊 詳細分析を見る
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
-                <div className="stat-label">最高評価</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-value">
-                  {formatDate(new Date(Math.max(...tastingRecords.map(r => r.tastingDate.getTime()))))}
-                </div>
-                <div className="stat-label">最新記録</div>
-              </div>
+              )}
             </div>
           </div>
         )}
 
-        {/* Tasting Records List */}
-        <div className="tasting-records-section">
-          <h3>テイスティング記録 ({tastingRecords.length}件)</h3>
-          
-          {recordsLoading && <LoadingSpinner message="記録を読み込み中..." />}
-          
-          {recordsError && (
-            <ErrorMessage
-              title="記録の読み込みに失敗しました"
-              message={recordsError}
-              onRetry={loadTastingRecords}
-            />
-          )}
-
-          {!recordsLoading && !recordsError && tastingRecords.length === 0 && (
-            <div className="no-records">
-              <p>まだこのワインの記録がありません</p>
-              <button 
-                className="add-first-record-button"
-                onClick={handleAddTasting}
-              >
-                🍷 最初の記録を追加
-              </button>
-            </div>
-          )}
-
-          {!recordsLoading && !recordsError && tastingRecords.length > 0 && (
-            <div className="records-list">
-              {tastingRecords.map((record) => (
-                <div 
-                  key={record.id} 
-                  className="tasting-record-card"
-                  onClick={() => setSelectedRecord(selectedRecord?.id === record.id ? null : record)}
-                >
-                  <div className="record-header">
-                    <div className="record-date">
-                      {formatDate(record.tastingDate)}
-                    </div>
-                    <div 
-                      className="record-rating"
-                      style={{ color: getRatingColor(record.overallRating) }}
-                    >
-                      {record.overallRating.toFixed(1)}/10
-                    </div>
-                    <div className="record-mode-badge">
-                      {record.recordMode === 'quick' ? 'クイック' : '詳細'}
-                    </div>
-                  </div>
-
-                  {selectedRecord?.id === record.id && (
-                    <div className="record-details">
-                      {record.notes && (
-                        <div className="detail-section">
-                          <h4>テイスティングメモ</h4>
-                          <p>{record.notes}</p>
-                        </div>
-                      )}
-                      
-                      {record.price && (
-                        <div className="detail-section">
-                          <h4>購入価格</h4>
-                          <p>¥{record.price.toLocaleString()}</p>
-                        </div>
-                      )}
-                      
-                      {record.purchaseLocation && (
-                        <div className="detail-section">
-                          <h4>購入場所</h4>
-                          <p>{record.purchaseLocation}</p>
-                        </div>
-                      )}
-
-                      {record.images && record.images.length > 0 && (
-                        <div className="detail-section">
-                          <h4>写真</h4>
-                          <div className="record-images">
-                            {record.images.map((imageUrl, index) => (
-                              <img 
-                                key={index}
-                                src={imageUrl} 
-                                alt={`テイスティング写真 ${index + 1}`}
-                                className="record-image"
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="record-actions">
-                        <button 
-                          className="edit-record-button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEditRecord(record.id);
-                          }}
-                        >
-                          ✏️ 編集
-                        </button>
-                        <button 
-                          className="delete-record-button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteRecord(record.id);
-                          }}
-                        >
-                          🗑️ 削除
-                        </button>
-                      </div>
+        {activeTab === 'analysis' && (
+          <div className="tab-content">
+            <div className="analysis-section">
+              <h3>詳細分析</h3>
+              
+              {getDetailedRecords().length === 0 ? (
+                <div className="no-detailed-analysis">
+                  <p>詳細モードで記録されたテイスティングデータがありません</p>
+                  <p>詳細モードで新しい記録を追加すると、グラフによる分析が表示されます。</p>
+                  <button 
+                    className="add-detailed-record-button"
+                    onClick={handleAddTasting}
+                  >
+                    詳細記録を追加
+                  </button>
+                </div>
+              ) : (
+                <div className="detailed-analysis-container">
+                  {/* Record Selector for Analysis */}
+                  {getDetailedRecords().length > 1 && (
+                    <div className="analysis-record-selector">
+                      <label htmlFor="analysis-record-select">分析する記録を選択:</label>
+                      <select 
+                        id="analysis-record-select"
+                        value={selectedRecord?.id || getDetailedRecords()[0].id}
+                        onChange={(e) => {
+                          const record = getDetailedRecords().find(r => r.id === e.target.value);
+                          setSelectedRecord(record || null);
+                        }}
+                      >
+                        {getDetailedRecords().map((record) => (
+                          <option key={record.id} value={record.id}>
+                            {formatDate(record.tastingDate)} - 評価: {record.overallRating.toFixed(1)}/10
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   )}
+
+                  {/* Analysis Charts */}
+                  <TastingAnalysisCharts 
+                    record={selectedRecord || getDetailedRecords()[0]} 
+                  />
                 </div>
-              ))}
+              )}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </main>
     </div>
   );

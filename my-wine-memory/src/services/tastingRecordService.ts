@@ -180,7 +180,7 @@ class TastingRecordService {
   ): Promise<void> {
     try {
       const docRef = doc(db, this.collection, id);
-      const updateData: any = {
+      const updateData: Record<string, unknown> = {
         ...data,
         updatedAt: Timestamp.fromDate(new Date())
       };

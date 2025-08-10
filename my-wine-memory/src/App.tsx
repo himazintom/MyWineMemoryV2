@@ -1,17 +1,21 @@
+import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
-import Home from './pages/Home';
-import Quiz from './pages/Quiz';
-import Stats from './pages/Stats';
-import Profile from './pages/Profile';
-import Records from './pages/Records';
-import SelectWine from './pages/SelectWine';
-import AddTastingRecord from './pages/AddTastingRecord';
-import WineDetail from './pages/WineDetail';
-import QuizGame from './pages/QuizGame';
 import BottomNavigation from './components/BottomNavigation';
+import LoadingSpinner from './components/LoadingSpinner';
 import './App.css';
+
+// Lazy load page components
+const Home = React.lazy(() => import('./pages/Home'));
+const Quiz = React.lazy(() => import('./pages/Quiz'));
+const Stats = React.lazy(() => import('./pages/Stats'));
+const Profile = React.lazy(() => import('./pages/Profile'));
+const Records = React.lazy(() => import('./pages/Records'));
+const SelectWine = React.lazy(() => import('./pages/SelectWine'));
+const AddTastingRecord = React.lazy(() => import('./pages/AddTastingRecord'));
+const WineDetail = React.lazy(() => import('./pages/WineDetail'));
+const QuizGame = React.lazy(() => import('./pages/QuizGame'));
 
 function App() {
   return (
@@ -20,18 +24,29 @@ function App() {
         <Router>
           <div className="app">
             <main className="main-content">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/records" element={<Records />} />
-                <Route path="/select-wine" element={<SelectWine />} />
-                <Route path="/add-tasting-record/:wineId" element={<AddTastingRecord />} />
-                <Route path="/edit-tasting-record/:recordId" element={<AddTastingRecord />} />
-                <Route path="/wine-detail/:wineId" element={<WineDetail />} />
-                <Route path="/quiz" element={<Quiz />} />
-                <Route path="/quiz/play/:difficulty" element={<QuizGame />} />
-                <Route path="/stats" element={<Stats />} />
-                <Route path="/profile" element={<Profile />} />
-              </Routes>
+              <Suspense fallback={
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  alignItems: 'center', 
+                  height: '50vh' 
+                }}>
+                  <LoadingSpinner message="ページを読み込み中..." />
+                </div>
+              }>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/records" element={<Records />} />
+                  <Route path="/select-wine" element={<SelectWine />} />
+                  <Route path="/add-tasting-record/:wineId" element={<AddTastingRecord />} />
+                  <Route path="/edit-tasting-record/:recordId" element={<AddTastingRecord />} />
+                  <Route path="/wine-detail/:wineId" element={<WineDetail />} />
+                  <Route path="/quiz" element={<Quiz />} />
+                  <Route path="/quiz/play/:difficulty" element={<QuizGame />} />
+                  <Route path="/stats" element={<Stats />} />
+                  <Route path="/profile" element={<Profile />} />
+                </Routes>
+              </Suspense>
             </main>
             <BottomNavigation />
           </div>

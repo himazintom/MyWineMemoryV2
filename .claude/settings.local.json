@@ -22,7 +22,10 @@
       "Bash(git commit:*)",
       "Bash(npm outdated)",
       "Bash(grep:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(timeout 10 npm run dev)",
+      "Bash(npm run lint)",
+      "Bash(npx depcheck:*)"
     ],
     "deny": []
   },

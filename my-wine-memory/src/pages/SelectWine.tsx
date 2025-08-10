@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { wineMasterService } from '../services/wineMasterService';
 import type { WineMaster } from '../types';
@@ -16,9 +16,30 @@ const SelectWine: React.FC = () => {
   const { loading: searchLoading, error: searchError, execute: executeSearch } = useAsyncOperation<WineMaster[]>();
   const { loading: popularLoading, error: popularError, execute: executeLoadPopular } = useAsyncOperation<WineMaster[]>();
 
+
+  const loadPopularWines = useCallback(async () => {
+    try {
+      const wines = await executeLoadPopular(() => wineMasterService.getPopularWines(10));
+      setPopularWines(wines || []);
+    } catch (error) {
+      console.error('Failed to load popular wines:', error);
+    }
+  }, [executeLoadPopular]);
+
+  const searchWines = useCallback(async () => {
+    if (!searchTerm.trim()) return;
+
+    try {
+      const results = await executeSearch(() => wineMasterService.searchWineMasters(searchTerm, 20));
+      setSearchResults(results || []);
+    } catch (error) {
+      console.error('Failed to search wines:', error);
+    }
+  }, [searchTerm, executeSearch]);
+
   useEffect(() => {
     loadPopularWines();
-  }, []);
+  }, [loadPopularWines]);
 
   useEffect(() => {
     if (searchTerm.trim()) {
@@ -30,27 +51,7 @@ const SelectWine: React.FC = () => {
     } else {
       setSearchResults([]);
     }
-  }, [searchTerm]);
-
-  const loadPopularWines = async () => {
-    try {
-      const wines = await executeLoadPopular(() => wineMasterService.getPopularWines(10));
-      setPopularWines(wines || []);
-    } catch (error) {
-      console.error('Failed to load popular wines:', error);
-    }
-  };
-
-  const searchWines = async () => {
-    if (!searchTerm.trim()) return;
-
-    try {
-      const results = await executeSearch(() => wineMasterService.searchWineMasters(searchTerm, 20));
-      setSearchResults(results || []);
-    } catch (error) {
-      console.error('Failed to search wines:', error);
-    }
-  };
+  }, [searchTerm, searchWines]);
 
   const handleSelectWine = (wineId: string) => {
     navigate(`/add-tasting-record/${wineId}`);

@@ -105,7 +105,9 @@ my-wine-memory/src/
 │   ├── BottomNavigation.tsx
 │   ├── WineCard.tsx
 │   ├── LoadingSpinner.tsx
-│   └── ErrorMessage.tsx
+│   ├── ErrorMessage.tsx
+│   ├── LoginPrompt.tsx
+│   └── ThemeToggle.tsx
 ├── pages/              # Route components
 │   ├── Home.tsx        # Dashboard with quick actions
 │   ├── SelectWine.tsx  # Step 1: Wine selection/creation
@@ -115,10 +117,11 @@ my-wine-memory/src/
 │   ├── Quiz.tsx
 │   ├── QuizGame.tsx
 │   ├── Stats.tsx
-│   ├── Profile.tsx
-│   └── AddWine.tsx     # Legacy page (to be removed)
+│   └── Profile.tsx
 ├── hooks/              # Custom React hooks
-│   └── useAsyncOperation.ts
+│   ├── useAsyncOperation.ts
+│   ├── useAutoSave.ts
+│   └── useNetworkStatus.ts
 ├── services/           # Firebase services, API calls
 │   ├── wineMasterService.ts     # WineMaster CRUD operations
 │   ├── tastingRecordService.ts  # TastingRecord CRUD operations
@@ -126,7 +129,8 @@ my-wine-memory/src/
 │   ├── userService.ts
 │   └── guestDataService.ts
 ├── contexts/           # React contexts for global state
-│   └── AuthContext.tsx
+│   ├── AuthContext.tsx
+│   └── ThemeContext.tsx
 ├── types/              # TypeScript type definitions
 │   └── index.ts        # WineMaster, TastingRecord interfaces
 ├── App.tsx             # Main routing component
@@ -180,12 +184,11 @@ my-wine-memory/src/
 ├── /quiz/play/:difficulty          # Quiz game
 ├── /stats                          # User statistics
 ├── /profile                        # User profile
-└── /add-wine                       # Legacy page (to be removed)
 ```
 
 ### Database Collections:
 
-1. **wineMasters** - Shared wine data
+1. **wines_master** - Shared wine data
    ```typescript
    {
      id: string,
@@ -202,7 +205,7 @@ my-wine-memory/src/
    }
    ```
 
-2. **tastingRecords** - Individual user experiences
+2. **tasting_records** - Individual user experiences
    ```typescript
    {
      id: string,

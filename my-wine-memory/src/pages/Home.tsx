@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthHooks';
+import { useTheme } from '../contexts/ThemeHooks';
 import { tastingRecordService } from '../services/tastingRecordService';
 import { draftService } from '../services/wineService';
 import { goalService } from '../services/userService';
@@ -29,21 +29,7 @@ const Home: React.FC = () => {
   const { loading, error, execute: executeLoadHome } = useAsyncOperation<void>();
   const { loading: authLoading, execute: executeAuth } = useAsyncOperation<void>();
 
-  useEffect(() => {
-    loadHomeData();
-  }, [currentUser]);
-
-  // モバイル判定（リサイズ対応）
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return;
-    const mql = window.matchMedia('(max-width: 767px)');
-    const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    setIsMobile(mql.matches);
-    mql.addEventListener('change', onChange);
-    return () => mql.removeEventListener('change', onChange);
-  }, []);
-
-  const loadHomeData = async () => {
+  const loadHomeData = useCallback(async () => {
     try {
       await executeLoadHome(async () => {
         if (currentUser) {
@@ -68,7 +54,21 @@ const Home: React.FC = () => {
     } catch (error) {
       console.error('Failed to load home data:', error);
     }
-  };
+  }, [currentUser, executeLoadHome]);
+
+  useEffect(() => {
+    loadHomeData();
+  }, [loadHomeData]);
+
+  // モバイル判定（リサイズ対応）
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mql = window.matchMedia('(max-width: 767px)');
+    const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    setIsMobile(mql.matches);
+    mql.addEventListener('change', onChange);
+    return () => mql.removeEventListener('change', onChange);
+  }, []);
 
   const calculateProgress = (completed: number, goal: number) => {
     return Math.min(100, (completed / goal) * 100);
@@ -85,20 +85,20 @@ const Home: React.FC = () => {
       await executeAuth(async () => {
         await signInWithGoogle();
       });
-    } catch (error: any) {
-      setAuthError(error.message || 'ログインに失敗しました');
+    } catch (error: unknown) {
+      setAuthError(error instanceof Error ? error.message : 'ログインに失敗しました');
     }
   };
 
   // 可用ならモバイル用ヒーロー画像を使用（存在しない場合はデスクトップを流用）
-  const heroModules = import.meta.glob('../assets/images/hero/*', { eager: true }) as Record<string, any>;
+  const heroModules = import.meta.glob('../assets/images/hero/*', { eager: true }) as Record<string, { default: string }>;
   const getUrl = (p: string) => (heroModules[p]?.default as string | undefined);
   const mobileDark = getUrl('../assets/images/hero/home-hero-mobile-dark.webp');
   const mobileLight = getUrl('../assets/images/hero/home-hero-mobile-light.webp');
   const heroImage = theme === 'dark'
     ? (isMobile && mobileDark ? mobileDark : heroDark)
     : (isMobile && mobileLight ? mobileLight : heroLight);
-  const heroStyle = { ['--hero-image-url' as any]: `url(${heroImage})` } as React.CSSProperties;
+  const heroStyle = { '--hero-image-url': `url(${heroImage})` } as React.CSSProperties & { '--hero-image-url': string };
 
   return (
     <div className="page-container">

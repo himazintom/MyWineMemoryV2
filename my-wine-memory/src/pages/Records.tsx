@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthHooks';
 import { tastingRecordService } from '../services/tastingRecordService';
 import { wineMasterService } from '../services/wineMasterService';
 import type { WineMaster, TastingRecord } from '../types';
@@ -25,17 +25,7 @@ const Records: React.FC = () => {
 
   const { loading, error, execute: executeLoadRecords } = useAsyncOperation<WineWithTastings[]>();
 
-  useEffect(() => {
-    if (currentUser) {
-      loadRecords();
-    }
-  }, [currentUser]);
-
-  useEffect(() => {
-    filterAndSortRecords();
-  }, [wineGroups, searchTerm, sortBy]);
-
-  const loadRecords = async () => {
+  const loadRecords = useCallback(async () => {
     if (!currentUser) return;
 
     try {
@@ -79,38 +69,45 @@ const Records: React.FC = () => {
     } catch (error) {
       console.error('Failed to load records:', error);
     }
-  };
+  }, [currentUser, executeLoadRecords]);
 
-  const filterAndSortRecords = () => {
+  const filterAndSortRecords = useCallback(() => {
     let filtered = wineGroups;
 
     // Apply search filter
     if (searchTerm.trim()) {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(group =>
-        group.wine.wineName.toLowerCase().includes(term) ||
-        group.wine.producer.toLowerCase().includes(term) ||
-        group.wine.country.toLowerCase().includes(term) ||
-        group.wine.region.toLowerCase().includes(term)
+      filtered = filtered.filter(wineGroup => 
+        wineGroup.wine.wineName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        wineGroup.wine.producer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        wineGroup.wine.country.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Apply sorting
-    filtered = filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'date':
-          return b.latestTasting.getTime() - a.latestTasting.getTime();
-        case 'rating':
-          return b.averageRating - a.averageRating;
-        case 'count':
-          return b.tastingRecords.length - a.tastingRecords.length;
-        default:
-          return 0;
-      }
-    });
+    switch (sortBy) {
+      case 'date':
+        filtered.sort((a, b) => b.latestTasting.getTime() - a.latestTasting.getTime());
+        break;
+      case 'rating':
+        filtered.sort((a, b) => b.averageRating - a.averageRating);
+        break;
+      case 'count':
+        filtered.sort((a, b) => b.tastingRecords.length - a.tastingRecords.length);
+        break;
+    }
 
     setFilteredWineGroups(filtered);
-  };
+  }, [wineGroups, searchTerm, sortBy]);
+
+  useEffect(() => {
+    if (currentUser) {
+      loadRecords();
+    }
+  }, [currentUser, loadRecords]);
+
+  useEffect(() => {
+    filterAndSortRecords();
+  }, [filterAndSortRecords]);
 
   const handleWineClick = (wineId: string) => {
     navigate(`/wine-detail/${wineId}`);

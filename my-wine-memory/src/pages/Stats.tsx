@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '../contexts/AuthHooks';
 import { userService } from '../services/userService';
 import { badgeService } from '../services/badgeService';
 import type { UserStats } from '../types';
@@ -10,15 +10,8 @@ const Stats: React.FC = () => {
   const [badgeCount, setBadgeCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (currentUser) {
-      loadStats();
-    } else {
-      setLoading(false);
-    }
-  }, [currentUser]);
 
-  const loadStats = async () => {
+  const loadStats = useCallback(async () => {
     if (!currentUser) return;
     
     try {
@@ -39,7 +32,15 @@ const Stats: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (currentUser) {
+      loadStats();
+    } else {
+      setLoading(false);
+    }
+  }, [currentUser, loadStats]);
 
   const formatAverage = (avg: number) => {
     return avg > 0 ? avg.toFixed(1) : '-';

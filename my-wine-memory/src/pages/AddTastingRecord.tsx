@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthHooks';
 import { wineMasterService } from '../services/wineMasterService';
 import { tastingRecordService } from '../services/tastingRecordService';
 import { userService, goalService } from '../services/userService';
@@ -30,11 +30,55 @@ const AddTastingRecord: React.FC = () => {
     price: '',
     purchaseLocation: '',
     tastingDate: new Date().toISOString().split('T')[0],
-    images: [] as File[]
+    images: [] as File[],
+    // Detailed analysis fields
+    visualAnalysis: {
+      color: '',
+      clarity: '',
+      viscosity: ''
+    },
+    aromaAnalysis: {
+      firstImpression: '',
+      afterSwirling: '',
+      aromaIntensity: 5,
+      aromaCategories: [] as string[]
+    },
+    tasteAnalysis: {
+      attack: '',
+      development: '',
+      finish: '',
+      finishLength: 5
+    },
+    componentAnalysis: {
+      acidity: 5,
+      tannins: 5,
+      sweetness: 5,
+      body: 5,
+      alcohol: 5
+    },
+    environmentalFactors: {
+      temperature: '',
+      glassware: '',
+      decantingTime: ''
+    },
+    foodPairings: '',
+    personalNotes: '',
+    referenceUrls: [] as string[]
   });
 
   // New wine data from location state (if creating new wine)
   const newWineData = location.state?.newWineData;
+
+  const loadWineData = useCallback(async () => {
+    if (!wineId || wineId === 'new') return;
+    
+    try {
+      const wineData = await executeLoadWine(() => wineMasterService.getWineMaster(wineId));
+      setWine(wineData);
+    } catch (error) {
+      console.error('Failed to load wine data:', error);
+    }
+  }, [wineId, executeLoadWine]);
 
   useEffect(() => {
     if (wineId && wineId !== 'new') {
@@ -52,22 +96,54 @@ const AddTastingRecord: React.FC = () => {
     } else {
       navigate('/select-wine');
     }
-  }, [wineId, newWineData]);
-
-  const loadWineData = async () => {
-    if (!wineId || wineId === 'new') return;
-    
-    try {
-      const wineData = await executeLoadWine(() => wineMasterService.getWineMaster(wineId));
-      setWine(wineData);
-    } catch (error) {
-      console.error('Failed to load wine data:', error);
-    }
-  };
+  }, [wineId, newWineData, loadWineData, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleNestedInputChange = (section: string, field: string, value: string | number) => {
+    setFormData(prev => ({
+      ...prev,
+      [section]: {
+        ...(prev[section as keyof typeof prev] as Record<string, unknown>),
+        [field]: value
+      }
+    }));
+  };
+
+  const handleAromaCategoryToggle = (category: string) => {
+    setFormData(prev => ({
+      ...prev,
+      aromaAnalysis: {
+        ...prev.aromaAnalysis,
+        aromaCategories: prev.aromaAnalysis.aromaCategories.includes(category)
+          ? prev.aromaAnalysis.aromaCategories.filter(c => c !== category)
+          : [...prev.aromaAnalysis.aromaCategories, category]
+      }
+    }));
+  };
+
+  const addReferenceUrl = () => {
+    setFormData(prev => ({
+      ...prev,
+      referenceUrls: [...prev.referenceUrls, '']
+    }));
+  };
+
+  const updateReferenceUrl = (index: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      referenceUrls: prev.referenceUrls.map((url, i) => i === index ? value : url)
+    }));
+  };
+
+  const removeReferenceUrl = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      referenceUrls: prev.referenceUrls.filter((_, i) => i !== index)
+    }));
   };
 
   const handleRatingChange = (rating: number) => {
@@ -138,7 +214,72 @@ const AddTastingRecord: React.FC = () => {
           price: formData.price ? parseFloat(formData.price) : undefined,
           purchaseLocation: formData.purchaseLocation || undefined,
           images: imageUrls.length > 0 ? imageUrls : undefined,
-          isPublic: false // Default to private
+          isPublic: false, // Default to private
+          
+          // Detailed analysis for detailed mode
+          detailedAnalysis: recordMode === 'detailed' ? {
+            appearance: {
+              color: formData.visualAnalysis.color || '',
+              clarity: formData.visualAnalysis.clarity || '',
+              viscosity: formData.visualAnalysis.viscosity || '',
+              intensity: 3 // Default middle value
+            },
+            aroma: {
+              firstImpression: { 
+                intensity: formData.aromaAnalysis.aromaIntensity,
+                notes: formData.aromaAnalysis.firstImpression || ''
+              },
+              afterSwirling: { 
+                intensity: formData.aromaAnalysis.aromaIntensity,
+                notes: formData.aromaAnalysis.afterSwirling || ''
+              },
+              categories: {
+                fruity: formData.aromaAnalysis.aromaCategories.includes('果実') ? 1 : 0,
+                floral: formData.aromaAnalysis.aromaCategories.includes('花') ? 1 : 0,
+                spicy: formData.aromaAnalysis.aromaCategories.includes('スパイス') ? 1 : 0,
+                herbal: formData.aromaAnalysis.aromaCategories.includes('ハーブ') ? 1 : 0,
+                earthy: formData.aromaAnalysis.aromaCategories.includes('土') ? 1 : 0,
+                woody: formData.aromaAnalysis.aromaCategories.includes('木') ? 1 : 0,
+                other: formData.aromaAnalysis.aromaCategories.filter(c => 
+                  !['果実', '花', 'スパイス', 'ハーブ', '土', '木'].includes(c)
+                ).length
+              },
+              specificAromas: formData.aromaAnalysis.aromaCategories
+            },
+            taste: {
+              attack: { 
+                intensity: 5,
+                notes: formData.tasteAnalysis.attack || ''
+              },
+              development: { 
+                complexity: 5,
+                notes: formData.tasteAnalysis.development || ''
+              },
+              finish: { 
+                length: formData.tasteAnalysis.finishLength,
+                notes: formData.tasteAnalysis.finish || ''
+              }
+            },
+            structure: {
+              acidity: { intensity: formData.componentAnalysis.acidity },
+              tannins: { intensity: formData.componentAnalysis.tannins },
+              sweetness: formData.componentAnalysis.sweetness,
+              body: formData.componentAnalysis.body
+            }
+          } : undefined,
+          
+          // Environment and context
+          environment: recordMode === 'detailed' ? {
+            temperature: formData.environmentalFactors.temperature ? 
+              parseFloat(formData.environmentalFactors.temperature) : undefined,
+            glassType: formData.environmentalFactors.glassware || undefined,
+            decanted: formData.environmentalFactors.decantingTime ? 
+              formData.environmentalFactors.decantingTime !== 'なし' : undefined,
+            occasion: formData.personalNotes || undefined,
+            companions: formData.personalNotes || undefined
+          } : undefined,
+          
+          referenceUrls: formData.referenceUrls.filter(url => url.trim() !== '') || undefined
         };
 
         await tastingRecordService.createTastingRecord(currentUser.uid, tastingData);
@@ -153,7 +294,7 @@ const AddTastingRecord: React.FC = () => {
           recordMode,
           createdAt: new Date(),
           updatedAt: new Date()
-        } as any);
+        } as Parameters<typeof userService.updateStatsAfterWineRecord>[1]);
         
         const xpToAdd = recordMode === 'detailed' ? 20 : 10;
         await userService.addXP(currentUser.uid, xpToAdd);
@@ -345,10 +486,328 @@ const AddTastingRecord: React.FC = () => {
 
           {/* Detailed Mode Fields */}
           {recordMode === 'detailed' && (
-            <div className="form-section">
-              <h3>詳細分析</h3>
-              <p className="coming-soon">詳細分析機能は今後実装予定です</p>
-            </div>
+            <>
+              {/* Visual Analysis */}
+              <div className="form-section">
+                <h3>外観分析</h3>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="color">色合い</label>
+                    <input
+                      id="color"
+                      name="color"
+                      type="text"
+                      value={formData.visualAnalysis.color}
+                      onChange={(e) => handleNestedInputChange('visualAnalysis', 'color', e.target.value)}
+                      placeholder="例: 濃い赤紫、黄金色"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="clarity">透明度</label>
+                    <select
+                      id="clarity"
+                      name="clarity"
+                      value={formData.visualAnalysis.clarity}
+                      onChange={(e) => handleNestedInputChange('visualAnalysis', 'clarity', e.target.value)}
+                    >
+                      <option value="">選択してください</option>
+                      <option value="clear">透明</option>
+                      <option value="slightly_hazy">わずかに濁り</option>
+                      <option value="hazy">濁り</option>
+                      <option value="opaque">不透明</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="viscosity">粘性（脚の様子）</label>
+                  <textarea
+                    id="viscosity"
+                    name="viscosity"
+                    value={formData.visualAnalysis.viscosity}
+                    onChange={(e) => handleNestedInputChange('visualAnalysis', 'viscosity', e.target.value)}
+                    placeholder="例: ゆっくりと落ちる太い脚、サラサラとした軽い脚"
+                    rows={2}
+                  />
+                </div>
+              </div>
+
+              {/* Aroma Analysis */}
+              <div className="form-section">
+                <h3>香り分析</h3>
+                <div className="form-group">
+                  <label htmlFor="firstImpression">第一印象</label>
+                  <textarea
+                    id="firstImpression"
+                    name="firstImpression"
+                    value={formData.aromaAnalysis.firstImpression}
+                    onChange={(e) => handleNestedInputChange('aromaAnalysis', 'firstImpression', e.target.value)}
+                    placeholder="グラスに注いだ直後の香りの印象"
+                    rows={2}
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="afterSwirling">スワリング後</label>
+                  <textarea
+                    id="afterSwirling"
+                    name="afterSwirling"
+                    value={formData.aromaAnalysis.afterSwirling}
+                    onChange={(e) => handleNestedInputChange('aromaAnalysis', 'afterSwirling', e.target.value)}
+                    placeholder="グラスを回した後の香りの変化"
+                    rows={2}
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>香りの強さ ({formData.aromaAnalysis.aromaIntensity}/10)</label>
+                  <input
+                    type="range"
+                    className="component-slider"
+                    min="1"
+                    max="10"
+                    step="1"
+                    value={formData.aromaAnalysis.aromaIntensity}
+                    onChange={(e) => handleNestedInputChange('aromaAnalysis', 'aromaIntensity', parseInt(e.target.value))}
+                  />
+                  <div className="slider-labels">
+                    <span>弱い</span>
+                    <span>強い</span>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>香りのカテゴリー</label>
+                  <div className="aroma-categories">
+                    {['果実', '花', 'スパイス', '木', '土', 'ハーブ', 'ミネラル', '動物的', '化学的'].map(category => (
+                      <button
+                        key={category}
+                        type="button"
+                        className={`category-button ${formData.aromaAnalysis.aromaCategories.includes(category) ? 'active' : ''}`}
+                        onClick={() => handleAromaCategoryToggle(category)}
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Taste Analysis */}
+              <div className="form-section">
+                <h3>味わい分析</h3>
+                <div className="form-group">
+                  <label htmlFor="attack">アタック（第一印象）</label>
+                  <textarea
+                    id="attack"
+                    name="attack"
+                    value={formData.tasteAnalysis.attack}
+                    onChange={(e) => handleNestedInputChange('tasteAnalysis', 'attack', e.target.value)}
+                    placeholder="口に含んだ瞬間の印象"
+                    rows={2}
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="development">展開</label>
+                  <textarea
+                    id="development"
+                    name="development"
+                    value={formData.tasteAnalysis.development}
+                    onChange={(e) => handleNestedInputChange('tasteAnalysis', 'development', e.target.value)}
+                    placeholder="口の中での味わいの変化"
+                    rows={2}
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="finish">フィニッシュ</label>
+                  <textarea
+                    id="finish"
+                    name="finish"
+                    value={formData.tasteAnalysis.finish}
+                    onChange={(e) => handleNestedInputChange('tasteAnalysis', 'finish', e.target.value)}
+                    placeholder="飲み込んだ後の余韻"
+                    rows={2}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>余韻の長さ ({formData.tasteAnalysis.finishLength}/10)</label>
+                  <input
+                    type="range"
+                    className="component-slider"
+                    min="1"
+                    max="10"
+                    step="1"
+                    value={formData.tasteAnalysis.finishLength}
+                    onChange={(e) => handleNestedInputChange('tasteAnalysis', 'finishLength', parseInt(e.target.value))}
+                  />
+                  <div className="slider-labels">
+                    <span>短い</span>
+                    <span>長い</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Component Analysis */}
+              <div className="form-section">
+                <h3>成分分析</h3>
+                <div className="components-grid">
+                  <div className="component-item">
+                    <label>酸味 ({formData.componentAnalysis.acidity}/10)</label>
+                    <input
+                      type="range"
+                      className="component-slider"
+                      min="1"
+                      max="10"
+                      step="1"
+                      value={formData.componentAnalysis.acidity}
+                      onChange={(e) => handleNestedInputChange('componentAnalysis', 'acidity', parseInt(e.target.value))}
+                    />
+                  </div>
+                  <div className="component-item">
+                    <label>タンニン ({formData.componentAnalysis.tannins}/10)</label>
+                    <input
+                      type="range"
+                      className="component-slider"
+                      min="1"
+                      max="10"
+                      step="1"
+                      value={formData.componentAnalysis.tannins}
+                      onChange={(e) => handleNestedInputChange('componentAnalysis', 'tannins', parseInt(e.target.value))}
+                    />
+                  </div>
+                  <div className="component-item">
+                    <label>甘味 ({formData.componentAnalysis.sweetness}/10)</label>
+                    <input
+                      type="range"
+                      className="component-slider"
+                      min="1"
+                      max="10"
+                      step="1"
+                      value={formData.componentAnalysis.sweetness}
+                      onChange={(e) => handleNestedInputChange('componentAnalysis', 'sweetness', parseInt(e.target.value))}
+                    />
+                  </div>
+                  <div className="component-item">
+                    <label>ボディ ({formData.componentAnalysis.body}/10)</label>
+                    <input
+                      type="range"
+                      className="component-slider"
+                      min="1"
+                      max="10"
+                      step="1"
+                      value={formData.componentAnalysis.body}
+                      onChange={(e) => handleNestedInputChange('componentAnalysis', 'body', parseInt(e.target.value))}
+                    />
+                  </div>
+                  <div className="component-item">
+                    <label>アルコール感 ({formData.componentAnalysis.alcohol}/10)</label>
+                    <input
+                      type="range"
+                      className="component-slider"
+                      min="1"
+                      max="10"
+                      step="1"
+                      value={formData.componentAnalysis.alcohol}
+                      onChange={(e) => handleNestedInputChange('componentAnalysis', 'alcohol', parseInt(e.target.value))}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Environmental Factors */}
+              <div className="form-section">
+                <h3>環境・条件</h3>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="temperature">サービス温度</label>
+                    <input
+                      id="temperature"
+                      name="temperature"
+                      type="text"
+                      value={formData.environmentalFactors.temperature}
+                      onChange={(e) => handleNestedInputChange('environmentalFactors', 'temperature', e.target.value)}
+                      placeholder="例: 16-18℃"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="glassware">グラス</label>
+                    <input
+                      id="glassware"
+                      name="glassware"
+                      type="text"
+                      value={formData.environmentalFactors.glassware}
+                      onChange={(e) => handleNestedInputChange('environmentalFactors', 'glassware', e.target.value)}
+                      placeholder="例: ボルドーグラス"
+                    />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="decantingTime">デカンタージュ時間</label>
+                  <input
+                    id="decantingTime"
+                    name="decantingTime"
+                    type="text"
+                    value={formData.environmentalFactors.decantingTime}
+                    onChange={(e) => handleNestedInputChange('environmentalFactors', 'decantingTime', e.target.value)}
+                    placeholder="例: 1時間、なし"
+                  />
+                </div>
+              </div>
+
+              {/* Food Pairings and Additional Notes */}
+              <div className="form-section">
+                <h3>フードペアリング・追加メモ</h3>
+                <div className="form-group">
+                  <label htmlFor="foodPairings">料理との相性</label>
+                  <textarea
+                    id="foodPairings"
+                    name="foodPairings"
+                    value={formData.foodPairings}
+                    onChange={handleInputChange}
+                    placeholder="一緒に楽しんだ料理や、合いそうな料理"
+                    rows={3}
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="personalNotes">個人的なメモ</label>
+                  <textarea
+                    id="personalNotes"
+                    name="personalNotes"
+                    value={formData.personalNotes}
+                    onChange={handleInputChange}
+                    placeholder="シチュエーション、同席者、特別な思い出など"
+                    rows={3}
+                  />
+                </div>
+              </div>
+
+              {/* Reference URLs */}
+              <div className="form-section">
+                <h3>参考リンク</h3>
+                {formData.referenceUrls.map((url, index) => (
+                  <div key={index} className="reference-url-item">
+                    <input
+                      type="url"
+                      value={url}
+                      onChange={(e) => updateReferenceUrl(index, e.target.value)}
+                      placeholder="https://example.com"
+                    />
+                    <button
+                      type="button"
+                      className="remove-url-button"
+                      onClick={() => removeReferenceUrl(index)}
+                    >
+                      削除
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  className="add-url-button"
+                  onClick={addReferenceUrl}
+                >
+                  + 参考リンクを追加
+                </button>
+              </div>
+            </>
           )}
 
           {/* Save Buttons */}

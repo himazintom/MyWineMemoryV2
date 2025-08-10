@@ -7,11 +7,12 @@ import {
   increment 
 } from 'firebase/firestore';
 import { db } from './firebase';
+import type { User as FirebaseUser } from 'firebase/auth';
 import type { User, UserStats, DailyGoal } from '../types';
 
 export const userService = {
   // Create or update user profile
-  async createOrUpdateUser(firebaseUser: any): Promise<User> {
+  async createOrUpdateUser(firebaseUser: FirebaseUser): Promise<User> {
     const userRef = doc(db, 'users', firebaseUser.uid);
     const userDoc = await getDoc(userRef);
 
@@ -38,10 +39,10 @@ export const userService = {
       // Create new user
       const newUser: User = {
         id: firebaseUser.uid,
-        email: firebaseUser.email,
-        displayName: firebaseUser.displayName,
-        photoURL: firebaseUser.photoURL,
-        nickname: firebaseUser.displayName,
+        email: firebaseUser.email || '',
+        displayName: firebaseUser.displayName || '',
+        photoURL: firebaseUser.photoURL || undefined,
+        nickname: firebaseUser.displayName || undefined,
         level: 1,
         xp: 0,
         streak: 0,
@@ -155,7 +156,7 @@ export const userService = {
   },
 
   // Update user statistics when wine is added
-  async updateStatsAfterWineRecord(userId: string, wineData: any): Promise<void> {
+  async updateStatsAfterWineRecord(userId: string, wineData: { country: string; grapeVarieties?: string[] }): Promise<void> {
     const statsRef = doc(db, 'user_stats', userId);
     const currentMonth = new Date().toISOString().substring(0, 7); // YYYY-MM format
 
@@ -168,7 +169,7 @@ export const userService = {
 
     // Update grape varieties if provided
     if (wineData.grapeVarieties && wineData.grapeVarieties.length > 0) {
-      const varietyUpdates: any = {};
+      const varietyUpdates: Record<string, unknown> = {};
       wineData.grapeVarieties.forEach((variety: string) => {
         varietyUpdates[`varietyDistribution.${variety}`] = increment(1);
       });
