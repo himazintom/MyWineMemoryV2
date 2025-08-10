@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from 'react';
-import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut } from 'firebase/auth';
 import type { User as FirebaseUser } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import type { User } from '../types';
@@ -19,17 +19,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const provider = new GoogleAuthProvider();
     provider.addScope('profile');
     provider.addScope('email');
-    // Remove custom parameters that might interfere with popup
     provider.setCustomParameters({
       prompt: 'select_account'
     });
     
     try {
-      const result = await signInWithPopup(auth, provider);
+      // Try popup first, fallback to redirect on mobile or if popup fails
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       
-      // Create or update user profile in Firestore
-      const userProfile = await userService.createOrUpdateUser(result.user);
-      setUserProfile(userProfile);
+      if (isMobile) {
+        // Use redirect on mobile devices
+        await signInWithRedirect(auth, provider);
+        return; // Redirect result will be handled in useEffect
+      } else {
+        // Try popup on desktop
+        const result = await signInWithPopup(auth, provider);
+        
+        // Create or update user profile in Firestore
+        const userProfile = await userService.createOrUpdateUser(result.user);
+        setUserProfile(userProfile);
+      }
     } catch (error: unknown) {
       console.error('Google sign-in error:', error);
       
@@ -39,13 +48,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (authError.code === 'auth/popup-closed-by-user') {
           throw new Error('サインインがキャンセルされました');
         } else if (authError.code === 'auth/popup-blocked') {
-          throw new Error('ポップアップがブロックされています。ポップアップブロッカーを無効にしてください');
+          // Popup blocked, try redirect instead
+          console.log('Popup blocked, falling back to redirect');
+          await signInWithRedirect(auth, provider);
+          return;
         } else if (authError.code === 'auth/cancelled-popup-request') {
           throw new Error('サインイン要求がキャンセルされました');
         } else if (authError.code === 'auth/unauthorized-domain') {
           throw new Error('このドメインは認証が許可されていません');
         } else {
-          throw new Error(`サインインエラー: ${authError.message || 'Unknown error'}`);
+          // For any other popup error, try redirect
+          console.log('Popup failed, falling back to redirect:', authError.message);
+          try {
+            await signInWithRedirect(auth, provider);
+            return;
+          } catch (redirectError) {
+            throw new Error(`サインインエラー: ${authError.message || 'Unknown error'}`);
+          }
         }
       } else {
         throw new Error('サインインに失敗しました');
@@ -143,6 +162,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     return unsubscribe;
+  }, []);
+
+  // Handle redirect result on component mount
+  useEffect(() => {
+    const handleRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result) {
+          console.log('Redirect sign-in successful');
+          // Create or update user profile in Firestore
+          const userProfile = await userService.createOrUpdateUser(result.user);
+          setUserProfile(userProfile);
+        }
+      } catch (error) {
+        console.error('Redirect result error:', error);
+      }
+    };
+    
+    handleRedirectResult();
   }, []);
 
   const value: AuthContextType = {
