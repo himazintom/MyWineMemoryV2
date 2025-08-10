@@ -19,6 +19,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const provider = new GoogleAuthProvider();
     provider.addScope('profile');
     provider.addScope('email');
+    provider.setCustomParameters({
+      redirect_uri: window.location.origin,
+      popup: 'true'
+    });
     
     try {
       const result = await signInWithPopup(auth, provider);

@@ -12,6 +12,12 @@ export interface User {
   badges: Badge[];
   createdAt: Date;
   updatedAt: Date;
+  // Privacy settings
+  privacySettings?: {
+    defaultRecordVisibility: 'public' | 'private';
+    allowPublicProfile: boolean;
+    pushNotifications: boolean;
+  };
 }
 
 // Wine Master Data (shared across users)

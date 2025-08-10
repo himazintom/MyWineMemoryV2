@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthHooks';
 import { badgeService } from '../services/badgeService';
 import { userService } from '../services/userService';
+import ThemeToggle from '../components/ThemeToggle';
 import type { Badge, UserStats } from '../types';
 
 const Profile: React.FC = () => {
@@ -53,6 +54,26 @@ const Profile: React.FC = () => {
 
   const getCategoryBadges = (category: Badge['category']) => {
     return badges.filter(badge => badge.category === category);
+  };
+
+  const handlePrivacySettingChange = async (setting: string, value: boolean | string) => {
+    if (!currentUser || !userProfile) return;
+    
+    try {
+      const updatedSettings = {
+        ...userProfile.privacySettings,
+        [setting]: value
+      };
+      
+      await userService.updateUserPrivacySettings(currentUser.uid, updatedSettings);
+      
+      // Note: This is a simple approach. In a real app, you'd want to update the context
+      // or use a proper state management solution to reflect changes immediately
+      loadUserData();
+    } catch (error) {
+      console.error('Failed to update privacy settings:', error);
+      alert('プライバシー設定の更新に失敗しました。');
+    }
   };
 
   return (
@@ -158,17 +179,48 @@ const Profile: React.FC = () => {
         
         <div className="settings">
           <h3>設定</h3>
+          
           <div className="setting-item">
-            <label>
-              <input type="checkbox" />
-              通知を有効にする
+            <label className="setting-label">
+              <span>プッシュ通知</span>
+              <input 
+                type="checkbox" 
+                checked={userProfile?.privacySettings?.pushNotifications ?? false}
+                onChange={(e) => handlePrivacySettingChange('pushNotifications', e.target.checked)}
+                className="setting-checkbox"
+              />
             </label>
           </div>
+          
           <div className="setting-item">
-            <label>
-              <input type="checkbox" />
-              記録を公開する
+            <label className="setting-label">
+              <span>記録をデフォルトで公開する</span>
+              <input 
+                type="checkbox" 
+                checked={userProfile?.privacySettings?.defaultRecordVisibility === 'public'}
+                onChange={(e) => handlePrivacySettingChange('defaultRecordVisibility', e.target.checked ? 'public' : 'private')}
+                className="setting-checkbox"
+              />
             </label>
+          </div>
+          
+          <div className="setting-item">
+            <label className="setting-label">
+              <span>プロフィールを公開する</span>
+              <input 
+                type="checkbox" 
+                checked={userProfile?.privacySettings?.allowPublicProfile ?? false}
+                onChange={(e) => handlePrivacySettingChange('allowPublicProfile', e.target.checked)}
+                className="setting-checkbox"
+              />
+            </label>
+          </div>
+          
+          <div className="setting-item">
+            <div className="setting-label">
+              <span>テーマ</span>
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </main>

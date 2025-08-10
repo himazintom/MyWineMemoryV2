@@ -225,5 +225,23 @@ export const goalService = {
     await updateDoc(goalRef, {
       [field]: increment(amount)
     });
+  },
+
+  // Update user privacy settings
+  async updateUserPrivacySettings(userId: string, privacySettings: {
+    defaultRecordVisibility: 'public' | 'private';
+    allowPublicProfile: boolean;
+    pushNotifications: boolean;
+  }): Promise<void> {
+    try {
+      const userRef = doc(db, 'users', userId);
+      await updateDoc(userRef, {
+        privacySettings,
+        updatedAt: Timestamp.fromDate(new Date())
+      });
+    } catch (error) {
+      console.error('Error updating user privacy settings:', error);
+      throw new Error('プライバシー設定の更新に失敗しました');
+    }
   }
 };

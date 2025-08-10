@@ -479,6 +479,27 @@ const AddTastingRecord: React.FC = () => {
               {formData.images.length > 0 && (
                 <div className="image-preview">
                   <p>{formData.images.length}枚の画像が選択されています</p>
+                  <div className="image-preview-grid">
+                    {formData.images.map((image, index) => (
+                      <div key={index} className="image-preview-item">
+                        <img 
+                          src={URL.createObjectURL(image)}
+                          alt={`Preview ${index + 1}`}
+                          className="preview-image"
+                        />
+                        <button 
+                          type="button"
+                          className="remove-image-btn"
+                          onClick={() => {
+                            const newImages = formData.images.filter((_, i) => i !== index);
+                            setFormData(prev => ({ ...prev, images: newImages }));
+                          }}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
