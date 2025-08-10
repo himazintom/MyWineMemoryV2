@@ -184,6 +184,114 @@ body {
   box-sizing: border-box;
 }
 
+/* Hero section */
+.home-hero {
+  position: relative;
+  width: 100%;
+  height: 50vh;
+  min-height: 300px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #3a1f23, #151012);
+  background-size: cover;
+  background-position: center;
+}
+
+/* 背景画像は CSS 変数で差し替え可能: --hero-image-url */
+.home-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--hero-image-url, none);
+  background-size: cover;
+  background-position: center;
+  transform: scale(1.02);
+  filter: saturate(1.05);
+}
+
+.home-hero::after {
+  /* 読みやすさのためのグラデーションスクリーン */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0.58) 100%);
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 2rem;
+  z-index: 1;
+  color: #fff;
+}
+
+.hero-inner {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.hero-overlay h1 {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+}
+
+.brand-title {
+  margin: 0;
+}
+
+.hero-overlay p {
+  margin: 0 0 0.5rem 0;
+  opacity: 0.95;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 1024px) {
+  .home-hero { height: 60vh; }
+  .hero-overlay h1 { font-size: 2.4rem; }
+}
+
+@media (max-width: 767px) {
+  .home-hero { height: 46vh; min-height: 260px; border-radius: 12px; }
+  .hero-overlay { padding: 1.25rem; }
+  .hero-actions { gap: 0.5rem; }
+  .brand-logo { width: 32px; height: 32px; }
+}
+
+/* モーション軽減対応 */
+@media (prefers-reduced-motion: reduce) {
+  .wine-card:hover,
+  .wine-list-item:hover,
+  .wine-group-card:hover,
+  .action-button:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
 .quick-actions {
   display: flex;
   flex-direction: column;
@@ -273,6 +381,20 @@ body {
 .recent-activity h2 {
   color: #722F37;
   margin-bottom: 1rem;
+}
+
+.wine-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 600px) {
+  .wine-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 1024px) {
+  .wine-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 .view-all-button {
@@ -784,6 +906,68 @@ body {
   padding: 1.5rem;
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+/* Photo cover variant */
+.wine-card--photo {
+  position: relative;
+  padding: 0;
+  min-height: 220px;
+  overflow: hidden;
+  color: #fff;
+}
+
+.wine-card--photo .wine-card-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transform: translateZ(0) scale(1.02);
+  filter: saturate(1.03);
+}
+
+.wine-card--photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 100%);
+}
+
+.wine-card--photo .wine-card-body {
+  position: relative;
+  z-index: 1;
+  padding: 1rem 1rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.wine-card--photo .wine-card-header {
+  margin-bottom: 0.75rem;
+}
+
+.wine-card--photo .wine-name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.wine-card--photo .wine-name,
+.wine-card--photo .wine-info p,
+.wine-card--photo .rating-score,
+.wine-card--photo .rating-scale,
+.wine-card--photo .record-date {
+  color: #fff;
+}
+
+.wine-card--photo .record-mode {
+  background: rgba(255,255,255,0.16);
+  color: #fff;
+}
+
+@media (min-width: 1024px) {
+  .wine-card--photo { min-height: 260px; }
 }
 
 .wine-card:hover {

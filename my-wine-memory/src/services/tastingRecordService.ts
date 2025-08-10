@@ -109,11 +109,12 @@ class TastingRecordService {
     }
   }
 
-  // Get tasting records for specific wine
-  async getTastingRecordsForWine(wineId: string, limit: number = 20): Promise<TastingRecord[]> {
+  // Get tasting records for specific wine (current user only)
+  async getTastingRecordsForWine(userId: string, wineId: string, limit: number = 20): Promise<TastingRecord[]> {
     try {
       const q = query(
         collection(db, this.collection),
+        where('userId', '==', userId),
         where('wineId', '==', wineId),
         orderBy('tastingDate', 'desc'),
         limitQuery(limit)
@@ -211,7 +212,7 @@ class TastingRecordService {
   async uploadWineImage(imageFile: File, userId: string): Promise<string> {
     try {
       const timestamp = Date.now();
-      const fileName = `wine_images/${userId}/${timestamp}_${imageFile.name}`;
+      const fileName = `wine-images/${userId}/${timestamp}_${imageFile.name}`;
       const storageRef = ref(storage, fileName);
       
       const snapshot = await uploadBytes(storageRef, imageFile);

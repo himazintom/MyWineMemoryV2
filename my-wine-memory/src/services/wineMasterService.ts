@@ -121,6 +121,34 @@ class WineMasterService {
     }
   }
 
+  // Batch get wine masters by IDs (max 10 per call due to 'in' limitation)
+  async getWineMastersByIds(ids: string[]): Promise<WineMaster[]> {
+    if (ids.length === 0) return [];
+    const uniqueIds = Array.from(new Set(ids));
+    const chunks: string[][] = [];
+    for (let i = 0; i < uniqueIds.length; i += 10) {
+      chunks.push(uniqueIds.slice(i, i + 10));
+    }
+
+    const results: WineMaster[] = [];
+    for (const chunk of chunks) {
+      const q = query(
+        collection(db, this.collection),
+        where('__name__', 'in', chunk)
+      );
+      const snap = await getDocs(q);
+      snap.docs.forEach((doc) => {
+        results.push({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate() || new Date(),
+          updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+        } as WineMaster);
+      });
+    }
+    return results;
+  }
+
   // Search wine masters
   async searchWineMasters(searchTerm: string, limit: number = 20): Promise<WineMaster[]> {
     try {

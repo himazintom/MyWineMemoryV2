@@ -45,11 +45,9 @@ const WineDetail: React.FC = () => {
     
     try {
       const records = await executeLoadRecords(() => 
-        tastingRecordService.getTastingRecordsForWine(wineId, 100)
+        tastingRecordService.getTastingRecordsForWine(currentUser.uid, wineId, 100)
       );
-      // Filter to only show current user's records
-      const userRecords = records.filter(record => record.userId === currentUser.uid);
-      setTastingRecords(userRecords);
+      setTastingRecords(records);
     } catch (error) {
       console.error('Failed to load tasting records:', error);
     }

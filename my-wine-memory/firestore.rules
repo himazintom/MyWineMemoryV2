@@ -1,6 +1,52 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Wine master data - public read, authenticated write with validation
+    match /wines_master/{wineId} {
+      allow read: if true;
+      allow create: if request.auth != null &&
+        request.resource.data.wineName != null &&
+        request.resource.data.producer != null &&
+        request.resource.data.country != null &&
+        request.resource.data.region != null &&
+        request.resource.data.createdBy == request.auth.uid;
+
+      allow update: if request.auth != null &&
+        resource.data.createdBy == request.auth.uid &&
+        // Immutable fields
+        request.resource.data.createdBy == resource.data.createdBy &&
+        request.resource.data.createdAt == resource.data.createdAt;
+
+      allow delete: if request.auth != null && resource.data.createdBy == request.auth.uid;
+    }
+
+    // Tasting records - only the owner can access with validation
+    match /tasting_records/{recordId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+
+      allow create: if request.auth != null &&
+        request.resource.data.userId == request.auth.uid &&
+        // rating range
+        request.resource.data.overallRating >= 0 && request.resource.data.overallRating <= 10 &&
+        // tastingDate not in the future
+        request.resource.data.tastingDate <= request.time &&
+        // recordMode constraint if provided
+        (request.resource.data.recordMode == 'quick' || request.resource.data.recordMode == 'detailed') &&
+        // images length if provided
+        (request.resource.data.images == null || request.resource.data.images.size() <= 10);
+
+      allow update: if request.auth != null && resource.data.userId == request.auth.uid &&
+        // Immutable fields
+        request.resource.data.userId == resource.data.userId &&
+        request.resource.data.createdAt == resource.data.createdAt &&
+        // Re-validate constraints on update
+        request.resource.data.overallRating >= 0 && request.resource.data.overallRating <= 10 &&
+        request.resource.data.tastingDate <= request.time &&
+        (request.resource.data.recordMode == 'quick' || request.resource.data.recordMode == 'detailed') &&
+        (request.resource.data.images == null || request.resource.data.images.size() <= 10);
+
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
     // Users can only access their own user document
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
@@ -11,15 +57,11 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
     
-    // Wine records - only the owner can read/write their records
+    // Wine records (legacy) - only the owner can read/write their records
     match /wines/{wineId} {
-      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null && request.auth.uid == resource.data.userId;
-    }
-    
-    // Public wine records - anyone can read public wines, only owners can write
-    match /wines/{wineId} {
-      allow read: if resource.data.isPublic == true;
+      allow read: if resource.data.isPublic == true || (request.auth != null && resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
     
     // Drafts - only the owner can access

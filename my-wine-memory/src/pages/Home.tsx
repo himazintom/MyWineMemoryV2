@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { tastingRecordService } from '../services/tastingRecordService';
 import { draftService } from '../services/wineService';
 import { goalService } from '../services/userService';
@@ -10,10 +11,17 @@ import WineCard from '../components/WineCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import { useAsyncOperation } from '../hooks/useAsyncOperation';
+import heroDark from '../assets/images/hero/home-hero-desktop-dark.webp';
+import heroLight from '../assets/images/hero/home-hero-desktop-light.webp';
+import brandLogo from '../assets/images/logo-icon/logo-icon.svg';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser, signInWithGoogle } = useAuth();
+  const { theme } = useTheme();
+  const [isMobile, setIsMobile] = useState<boolean>(() =>
+    typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(max-width: 767px)').matches : false
+  );
   const [recentWines, setRecentWines] = useState<WineRecord[]>([]);
   const [drafts, setDrafts] = useState<WineDraft[]>([]);
   const [dailyGoal, setDailyGoal] = useState<DailyGoal | null>(null);
@@ -24,6 +32,16 @@ const Home: React.FC = () => {
   useEffect(() => {
     loadHomeData();
   }, [currentUser]);
+
+  // モバイル判定（リサイズ対応）
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mql = window.matchMedia('(max-width: 767px)');
+    const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    setIsMobile(mql.matches);
+    mql.addEventListener('change', onChange);
+    return () => mql.removeEventListener('change', onChange);
+  }, []);
 
   const loadHomeData = async () => {
     try {
@@ -72,23 +90,39 @@ const Home: React.FC = () => {
     }
   };
 
+  // 可用ならモバイル用ヒーロー画像を使用（存在しない場合はデスクトップを流用）
+  const heroModules = import.meta.glob('../assets/images/hero/*', { eager: true }) as Record<string, any>;
+  const getUrl = (p: string) => (heroModules[p]?.default as string | undefined);
+  const mobileDark = getUrl('../assets/images/hero/home-hero-mobile-dark.webp');
+  const mobileLight = getUrl('../assets/images/hero/home-hero-mobile-light.webp');
+  const heroImage = theme === 'dark'
+    ? (isMobile && mobileDark ? mobileDark : heroDark)
+    : (isMobile && mobileLight ? mobileLight : heroLight);
+  const heroStyle = { ['--hero-image-url' as any]: `url(${heroImage})` } as React.CSSProperties;
+
   return (
     <div className="page-container">
-      <header className="page-header">
-        <h1>MyWineMemory</h1>
-        <p>あなたのワイン体験を記録しよう</p>
-      </header>
+      <section className="home-hero" style={heroStyle}>
+        <div className="hero-overlay">
+          <div className="hero-inner">
+            <div className="brand">
+              <img src={brandLogo} alt="My Wine Memoy" className="brand-logo" />
+              <h1 className="brand-title">MyWineMemory</h1>
+            </div>
+            <p>写真で残す、あなただけのワイン体験</p>
+            <div className="hero-actions">
+              <button className="action-button primary" onClick={() => navigate('/select-wine')}>
+                🍷 ワインを記録する
+              </button>
+              <button className="action-button secondary" onClick={() => navigate('/quiz')}>
+                🧠 クイズに挑戦する
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
       
       <main className="home-content">
-        <div className="quick-actions">
-          <button className="action-button primary" onClick={() => navigate('/select-wine')}>
-            🍷 ワインを記録する
-          </button>
-          <button className="action-button secondary" onClick={() => navigate('/quiz')}>
-            🧠 クイズに挑戦する
-          </button>
-        </div>
-
         {!currentUser && (
           <div className="guest-notice">
             <p>💡 <strong>ゲストモード</strong>で体験中です</p>
@@ -166,13 +200,15 @@ const Home: React.FC = () => {
             />
           ) : recentWines.length > 0 ? (
             <>
-              {recentWines.map(wine => (
-                <WineCard 
-                  key={wine.id} 
-                  wine={wine} 
-                  onClick={() => navigate(`/wine-detail/${wine.id}`)}
-                />
-              ))}
+              <div className="wine-grid">
+                {recentWines.map(wine => (
+                  <WineCard 
+                    key={wine.id} 
+                    wine={wine} 
+                    onClick={() => navigate(`/wine-detail/${wine.id}`)}
+                  />
+                ))}
+              </div>
               <button 
                 className="view-all-button"
                 onClick={() => navigate('/records')}

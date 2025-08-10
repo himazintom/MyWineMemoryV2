@@ -52,21 +52,24 @@ const Records: React.FC = () => {
           wineGroups.get(record.wineId)!.push(record);
         });
 
-        // Get wine master data for each group
+        // Batch fetch wine master data for each group to avoid N+1
+        const wineIds = Array.from(wineGroups.keys());
+        const wines = await wineMasterService.getWineMastersByIds(wineIds);
+        const wineMap = new Map<string, WineMaster>();
+        wines.forEach((w) => wineMap.set(w.id, w));
+
         const wineWithTastings: WineWithTastings[] = [];
         for (const [wineId, records] of wineGroups.entries()) {
-          const wine = await wineMasterService.getWineMaster(wineId);
-          if (wine) {
-            const latestTasting = new Date(Math.max(...records.map(r => r.tastingDate.getTime())));
-            const averageRating = records.reduce((sum, r) => sum + r.overallRating, 0) / records.length;
-            
-            wineWithTastings.push({
-              wine,
-              tastingRecords: records.sort((a, b) => b.tastingDate.getTime() - a.tastingDate.getTime()),
-              latestTasting,
-              averageRating
-            });
-          }
+          const wine = wineMap.get(wineId);
+          if (!wine) continue;
+          const latestTasting = new Date(Math.max(...records.map(r => r.tastingDate.getTime())));
+          const averageRating = records.reduce((sum, r) => sum + r.overallRating, 0) / records.length;
+          wineWithTastings.push({
+            wine,
+            tastingRecords: records.sort((a, b) => b.tastingDate.getTime() - a.tastingDate.getTime()),
+            latestTasting,
+            averageRating
+          });
         }
 
         return wineWithTastings;

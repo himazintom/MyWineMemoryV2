@@ -84,6 +84,30 @@
         }
       ]
     }
+    {
+      "collectionGroup": "tasting_records",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "tastingDate", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "tasting_records",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "overallRating", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "tasting_records",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "wineId", "order": "ASCENDING" },
+        { "fieldPath": "tastingDate", "order": "DESCENDING" }
+      ]
+    }
   ],
   "fieldOverrides": []
 }
