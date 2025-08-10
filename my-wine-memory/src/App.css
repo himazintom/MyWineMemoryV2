@@ -48,7 +48,7 @@ body {
 /* レスポンシブレイアウト - 全画面使用 */
 .page-container {
   width: 100%;
-  padding: 2rem 1rem 1rem;
+  padding: 0;
   max-width: 100vw;
   margin: 0;
   box-sizing: border-box;
@@ -62,7 +62,7 @@ body {
   }
   
   .page-container {
-    padding: 1rem;
+    padding: 0;
     width: 100%;
     max-width: 100vw;
     margin: 0;
@@ -82,7 +82,7 @@ body {
   }
   
   .page-container {
-    padding: 0 2rem;
+    padding: 0;
     width: 100%;
     max-width: 100vw;
     margin: 0;
@@ -102,7 +102,7 @@ body {
   }
   
   .page-container {
-    padding: 0 3rem;
+    padding: 0;
     width: 100%;
     max-width: 100vw;
     margin: 0;
@@ -118,11 +118,12 @@ body {
 
 .page-header {
   text-align: center;
-  padding: 1rem 0 2rem;
+  padding: 2rem 1rem;
   background: linear-gradient(135deg, #722F37, #8B4513);
   color: white;
-  margin: 0 -1rem 2rem -1rem;
+  margin: 0 0 2rem 0;
   border-radius: 0 0 20px 20px;
+  min-height: auto;
 }
 
 .page-header h1 {
@@ -522,6 +523,10 @@ body {
 }
 
 /* Profile page styles */
+.profile-content {
+  padding: 1rem;
+}
+
 .profile-info {
   text-align: center;
   margin-bottom: 2rem;
@@ -2683,8 +2688,8 @@ body {
 
 /* Add Tasting Record Page */
 .add-tasting-content {
-  padding: 1rem 1rem 2rem;
-  margin-top: 2rem;
+  padding: 1rem;
+  margin-top: 0;
 }
 
 .selected-wine-info {
