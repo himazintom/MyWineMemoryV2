@@ -276,6 +276,33 @@ class WineMasterService {
   }
 
   // Batch operations for data migration
+  // Create new wine master without checking for existing
+  async createWineMaster(data: Omit<WineMaster, 'id' | 'createdAt' | 'createdBy' | 'referenceCount' | 'updatedAt'>, userId: string): Promise<WineMaster> {
+    try {
+      const wineMasterData: Omit<WineMaster, 'id'> = {
+        ...data,
+        createdAt: new Date(),
+        createdBy: userId,
+        referenceCount: 1,
+        updatedAt: new Date()
+      };
+
+      const docRef = await addDoc(collection(db, this.collection), {
+        ...wineMasterData,
+        createdAt: Timestamp.fromDate(wineMasterData.createdAt),
+        updatedAt: Timestamp.fromDate(wineMasterData.updatedAt)
+      });
+
+      return {
+        id: docRef.id,
+        ...wineMasterData
+      };
+    } catch (error) {
+      console.error('Error creating wine master:', error);
+      throw new Error('ワインマスターの作成に失敗しました');
+    }
+  }
+
   async batchCreateWineMasters(wines: Omit<WineMaster, 'id' | 'createdAt' | 'updatedAt'>[]): Promise<void> {
     try {
       const batch = writeBatch(db);
