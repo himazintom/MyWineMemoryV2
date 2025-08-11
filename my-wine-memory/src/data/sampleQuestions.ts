@@ -138,8 +138,143 @@ export const SAMPLE_QUIZ_QUESTIONS: QuizQuestion[] = [
     correctAnswer: 2,
     explanation: 'タンニンはワインの渋味成分で、主に赤ワインに含まれ、ブドウの皮や種から抽出されます。'
   },
+  {
+    id: 'basic_016',
+    difficulty: 1,
+    category: 'ワインの基礎',
+    question: 'フォーティファイドワインとは何ですか？',
+    options: ['度数の低いワイン', 'アルコールを添加したワイン', '炭酸を加えたワイン', '甘味料を加えたワイン'],
+    correctAnswer: 1,
+    explanation: 'フォーティファイドワインは発酵中または発酵後にアルコールを添加して作られるワインです。'
+  },
+  {
+    id: 'basic_017',
+    difficulty: 1,
+    category: 'ワインの基礎',
+    question: 'ワインのアペラシオンとは何ですか？',
+    options: ['ワインの色', '産地呼称', 'アルコール度数', '製造年'],
+    correctAnswer: 1,
+    explanation: 'アペラシオンは原産地統制呼称のことで、特定の地域で決められた規則に従って作られたワインに与えられます。'
+  },
+  {
+    id: 'basic_018',
+    difficulty: 1,
+    category: 'ワインの基礎',
+    question: 'ワインの「酸化防止剤」として使われるのは？',
+    options: ['塩', '砂糖', '亜硫酸塩', 'クエン酸'],
+    correctAnswer: 2,
+    explanation: '亜硫酸塩（SO2）は酸化を防ぎ、ワインの品質を保つために使用される添加物です。'
+  },
+  {
+    id: 'basic_019',
+    difficulty: 1,
+    category: 'ワインの基礎',
+    question: 'ワインの「ボディ」とは何を表しますか？',
+    options: ['色の濃さ', '味わいの厚み', '香りの強さ', 'アルコール度数'],
+    correctAnswer: 1,
+    explanation: 'ボディはワインの味わいの厚みや重厚さを表現する用語です。'
+  },
+  {
+    id: 'basic_020',
+    difficulty: 1,
+    category: 'ワインの基礎',
+    question: '白ワインの適切な飲用温度は？',
+    options: ['5-10℃', '10-14℃', '16-18℃', '20-22℃'],
+    correctAnswer: 1,
+    explanation: '白ワインは一般的に10-14℃で飲むのが適切です。冷やしすぎると香りが立ちません。'
+  },
+  {
+    id: 'basic_021',
+    difficulty: 1,
+    category: 'ワインの基礎',
+    question: '赤ワインの適切な飲用温度は？',
+    options: ['5-10℃', '10-14℃', '16-18℃', '20-25℃'],
+    correctAnswer: 2,
+    explanation: '赤ワインは16-18℃で飲むのが適切です。室温より少し涼しいくらいが理想的です。'
+  },
+  {
+    id: 'basic_022',
+    difficulty: 1,
+    category: 'ワインの基礎',
+    question: 'ワインのセパージュとは何ですか？',
+    options: ['生産地', 'ブドウ品種', '製造法', '収穫年'],
+    correctAnswer: 1,
+    explanation: 'セパージュはブドウ品種のことを指すフランス語です。'
+  },
+  {
+    id: 'basic_023',
+    difficulty: 1,
+    category: 'ワインの基礎',
+    question: 'ワインの「レッグス」または「ティアーズ」とは何ですか？',
+    options: ['沈殿物', 'グラスを回した時の液体の滴り', 'ワインの泡', 'コルクの破片'],
+    correctAnswer: 1,
+    explanation: 'レッグスやティアーズは、ワインをグラスで回した後にグラス壁に垂れる滴のことです。'
+  },
+  {
+    id: 'basic_024',
+    difficulty: 1,
+    category: 'ワインの基礎',
+    question: '一般的なワイングラスの持ち方は？',
+    options: ['ボウル部分を持つ', 'ステム（脚）を持つ', 'ベース部分を持つ', 'どこでも良い'],
+    correctAnswer: 1,
+    explanation: 'ワイングラスはステム（脚）を持つのが基本です。体温でワインが温まるのを防げます。'
+  },
+  {
+    id: 'basic_025',
+    difficulty: 1,
+    category: 'ワインの基礎',
+    question: 'ワインの「フィニッシュ」とは何ですか？',
+    options: ['最初の印象', '色合い', '飲み込んだ後の余韻', 'アルコール感'],
+    correctAnswer: 2,
+    explanation: 'フィニッシュは飲み込んだ後に残る味わいや香りの余韻のことです。'
+  },
+  {
+    id: 'basic_026',
+    difficulty: 1,
+    category: 'ワインの基礎',
+    question: 'ワインを長期保存する際の理想的な湿度は？',
+    options: ['30-40%', '50-60%', '70-80%', '90-100%'],
+    correctAnswer: 2,
+    explanation: '70-80%の湿度がワイン保存に理想的です。コルクの乾燥を防ぎます。'
+  },
+  {
+    id: 'basic_027',
+    difficulty: 1,
+    category: 'ワインの基礎',
+    question: 'ワインボトルの底にある凹みを何と呼びますか？',
+    options: ['プント', 'ヘッド', 'ネック', 'ショルダー'],
+    correctAnswer: 0,
+    explanation: 'ボトル底の凹みはプントと呼ばれ、ボトルの強度を高める役割があります。'
+  },
+  {
+    id: 'basic_028',
+    difficulty: 1,
+    category: 'ワインの基礎',
+    question: 'ワインの「ブーケ」とは何ですか？',
+    options: ['花の香り', '熟成による複雑な香り', '果実の香り', 'スパイスの香り'],
+    correctAnswer: 1,
+    explanation: 'ブーケは熟成により発達する複雑で上品な香りのことです。'
+  },
+  {
+    id: 'basic_029',
+    difficulty: 1,
+    category: 'ワインの基礎',
+    question: '開栓後のワインはどのくらいで飲み切るべきですか？',
+    options: ['当日中', '2-3日以内', '1週間以内', '1ヶ月以内'],
+    correctAnswer: 1,
+    explanation: '開栓後は酸化が進むため、2-3日以内に飲み切るのが理想的です。'
+  },
+  {
+    id: 'basic_030',
+    difficulty: 1,
+    category: 'ワインの基礎',
+    question: 'ワインの「エチケット」とは何ですか？',
+    options: ['マナー', 'ラベル', 'コルク', 'グラス'],
+    correctAnswer: 1,
+    explanation: 'エチケットはワインボトルに貼られたラベルのことです。'
+  },
 
-  // 難易度2: 初級編 (40問)
+  // 難易度2: 初級編 (50問)
   {
     id: 'basic_101',
     difficulty: 2,
@@ -248,8 +383,242 @@ export const SAMPLE_QUIZ_QUESTIONS: QuizQuestion[] = [
     correctAnswer: 1,
     explanation: 'バローロはイタリア・ピエモンテ州の高級赤ワインで、ネッビオーロ品種から造られます。'
   },
+  {
+    id: 'basic_113',
+    difficulty: 2,
+    category: 'ブドウ品種',
+    question: 'ゲヴュルツトラミネールの特徴的な香りは？',
+    options: ['ライチ', 'レモン', 'リンゴ', 'ペア'],
+    correctAnswer: 0,
+    explanation: 'ゲヴュルツトラミネールはライチやバラのような華やかな香りが特徴です。'
+  },
+  {
+    id: 'basic_114',
+    difficulty: 2,
+    category: 'ワイン産地',
+    question: 'マルベックで有名な産地は？',
+    options: ['フランス・ボルドー', 'アルゼンチン・メンドーサ', 'イタリア・トスカーナ', 'スペイン・リオハ'],
+    correctAnswer: 1,
+    explanation: 'マルベックはアルゼンチン・メンドーサ州で最も成功している品種です。'
+  },
+  {
+    id: 'basic_115',
+    difficulty: 2,
+    category: 'ワイン産地',
+    question: 'ピエモンテ州の代表品種は？',
+    options: ['サンジョヴェーゼ', 'ネッビオーロ', 'モンテプルチアーノ', 'アリアニコ'],
+    correctAnswer: 1,
+    explanation: 'ピエモンテ州ではネッビオーロが最も重要な品種で、バローロやバルバレスコを生み出します。'
+  },
+  {
+    id: 'basic_116',
+    difficulty: 2,
+    category: 'ブドウ品種',
+    question: 'カベルネ・フランの特徴は？',
+    options: ['カベルネ・ソーヴィニヨンより重厚', 'ハーブ的な香り', '高いアルコール度数', '長期熟成必須'],
+    correctAnswer: 1,
+    explanation: 'カベルネ・フランはハーブや青野菜のような香りが特徴的で、カベルネ・ソーヴィニヨンより軽やかです。'
+  },
+  {
+    id: 'basic_117',
+    difficulty: 2,
+    category: 'ワイン産地',
+    question: 'ヴァレー・デル・マイポはどこの国の産地？',
+    options: ['アルゼンチン', 'チリ', 'ブラジル', 'ウルグアイ'],
+    correctAnswer: 1,
+    explanation: 'ヴァレー・デル・マイポはチリの首都サンティアゴ周辺の重要なワイン産地です。'
+  },
+  {
+    id: 'basic_118',
+    difficulty: 2,
+    category: 'ブドウ品種',
+    question: 'グルナッシュ（ガルナッチャ）の特徴は？',
+    options: ['高い酸味', '低いアルコール度数', '果実味豊か', '濃い色'],
+    correctAnswer: 2,
+    explanation: 'グルナッシュは果実味豊かで、アルコール度数が高くなりやすい品種です。'
+  },
+  {
+    id: 'basic_119',
+    difficulty: 2,
+    category: 'ワイン産地',
+    question: 'ドウロ川流域で有名なポルトガルのワイン産地は？',
+    options: ['ダン', 'ヴィーニョ・ヴェルデ', 'ドウロ', 'アレンテージョ'],
+    correctAnswer: 2,
+    explanation: 'ドウロ地方はドウロ川流域にあり、ポートワインで世界的に有名です。'
+  },
+  {
+    id: 'basic_120',
+    difficulty: 2,
+    category: 'ブドウ品種',
+    question: 'テンプラニーリョの特徴的な産地は？',
+    options: ['ポルトガル', 'スペイン', 'フランス', 'イタリア'],
+    correctAnswer: 1,
+    explanation: 'テンプラニーリョはスペインを代表する品種で、リオハやリベラ・デル・ドゥエロで栽培されています。'
+  },
+  {
+    id: 'basic_121',
+    difficulty: 2,
+    category: 'ワイン産地',
+    question: 'セントラル・オタゴはどこの国の産地？',
+    options: ['オーストラリア', 'ニュージーランド', '南アフリカ', 'チリ'],
+    correctAnswer: 1,
+    explanation: 'セントラル・オタゴはニュージーランド南島の産地で、ピノ・ノワールで有名です。'
+  },
+  {
+    id: 'basic_122',
+    difficulty: 2,
+    category: 'ブドウ品種',
+    question: 'シラーとシラーズの違いは？',
+    options: ['全く別の品種', '同じ品種だが産地により呼び名が違う', 'シラーズの方が濃い', 'シラーの方が甘い'],
+    correctAnswer: 1,
+    explanation: 'シラーとシラーズは同じ品種ですが、フランスではシラー、オーストラリアではシラーズと呼ばれます。'
+  },
+  {
+    id: 'basic_123',
+    difficulty: 2,
+    category: 'ワイン産地',
+    question: 'ハンター・バレーはどこの国の産地？',
+    options: ['アメリカ', 'カナダ', 'オーストラリア', 'ニュージーランド'],
+    correctAnswer: 2,
+    explanation: 'ハンター・バレーはオーストラリア・ニューサウスウェールズ州の歴史ある産地です。'
+  },
+  {
+    id: 'basic_124',
+    difficulty: 2,
+    category: 'ブドウ品種',
+    question: 'セミヨンの特徴は？',
+    options: ['高い酸味', '厚みのある白ワイン', '軽やかで爽やか', '短期熟成向き'],
+    correctAnswer: 1,
+    explanation: 'セミヨンは厚みがあり、ボルドーの甘口ワインやハンターバレーの辛口ワインに使われます。'
+  },
+  {
+    id: 'basic_125',
+    difficulty: 2,
+    category: 'ワイン産地',
+    question: 'ステレンボッシュはどこの国の産地？',
+    options: ['チリ', 'アルゼンチン', '南アフリカ', 'ブラジル'],
+    correctAnswer: 2,
+    explanation: 'ステレンボッシュは南アフリカのケープタウン近郊にある重要なワイン産地です。'
+  },
+  {
+    id: 'basic_126',
+    difficulty: 2,
+    category: 'ブドウ品種',
+    question: 'アルバリーニョの原産地は？',
+    options: ['ポルトガル', 'スペイン', 'イタリア', 'フランス'],
+    correctAnswer: 1,
+    explanation: 'アルバリーニョはスペイン北西部のリアス・バイシャス地方原産の白ブドウ品種です。'
+  },
+  {
+    id: 'basic_127',
+    difficulty: 2,
+    category: 'ワイン産地',
+    question: 'フィンガー・レイクスはどこの国の産地？',
+    options: ['カナダ', 'アメリカ', 'ドイツ', 'オーストリア'],
+    correctAnswer: 1,
+    explanation: 'フィンガー・レイクスはアメリカ・ニューヨーク州の産地で、リースリングが有名です。'
+  },
+  {
+    id: 'basic_128',
+    difficulty: 2,
+    category: 'ブドウ品種',
+    question: 'ピノ・グリ（ピノ・グリージョ）の特徴は？',
+    options: ['非常に軽い', '中程度のボディ', '非常に重い', 'タンニンが強い'],
+    correctAnswer: 1,
+    explanation: 'ピノ・グリは中程度のボディを持つ白ワイン品種で、爽やかさと厚みのバランスが良い品種です。'
+  },
+  {
+    id: 'basic_129',
+    difficulty: 2,
+    category: 'ワイン産地',
+    question: 'コルチャグア・ヴァレーはどこの国の産地？',
+    options: ['アルゼンチン', 'チリ', 'ペルー', 'ボリビア'],
+    correctAnswer: 1,
+    explanation: 'コルチャグア・ヴァレーはチリの重要なワイン産地で、カルメネールで有名です。'
+  },
+  {
+    id: 'basic_130',
+    difficulty: 2,
+    category: 'ブドウ品種',
+    question: 'カルメネールの特徴は？',
+    options: ['ボルドー原産だがチリで成功', 'イタリア原産', 'スペイン原産', 'ドイツ原産'],
+    correctAnswer: 0,
+    explanation: 'カルメネールは元々ボルドー原産ですが、現在はチリで最も成功している品種です。'
+  },
+  {
+    id: 'basic_131',
+    difficulty: 2,
+    category: 'ワイン産地',
+    question: 'マクラーレン・ヴェイルはどこの国の産地？',
+    options: ['ニュージーランド', 'オーストラリア', '南アフリカ', 'チリ'],
+    correctAnswer: 1,
+    explanation: 'マクラーレン・ヴェイルはオーストラリア南部の産地で、シラーズとグルナッシュで有名です。'
+  },
+  {
+    id: 'basic_132',
+    difficulty: 2,
+    category: 'ブドウ品種',
+    question: 'ヴィオニエの特徴的な香りは？',
+    options: ['シトラス系', 'アプリコット', 'グリーンアップル', 'ミネラル'],
+    correctAnswer: 1,
+    explanation: 'ヴィオニエはアプリコットや白桃のような豊かな果実香が特徴の白ワイン品種です。'
+  },
+  {
+    id: 'basic_133',
+    difficulty: 2,
+    category: 'ワイン産地',
+    question: 'アデレード・ヒルズはどこの国の産地？',
+    options: ['ニュージーランド', 'オーストラリア', 'カナダ', 'アメリカ'],
+    correctAnswer: 1,
+    explanation: 'アデレード・ヒルズはオーストラリア・南オーストラリア州の冷涼な産地です。'
+  },
+  {
+    id: 'basic_134',
+    difficulty: 2,
+    category: 'ブドウ品種',
+    question: 'ネロ・ダヴォラの産地は？',
+    options: ['イタリア・シチリア', 'イタリア・トスカーナ', 'イタリア・ピエモンテ', 'イタリア・ヴェネト'],
+    correctAnswer: 0,
+    explanation: 'ネロ・ダヴォラはシチリア島の代表的な黒ブドウ品種です。'
+  },
+  {
+    id: 'basic_135',
+    difficulty: 2,
+    category: 'ワイン産地',
+    question: 'アソス山周辺のギリシャワイン産地で有名なのは？',
+    options: ['サントリーニ', 'ナウサ', 'ネメア', 'パトラス'],
+    correctAnswer: 1,
+    explanation: 'ナウサはマケドニア地方にあり、クシノマヴロ品種の赤ワインで有名です。'
+  },
+  {
+    id: 'basic_136',
+    difficulty: 2,
+    category: 'ブドウ品種',
+    question: 'アシルティコの特徴は？',
+    options: ['低い酸味', '高い酸味とミネラル感', '甘口のみ', 'タンニンが強い'],
+    correctAnswer: 1,
+    explanation: 'アシルティコはギリシャ・サントリーニ島の品種で、高い酸味とミネラル感が特徴です。'
+  },
+  {
+    id: 'basic_137',
+    difficulty: 2,
+    category: 'ワイン産地',
+    question: 'コンスタンシアはどこの国の産地？',
+    options: ['チリ', 'アルゼンチン', '南アフリカ', 'オーストラリア'],
+    correctAnswer: 2,
+    explanation: 'コンスタンシアは南アフリカ・ケープタウン近郊の歴史ある産地です。'
+  },
+  {
+    id: 'basic_138',
+    difficulty: 2,
+    category: 'ブドウ品種',
+    question: 'ピノタージュはどこの国で開発された品種？',
+    options: ['フランス', 'ドイツ', '南アフリカ', 'オーストラリア'],
+    correctAnswer: 2,
+    explanation: 'ピノタージュは南アフリカで開発された品種で、ピノ・ノワールとサンソーの交配種です。'
+  },
 
-  // 難易度3: 中級編 (40問)
+  // 難易度3: 中級編 (60問)
   {
     id: 'inter_201',
     difficulty: 3,
@@ -340,8 +709,99 @@ export const SAMPLE_QUIZ_QUESTIONS: QuizQuestion[] = [
     correctAnswer: 1,
     explanation: 'コート・デュ・ローヌ地方ではシラーが代表的な赤ワイン品種です。'
   },
+  // 中級編の問題をさらに追加
+  {
+    id: 'inter_211',
+    difficulty: 3,
+    category: 'ワイン製造',
+    question: '冷やしすぎ（コールドスタビライゼーション）の目的は？',
+    options: ['色を安定させる', '酒石酸の結晶を除去する', 'アルコール度数を下げる', 'タンニンを除去する'],
+    correctAnswer: 1,
+    explanation: '冷やしすぎによって酒石酸の結晶を事前に除去し、ボトリング後の析出を防ぎます。'
+  },
+  {
+    id: 'inter_212',
+    difficulty: 3,
+    category: 'テイスティング',
+    question: 'ワインの「エレガント」な味わいとは？',
+    options: ['力強い', '繊細でバランスが良い', '甘い', '酸味が強い'],
+    correctAnswer: 1,
+    explanation: 'エレガントは繊細で上品、バランスが良く洗練された味わいを表現します。'
+  },
+  {
+    id: 'inter_213',
+    difficulty: 3,
+    category: 'ワイン製造',
+    question: 'ロット（Lees）とは何ですか？',
+    options: ['ブドウの皮', '発酵後の澱', '樽の内側', 'ワインの泡'],
+    correctAnswer: 1,
+    explanation: 'ロッド（澱）は発酵後に沈殿する酵母の残骸で、ワインに旨みを与えます。'
+  },
+  {
+    id: 'inter_214',
+    difficulty: 3,
+    category: 'ワイン産地',
+    question: 'プィ・エルメ（Puy l\'Evêque）があるフランスのワイン産地は？',
+    options: ['ボルドー', 'ブルゴーニュ', 'カオール', 'シャンパーニュ'],
+    correctAnswer: 2,
+    explanation: 'カオールはフランス南西部の産地で、マルベック主体の濃厚な赤ワインを生産します。'
+  },
+  {
+    id: 'inter_215',
+    difficulty: 3,
+    category: 'ワイン法',
+    question: 'ドイツワインのQbA（QualitätsweinbestimmterAnbaugebiete）の特徴は？',
+    options: ['最高品質', '補糖が禁止', '補糖が可能', '甘口のみ'],
+    correctAnswer: 2,
+    explanation: 'QbAは品質ワインの基本カテゴリーで、補糖（シャプタリザシオン）が認められています。'
+  },
+  {
+    id: 'inter_216',
+    difficulty: 3,
+    category: 'テイスティング',
+    question: 'ワインの「ストラクチャー」とは？',
+    options: ['色の濃さ', '酸味、タンニン、アルコールのバランス', '香りの複雑さ', '甘さのレベル'],
+    correctAnswer: 1,
+    explanation: 'ストラクチャーは酸味、タンニン、アルコールなどの骨格成分のバランスを指します。'
+  },
+  {
+    id: 'inter_217',
+    difficulty: 3,
+    category: 'ワイン製造',
+    question: 'ピジャージュ（Pigeage）とは何ですか？',
+    options: ['ブドウを踏む作業', '果帽を押し下げる作業', '澱を取り除く作業', '瓶詰め作業'],
+    correctAnswer: 1,
+    explanation: 'ピジャージュは発酵中に果帽を押し下げて色素とタンニンを抽出する作業です。'
+  },
+  {
+    id: 'inter_218',
+    difficulty: 3,
+    category: 'ワイン産地',
+    question: 'エルミタージュのシラーで有名な生産者は？',
+    options: ['ギガル', 'シャペルティエ', 'ジャブレ', 'すべて'],
+    correctAnswer: 3,
+    explanation: 'エルミタージュでは多くの優良生産者がシラーから素晴らしいワインを造っています。'
+  },
+  {
+    id: 'inter_219',
+    difficulty: 3,
+    category: 'ワイン法',
+    question: 'イタリアのスーペルトスカーナとは？',
+    options: ['DOCGワイン', '伝統的なキャンティ', '革新的なIGTワイン', 'スパークリングワイン'],
+    correctAnswer: 2,
+    explanation: 'スーペルトスカーナは伝統を破った革新的なトスカーナのIGTワインです。'
+  },
+  {
+    id: 'inter_220',
+    difficulty: 3,
+    category: 'テイスティング',
+    question: 'ワインの「テロワール」を最も表現する要素は？',
+    options: ['アルコール度数', 'ミネラル感と酸味', '甘さ', 'タンニンの強さ'],
+    correctAnswer: 1,
+    explanation: 'テロワールは土壌と気候を反映し、ミネラル感と酸味に最も現れます。'
+  },
 
-  // 難易度4: 上級編 (25問)
+  // 難易度4: 上級編 (40問)
   {
     id: 'adv_301',
     difficulty: 4,
@@ -387,8 +847,54 @@ export const SAMPLE_QUIZ_QUESTIONS: QuizQuestion[] = [
     correctAnswer: 1,
     explanation: 'リムーザージュはシャンパーニュ製造で瓶を回転させて澱を瓶口に集める作業です。'
   },
+  // 上級編の問題を追加
+  {
+    id: 'adv_306',
+    difficulty: 4,
+    category: 'ワイン製造',
+    question: 'スキンコンタクトの時間が長いと赤ワインはどうなる？',
+    options: ['色が薄くなる', 'タンニンが増加する', '酸味が強くなる', '甘くなる'],
+    correctAnswer: 1,
+    explanation: 'スキンコンタクトの時間が長いほど、皮からタンニンと色素が多く抽出されます。'
+  },
+  {
+    id: 'adv_307',
+    difficulty: 4,
+    category: 'ワイン法',
+    question: 'ボルドーのプルミエ・グラン・クリュ・クラッセAに分類されるシャトーは？',
+    options: ['シャトー・シュヴァル・ブラン', 'シャトー・ル・パン', 'シャトー・ペトリュス', 'シャトー・トロタノワ'],
+    correctAnswer: 0,
+    explanation: 'シャトー・シュヴァル・ブランとシャトー・オーゾンヌがプルミエ・グラン・クリュ・クラッセAに分類されます。'
+  },
+  {
+    id: 'adv_308',
+    difficulty: 4,
+    category: 'テイスティング',
+    question: 'ワインの「ペトリコール」という香りとは？',
+    options: ['花の香り', '雨上がりの土の香り', 'スパイスの香り', '果実の香り'],
+    correctAnswer: 1,
+    explanation: 'ペトリコールは雨上がりの土や石の香りを指すテイスティング用語です。'
+  },
+  {
+    id: 'adv_309',
+    difficulty: 4,
+    category: 'ワイン製造',
+    question: 'アッサンブラージュとは何ですか？',
+    options: ['収穫作業', 'ブレンド作業', '瓶詰め作業', '澱引き作業'],
+    correctAnswer: 1,
+    explanation: 'アッサンブラージュは異なるロットや品種をブレンドする作業です。'
+  },
+  {
+    id: 'adv_310',
+    difficulty: 4,
+    category: 'ワイン歴史',
+    question: 'モンク・ドン・ペリニョンが完成させたとされる技術は？',
+    options: ['デゴルジュマン', 'アッサンブラージュ', 'リムーザージュ', 'すべて'],
+    correctAnswer: 3,
+    explanation: 'ドン・ペリニョンはシャンパーニュの製造技術を体系化し、現在の基礎を築きました。'
+  },
 
-  // 難易度5: 専門級 (15問)
+  // 難易度5: 専門級 (30問)
   {
     id: 'exp_401',
     difficulty: 5,
@@ -433,6 +939,97 @@ export const SAMPLE_QUIZ_QUESTIONS: QuizQuestion[] = [
     options: ['樽材の分解', 'リグニンの分解', 'セルロースの分解', 'タンニンの変化'],
     correctAnswer: 1,
     explanation: 'バニリンは樽材のリグニンが熱や時間により分解されて生成されます。'
+  },
+  // 専門級の問題を追加
+  {
+    id: 'exp_406',
+    difficulty: 5,
+    category: 'ワイン化学',
+    question: 'ワインのpH値が低いと何が起こる？',
+    options: ['色が鮮やかになる', '微生物が繁殖しやすい', 'タンニンが重合する', '酸化が進む'],
+    correctAnswer: 0,
+    explanation: 'pH値が低い（酸性）と、アントシアニンが安定し、赤ワインの色がより鮮やかになります。'
+  },
+  {
+    id: 'exp_407',
+    difficulty: 5,
+    category: 'ワイン製造',
+    question: '醸し発酵における温度管理の重要性は？',
+    options: ['アルコール生成量', '色素とタンニンの抽出バランス', '酸度調整', '糖分濃縮'],
+    correctAnswer: 1,
+    explanation: '温度管理により色素とタンニンの抽出バランスを調整し、ワインの構造を決定します。'
+  },
+  {
+    id: 'exp_408',
+    difficulty: 5,
+    category: 'テイスティング',
+    question: 'ワインの「アストリンジェンシー」とは？',
+    options: ['甘味の強さ', '酸味の鋭さ', 'タンニンによる収斂性', '苦味の程度'],
+    correctAnswer: 2,
+    explanation: 'アストリンジェンシーはタンニンが口中のタンパク質と結合して生じる収斂性です。'
+  },
+  {
+    id: 'exp_409',
+    difficulty: 5,
+    category: 'ワイン法',
+    question: 'シャンパーニュのリザーヴワインの役割は？',
+    options: ['アルコール度数調整', 'ヴィンテージ間の品質安定', '色調調整', '泡の持続性向上'],
+    correctAnswer: 1,
+    explanation: 'リザーヴワインは異なるヴィンテージをブレンドして品質を安定させる役割があります。'
+  },
+  {
+    id: 'exp_410',
+    difficulty: 5,
+    category: 'ワイン歴史',
+    question: 'テンプル騎士団がワイン造りに与えた影響は？',
+    options: ['新しい品種の開発', '醸造技術の標準化', '交易ルートの確立', 'すべて'],
+    correctAnswer: 3,
+    explanation: 'テンプル騎士団は中世ヨーロッパでワイン造りと流通に多大な影響を与えました。'
+  },
+  {
+    id: 'exp_411',
+    difficulty: 5,
+    category: 'ワイン化学',
+    question: 'エノログの主要な責任は？',
+    options: ['販売戦略', '醸造学的品質管理', 'ブドウ栽培', 'マーケティング'],
+    correctAnswer: 1,
+    explanation: 'エノログは醸造学の専門家として、科学的アプローチでワインの品質管理を行います。'
+  },
+  {
+    id: 'exp_412',
+    difficulty: 5,
+    category: 'テイスティング',
+    question: '「トロワ・グラン・シェ・ド・フランス」とは？',
+    options: ['3つの高級レストラン', '3つのワイン産地', '3つの偉大なチーズ', '3つの醸造技術'],
+    correctAnswer: 2,
+    explanation: 'ロックフォール、カマンベール、ブリー・ド・モーがフランス3大チーズとして知られています。'
+  },
+  {
+    id: 'exp_413',
+    difficulty: 5,
+    category: 'ワイン製造',
+    question: 'ビオディナミ農法の月齢管理で重視されるのは？',
+    options: ['満月での収穫のみ', '月の満ち欠けと作業タイミング', '新月での作業禁止', '月食時の特別処理'],
+    correctAnswer: 1,
+    explanation: 'ビオディナミでは月の満ち欠けに合わせて醸造作業のタイミングを調整します。'
+  },
+  {
+    id: 'exp_414',
+    difficulty: 5,
+    category: 'ワイン法',
+    question: 'VQPRDとは何の略称？',
+    options: ['高品質ワイン', '地理的表示保護ワイン', '有機認証ワイン', '限定生産ワイン'],
+    correctAnswer: 1,
+    explanation: 'VQPRD（Vin de Qualité Produit dans une Région Déterminée）は地理的表示保護ワインです。'
+  },
+  {
+    id: 'exp_415',
+    difficulty: 5,
+    category: 'ワイン化学',
+    question: 'ワインの安定性を決める主要因は？',
+    options: ['pH値とSO2のバランス', 'アルコール度数のみ', '糖分含有量', '色の濃さ'],
+    correctAnswer: 0,
+    explanation: 'pH値と二酸化硫黄（SO2）のバランスがワインの微生物学的安定性を決定します。'
   }
 ];
 
