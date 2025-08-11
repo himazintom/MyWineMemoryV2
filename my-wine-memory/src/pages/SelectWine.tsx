@@ -5,6 +5,7 @@ import { wineMasterService } from '../services/wineMasterService';
 import type { WineMaster } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
+import TagInput from '../components/TagInput';
 import { useAsyncOperation } from '../hooks/useAsyncOperation';
 
 const SelectWine: React.FC = () => {
@@ -14,6 +15,7 @@ const SelectWine: React.FC = () => {
   const [searchResults, setSearchResults] = useState<WineMaster[]>([]);
   const [popularWines, setPopularWines] = useState<WineMaster[]>([]);
   const [showNewWineForm, setShowNewWineForm] = useState(false);
+  const [grapeVarieties, setGrapeVarieties] = useState<string[]>([]);
   
   const { loading: searchLoading, error: searchError, execute: executeSearch } = useAsyncOperation<WineMaster[]>();
   const { loading: popularLoading, error: popularError, execute: executeLoadPopular } = useAsyncOperation<WineMaster[]>();
@@ -61,6 +63,12 @@ const SelectWine: React.FC = () => {
 
   const handleCreateNewWine = () => {
     setShowNewWineForm(true);
+    setGrapeVarieties([]); // Reset grape varieties when opening form
+  };
+
+  const handleCancelNewWine = () => {
+    setShowNewWineForm(false);
+    setGrapeVarieties([]);
   };
 
   const handleNewWineSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -74,9 +82,7 @@ const SelectWine: React.FC = () => {
       region: formData.get('region') as string,
       vintage: formData.get('vintage') ? parseInt(formData.get('vintage') as string) : undefined,
       wineType: formData.get('wineType') as 'red' | 'white' | 'rose' | 'sparkling' | 'dessert' | 'fortified' | undefined,
-      grapeVarieties: formData.get('grapeVarieties') 
-        ? (formData.get('grapeVarieties') as string).split(',').map(g => g.trim()).filter(g => g) 
-        : undefined
+      grapeVarieties: grapeVarieties.length > 0 ? grapeVarieties : undefined
     };
 
     try {
@@ -278,18 +284,17 @@ const SelectWine: React.FC = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="grapeVarieties">ブドウ品種</label>
-                  <input
-                    id="grapeVarieties"
-                    name="grapeVarieties"
-                    type="text"
-                    placeholder="例: カベルネ・ソーヴィニヨン, メルロー"
+                  <label>ブドウ品種</label>
+                  <TagInput
+                    value={grapeVarieties}
+                    onChange={setGrapeVarieties}
+                    placeholder="例: カベルネ・ソーヴィニヨン（Enterで追加）"
                   />
-                  <small className="field-help">複数の場合はカンマ区切りで入力</small>
+                  <small className="field-help">Enterまたはカンマで区切って複数入力できます</small>
                 </div>
 
                 <div className="modal-actions">
-                  <button type="button" className="btn-secondary" onClick={() => setShowNewWineForm(false)}>
+                  <button type="button" className="btn-secondary" onClick={handleCancelNewWine}>
                     キャンセル
                   </button>
                   <button type="submit" className="btn-primary">
