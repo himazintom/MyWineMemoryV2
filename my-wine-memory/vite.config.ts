@@ -8,7 +8,8 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
+      disable: true, // Temporarily disable PWA for debugging
       includeAssets: ['logo-icon.svg', 'playstore-icon.png'],
       manifest: {
         name: 'MyWineMemory',

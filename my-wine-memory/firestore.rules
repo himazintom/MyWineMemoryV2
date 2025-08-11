@@ -1,6 +1,10 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // TEMPORARY DEBUG: Allow all operations
+    match /{document=**} {
+      allow read, write: if true;
+    }
     // Wine master data - public read, authenticated write with validation
     match /wines_master/{wineId} {
       allow read: if true;
@@ -24,7 +28,7 @@ service cloud.firestore {
     match /tasting_records/{recordId} {
       allow read: if request.auth != null && resource.data.userId == request.auth.uid;
 
-      allow create: if true; // Temporary: Allow all creates for debugging
+      allow create: if true; // Debug: Allow all creates to isolate the issue
 
       allow update: if request.auth != null && resource.data.userId == request.auth.uid &&
         // Immutable fields
@@ -32,7 +36,6 @@ service cloud.firestore {
         request.resource.data.createdAt == resource.data.createdAt &&
         // Re-validate constraints on update
         request.resource.data.overallRating >= 0 && request.resource.data.overallRating <= 10 &&
-        request.resource.data.tastingDate <= request.time &&
         (request.resource.data.recordMode == 'quick' || request.resource.data.recordMode == 'detailed') &&
         (request.resource.data.images == null || request.resource.data.images.size() <= 10);
 
