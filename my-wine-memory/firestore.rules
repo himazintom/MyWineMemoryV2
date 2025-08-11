@@ -24,16 +24,7 @@ service cloud.firestore {
     match /tasting_records/{recordId} {
       allow read: if request.auth != null && resource.data.userId == request.auth.uid;
 
-      allow create: if request.auth != null &&
-        request.resource.data.userId == request.auth.uid &&
-        // rating range
-        request.resource.data.overallRating >= 0 && request.resource.data.overallRating <= 10 &&
-        // tastingDate not in the future
-        request.resource.data.tastingDate <= request.time &&
-        // recordMode constraint if provided
-        (request.resource.data.recordMode == 'quick' || request.resource.data.recordMode == 'detailed') &&
-        // images length if provided
-        (request.resource.data.images == null || request.resource.data.images.size() <= 10);
+      allow create: if request.auth != null;
 
       allow update: if request.auth != null && resource.data.userId == request.auth.uid &&
         // Immutable fields

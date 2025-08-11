@@ -40,12 +40,25 @@ class TastingRecordService {
       // Use current date if invalid or future date
       const validTastingDate = (isNaN(tastingDate.getTime()) || tastingDate > now) ? now : tastingDate;
 
-      const docRef = await addDoc(collection(db, this.collection), {
+      const firestoreData = {
         ...tastingData,
         tastingDate: Timestamp.fromDate(validTastingDate),
         createdAt: Timestamp.fromDate(tastingData.createdAt),
         updatedAt: Timestamp.fromDate(tastingData.updatedAt)
+      };
+
+      // Debug log for troubleshooting
+      console.log('Creating tasting record with data:', {
+        userId: firestoreData.userId,
+        wineId: firestoreData.wineId,
+        overallRating: firestoreData.overallRating,
+        recordMode: firestoreData.recordMode,
+        tastingDate: validTastingDate.toISOString(),
+        hasImages: !!firestoreData.images,
+        hasDetailedAnalysis: !!firestoreData.detailedAnalysis
       });
+
+      const docRef = await addDoc(collection(db, this.collection), firestoreData);
 
       return docRef.id;
     } catch (error) {
