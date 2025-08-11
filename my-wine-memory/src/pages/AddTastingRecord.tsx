@@ -583,7 +583,7 @@ const AddTastingRecord: React.FC = () => {
                 ))}
                 
                 {formData.images.length < 4 && (
-                  <div className={`image-gallery-add ${formData.images.length > 0 ? 'small' : ''}`}>
+                  <div className={`image-gallery-add pos-${formData.images.length + 1}`}>
                     <input
                       type="file"
                       accept="image/*"
