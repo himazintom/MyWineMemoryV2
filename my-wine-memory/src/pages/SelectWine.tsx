@@ -75,7 +75,7 @@ const SelectWine: React.FC = () => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     
-    const newWineData = {
+    const newWineDataRaw = {
       wineName: formData.get('wineName') as string,
       producer: formData.get('producer') as string,
       country: formData.get('country') as string,
@@ -84,6 +84,11 @@ const SelectWine: React.FC = () => {
       wineType: formData.get('wineType') as 'red' | 'white' | 'rose' | 'sparkling' | 'dessert' | 'fortified' | undefined,
       grapeVarieties: grapeVarieties.length > 0 ? grapeVarieties : undefined
     };
+
+    // Remove undefined values
+    const newWineData = Object.fromEntries(
+      Object.entries(newWineDataRaw).filter(([_, value]) => value !== undefined)
+    );
 
     try {
       // Need currentUser for wine creation, show login prompt if not available

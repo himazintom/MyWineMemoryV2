@@ -282,8 +282,21 @@ const AddTastingRecord: React.FC = () => {
           // Continue with record creation even if image upload fails
         }
 
-        // Create tasting record
-        const tastingData: Omit<TastingRecord, 'id' | 'userId' | 'createdAt' | 'updatedAt'> = {
+        // Helper function to remove undefined values
+        const removeUndefined = (obj: any): any => {
+          const cleaned = { ...obj };
+          Object.keys(cleaned).forEach(key => {
+            if (cleaned[key] === undefined) {
+              delete cleaned[key];
+            } else if (cleaned[key] && typeof cleaned[key] === 'object' && !Array.isArray(cleaned[key])) {
+              cleaned[key] = removeUndefined(cleaned[key]);
+            }
+          });
+          return cleaned;
+        };
+
+        // Create tasting record (before cleaning)
+        const tastingDataRaw = {
           wineId: finalWineId,
           overallRating: formData.overallRating,
           tastingDate: new Date(formData.tastingDate),
@@ -359,6 +372,9 @@ const AddTastingRecord: React.FC = () => {
           
           referenceUrls: formData.referenceUrls.filter(url => url.trim() !== '') || undefined
         };
+
+        // Clean the data by removing undefined values
+        const tastingData: any = removeUndefined(tastingDataRaw);
 
         await tastingRecordService.createTastingRecord(currentUser.uid, tastingData);
 
