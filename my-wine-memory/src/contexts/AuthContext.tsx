@@ -24,16 +24,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     
     try {
-      // Use redirect for all devices to avoid Cross-Origin-Opener-Policy issues
-      console.log('Starting Google sign-in with redirect...');
-      await signInWithRedirect(auth, provider);
-      return; // Redirect result will be handled in useEffect
+      console.log('Starting Google sign-in with popup...');
+      const result = await signInWithPopup(auth, provider);
+      
+      // Create or update user profile in Firestore
+      const userProfile = await userService.createOrUpdateUser(result.user);
+      setUserProfile(userProfile);
+      
+      return result;
     } catch (error: unknown) {
-      console.error('Google sign-in redirect error:', error);
+      console.error('Google sign-in popup error:', error);
       
       if (error && typeof error === 'object' && 'code' in error) {
         const authError = error as { code: string; message?: string };
-        if (authError.code === 'auth/unauthorized-domain') {
+        if (authError.code === 'auth/popup-closed-by-user') {
+          throw new Error('サインインがキャンセルされました');
+        } else if (authError.code === 'auth/unauthorized-domain') {
           throw new Error('このドメインは認証が許可されていません');
         } else {
           throw new Error(`サインインエラー: ${authError.message || 'Unknown error'}`);
