@@ -4643,20 +4643,30 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .image-gallery {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
   margin-bottom: 1rem;
-  max-width: 600px;
+  align-items: flex-start;
 }
 
 .image-gallery-item {
   position: relative;
-  aspect-ratio: 1;
   border-radius: 8px;
   overflow: hidden;
   border: 2px solid var(--border-color);
   background: var(--bg-secondary);
+  flex-shrink: 0;
+}
+
+.image-gallery-item:first-child {
+  width: 400px;
+  height: 300px;
+}
+
+.image-gallery-item:not(:first-child) {
+  width: 120px;
+  height: 120px;
 }
 
 .gallery-image {
@@ -4692,12 +4702,24 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .image-gallery-add {
-  aspect-ratio: 1;
   border: 2px dashed var(--border-color);
   border-radius: 8px;
   background: var(--bg-secondary);
   position: relative;
   transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+/* Add button size - default to large, then small when images exist */
+.image-gallery-add {
+  width: 400px;
+  height: 300px;
+}
+
+/* When there are images, make add button small */
+.image-gallery-add.small {
+  width: 120px;
+  height: 120px;
 }
 
 .image-gallery-add:hover {
@@ -4755,26 +4777,52 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Responsive adjustments */
-@media (min-width: 1024px) {
-  .image-gallery {
-    max-width: 400px;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.5rem;
-  }
-}
-
 @media (max-width: 768px) {
-  .image-gallery {
-    grid-template-columns: repeat(3, 1fr);
-    max-width: 300px;
+  .image-gallery-item:first-child {
+    width: 300px;
+    height: 225px;
+  }
+  
+  .image-gallery-item:not(:first-child) {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .image-gallery-add {
+    width: 300px;
+    height: 225px;
+  }
+  
+  .image-gallery-add.small {
+    width: 100px;
+    height: 100px;
   }
 }
 
 @media (max-width: 480px) {
   .image-gallery {
-    grid-template-columns: repeat(2, 1fr);
-    max-width: 200px;
-    gap: 0.5rem;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .image-gallery-item:first-child {
+    width: 280px;
+    height: 210px;
+  }
+  
+  .image-gallery-item:not(:first-child) {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .image-gallery-add {
+    width: 280px;
+    height: 210px;
+  }
+  
+  .image-gallery-add.small {
+    width: 80px;
+    height: 80px;
   }
   
   .remove-image-button {

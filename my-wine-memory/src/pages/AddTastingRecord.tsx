@@ -558,6 +558,9 @@ const AddTastingRecord: React.FC = () => {
                 <p className="text-muted">
                   おすすめ：お店の雰囲気、ペアリングした料理、一緒に楽しんだ人との記念写真など
                 </p>
+                <p className="text-muted" style={{fontSize: '0.85rem', fontWeight: '500'}}>
+                  ※1枚目の写真はメインサムネイルとして記録一覧で表示されます
+                </p>
               </div>
               
               <div className="image-gallery">
@@ -580,7 +583,7 @@ const AddTastingRecord: React.FC = () => {
                 ))}
                 
                 {formData.images.length < 4 && (
-                  <div className="image-gallery-add">
+                  <div className={`image-gallery-add ${formData.images.length > 0 ? 'small' : ''}`}>
                     <input
                       type="file"
                       accept="image/*"
