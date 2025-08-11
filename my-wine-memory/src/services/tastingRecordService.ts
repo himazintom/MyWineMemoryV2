@@ -261,6 +261,21 @@ class TastingRecordService {
       const snapshot = await uploadBytes(storageRef, imageFile, metadata);
       const downloadURL = await getDownloadURL(snapshot.ref);
       
+      // Use alternative URL format to avoid CORS issues
+      const bucketName = 'ywinememory-4bdf9.firebasestorage.app';
+      const encodedPath = encodeURIComponent(fileName);
+      const alternativeURL = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedPath}?alt=media`;
+      
+      // Try to verify the alternative URL is accessible
+      try {
+        const response = await fetch(alternativeURL, { method: 'HEAD' });
+        if (response.ok) {
+          return alternativeURL;
+        }
+      } catch (error) {
+        console.warn('Alternative URL verification failed, using standard URL:', error);
+      }
+      
       return downloadURL;
     }).catch((error) => {
       console.error('Error uploading wine image after retries:', error);

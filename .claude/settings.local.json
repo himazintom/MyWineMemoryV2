@@ -25,7 +25,8 @@
       "Bash(taskkill:*)",
       "Bash(timeout 10 npm run dev)",
       "Bash(npm run lint)",
-      "Bash(npx depcheck:*)"
+      "Bash(npx depcheck:*)",
+      "Bash(gsutil cors:*)"
     ],
     "deny": []
   },
@@ -40,7 +41,6 @@
           }
         ]
       }
-      
     ]
   }
 }
