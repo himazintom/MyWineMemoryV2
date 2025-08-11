@@ -26,7 +26,9 @@
       "Bash(timeout 10 npm run dev)",
       "Bash(npm run lint)",
       "Bash(npx depcheck:*)",
-      "Bash(gsutil cors:*)"
+      "Bash(gsutil cors:*)",
+      "Bash(firebase projects:list:*)",
+      "Bash(gsutil ls:*)"
     ],
     "deny": []
   },
@@ -37,7 +39,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node $CLAUDE_PROJECT_DIR/.claude/hooks/check-dark-mode.js"
+            "command": "node .claude/hooks/hook-manager.js"
           }
         ]
       }

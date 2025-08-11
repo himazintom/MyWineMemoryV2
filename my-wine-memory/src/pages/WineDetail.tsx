@@ -260,7 +260,7 @@ const WineDetail: React.FC = () => {
                   </div>
                   <div className="stat-card">
                     <div className="stat-value">
-                      {formatDate(new Date(Math.max(...tastingRecords.map(r => r.tastingDate.getTime()))))}
+                      {formatDate(new Date(Math.max(...tastingRecords.map(r => new Date(r.tastingDate).getTime()))))}
                     </div>
                     <div className="stat-label">最新記録</div>
                   </div>
@@ -276,7 +276,7 @@ const WineDetail: React.FC = () => {
                   {tastingRecords.slice(0, 3).map((record) => (
                     <div key={record.id} className="recent-record-item">
                       <div className="recent-record-date">
-                        {formatDate(record.tastingDate)}
+                        {formatDate(new Date(record.tastingDate))}
                       </div>
                       <div 
                         className="recent-record-rating"
@@ -340,7 +340,7 @@ const WineDetail: React.FC = () => {
                     >
                       <div className="record-header">
                         <div className="record-date">
-                          {formatDate(record.tastingDate)}
+                          {formatDate(new Date(record.tastingDate))}
                         </div>
                         <div 
                           className="record-rating"
@@ -466,7 +466,7 @@ const WineDetail: React.FC = () => {
                       >
                         {getDetailedRecords().map((record) => (
                           <option key={record.id} value={record.id}>
-                            {formatDate(record.tastingDate)} - 評価: {record.overallRating.toFixed(1)}/10
+                            {formatDate(new Date(record.tastingDate))} - 評価: {record.overallRating.toFixed(1)}/10
                           </option>
                         ))}
                       </select>

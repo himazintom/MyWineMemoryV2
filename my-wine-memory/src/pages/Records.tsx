@@ -52,11 +52,11 @@ const Records: React.FC = () => {
         for (const [wineId, records] of wineGroups.entries()) {
           const wine = wineMap.get(wineId);
           if (!wine) continue;
-          const latestTasting = new Date(Math.max(...records.map(r => r.tastingDate.getTime())));
+          const latestTasting = new Date(Math.max(...records.map(r => new Date(r.tastingDate).getTime())));
           const averageRating = records.reduce((sum, r) => sum + r.overallRating, 0) / records.length;
           wineWithTastings.push({
             wine,
-            tastingRecords: records.sort((a, b) => b.tastingDate.getTime() - a.tastingDate.getTime()),
+            tastingRecords: records.sort((a, b) => new Date(b.tastingDate).getTime() - new Date(a.tastingDate).getTime()),
             latestTasting,
             averageRating
           });
@@ -282,7 +282,7 @@ const Records: React.FC = () => {
                     {group.tastingRecords.slice(0, 3).map((record) => (
                       <div key={record.id} className="tasting-preview-item">
                         <div className="tasting-date">
-                          {formatDate(record.tastingDate)}
+                          {formatDate(new Date(record.tastingDate))}
                         </div>
                         <div 
                           className="tasting-rating"
