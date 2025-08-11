@@ -273,8 +273,53 @@ export const SAMPLE_QUIZ_QUESTIONS: QuizQuestion[] = [
     correctAnswer: 1,
     explanation: 'エチケットはワインボトルに貼られたラベルのことです。'
   },
+  {
+    id: 'basic_031',
+    difficulty: 1,
+    category: 'ワインの基礎',
+    question: 'ワインに含まれる「亜硫酸塩」の役割は？',
+    options: ['甘味を加える', '酸化防止', '色を濃くする', '泡を作る'],
+    correctAnswer: 1,
+    explanation: '亜硫酸塩は酸化を防ぎ、ワインの品質を保持する重要な役割を果たします。'
+  },
+  {
+    id: 'basic_032',
+    difficulty: 1,
+    category: 'ワインの基礎',
+    question: 'ワインの「アルコール発酵」で糖分が変化するものは？',
+    options: ['アルコールと二酸化炭素', '酸とタンニン', '色素とアロマ', '水と塩'],
+    correctAnswer: 0,
+    explanation: 'アルコール発酵では、酵母が糖分をアルコールと二酸化炭素に変換します。'
+  },
+  {
+    id: 'basic_033',
+    difficulty: 1,
+    category: 'ワインの基礎',
+    question: '「ワインの脚（レッグス）」が長いワインの特徴は？',
+    options: ['アルコール度数が高い', '酸味が強い', '甘味が強い', '渋味が強い'],
+    correctAnswer: 0,
+    explanation: 'レッグスが長いワインは一般的にアルコール度数が高く、グリセロール含有量も多いことを示します。'
+  },
+  {
+    id: 'basic_034',
+    difficulty: 1,
+    category: 'ワインの基礎',
+    question: 'ワインボトルの「パント（凹み）」の主な目的は？',
+    options: ['見た目を良くする', 'ボトルの強度を高める', '容量を減らす', '保存期間を延ばす'],
+    correctAnswer: 1,
+    explanation: 'パントはボトルの構造的強度を高め、圧力に対する耐性を向上させます。'
+  },
+  {
+    id: 'basic_035',
+    difficulty: 1,
+    category: 'ワインの基礎',
+    question: 'ワインの「デカンタージュ」を行う理想的なタイミングは？',
+    options: ['飲む直前', '飲む30分-2時間前', '飲む1週間前', '飲む直後'],
+    correctAnswer: 1,
+    explanation: 'デカンタージュは飲む30分から2時間前に行うのが理想的で、ワインによって時間を調整します。'
+  },
 
-  // 難易度2: 初級編 (50問)
+  // 難易度2: 初級編 (60問)
   {
     id: 'basic_101',
     difficulty: 2,
@@ -617,8 +662,98 @@ export const SAMPLE_QUIZ_QUESTIONS: QuizQuestion[] = [
     correctAnswer: 2,
     explanation: 'ピノタージュは南アフリカで開発された品種で、ピノ・ノワールとサンソーの交配種です。'
   },
+  {
+    id: 'basic_139',
+    difficulty: 2,
+    category: 'ワイン産地',
+    question: 'ドイツワインの「アイスヴァイン」の製造方法は？',
+    options: ['人工的に冷凍', '凍ったブドウを収穫', '氷を加えて醸造', '冷蔵発酵'],
+    correctAnswer: 1,
+    explanation: 'アイスヴァインは自然に凍ったブドウを収穫して造る高級甘口ワインです。'
+  },
+  {
+    id: 'basic_140',
+    difficulty: 2,
+    category: 'ブドウ品種',
+    question: 'ミュスカデで使われるブドウ品種は？',
+    options: ['ミュスカデ', 'ムロン・ド・ブルゴーニュ', 'シュナン・ブラン', 'アルバリーニョ'],
+    correctAnswer: 1,
+    explanation: 'ミュスカデは実際にはムロン・ド・ブルゴーニュという品種から造られるワインの名前です。'
+  },
+  {
+    id: 'basic_141',
+    difficulty: 2,
+    category: 'ワイン産地',
+    question: 'ジュヴレ・シャンベルタンはどこの村？',
+    options: ['ボルドー', 'ブルゴーニュ', 'シャンパーニュ', 'アルザス'],
+    correctAnswer: 1,
+    explanation: 'ジュヴレ・シャンベルタンはブルゴーニュ地方コート・ドールの有名な村です。'
+  },
+  {
+    id: 'basic_142',
+    difficulty: 2,
+    category: 'ブドウ品種',
+    question: 'プリミティーヴォとジンファンデルの関係は？',
+    options: ['全く別の品種', '同じ品種', 'プリミティーヴォの方が古い', 'ジンファンデルの変種'],
+    correctAnswer: 1,
+    explanation: 'プリミティーヴォ（イタリア）とジンファンデル（アメリカ）は同じ品種です。'
+  },
+  {
+    id: 'basic_143',
+    difficulty: 2,
+    category: 'ワイン産地',
+    question: 'モンタルチーノはどこの国にある？',
+    options: ['フランス', 'イタリア', 'スペイン', 'ポルトガル'],
+    correctAnswer: 1,
+    explanation: 'モンタルチーノはイタリア・トスカーナ州にあり、ブルネッロ・ディ・モンタルチーノで有名です。'
+  },
+  {
+    id: 'basic_144',
+    difficulty: 2,
+    category: 'ブドウ品種',
+    question: 'ヴェルデホの原産地は？',
+    options: ['ポルトガル', 'スペイン', 'イタリア', 'フランス'],
+    correctAnswer: 1,
+    explanation: 'ヴェルデホはスペイン・ルエダ地方原産の白ワイン用品種です。'
+  },
+  {
+    id: 'basic_145',
+    difficulty: 2,
+    category: 'ワイン産地',
+    question: 'ワラワラ・バレーはどこの国の産地？',
+    options: ['オーストラリア', 'ニュージーランド', 'アメリカ', 'カナダ'],
+    correctAnswer: 2,
+    explanation: 'ワラワラ・バレーはアメリカ・ワシントン州の新興ワイン産地です。'
+  },
+  {
+    id: 'basic_146',
+    difficulty: 2,
+    category: 'ブドウ品種',
+    question: 'アグリアニコの特徴は？',
+    options: ['軽やかで早飲み', '濃厚で長期熟成向き', '甘口専用', 'スパークリング専用'],
+    correctAnswer: 1,
+    explanation: 'アグリアニコは南イタリアの品種で、濃厚でタンニンが豊富な長期熟成向きの赤ワインを生み出します。'
+  },
+  {
+    id: 'basic_147',
+    difficulty: 2,
+    category: 'ワイン産地',
+    question: 'ロワール川流域のシノンで主に栽培される品種は？',
+    options: ['ピノ・ノワール', 'カベルネ・フラン', 'メルロー', 'ガメイ'],
+    correctAnswer: 1,
+    explanation: 'シノンはカベルネ・フランを主体とした赤ワインで有名なロワール地方の産地です。'
+  },
+  {
+    id: 'basic_148',
+    difficulty: 2,
+    category: 'ブドウ品種',
+    question: 'マルサンヌの特徴は？',
+    options: ['高い酸味', '低いアルコール', '厚みのある白ワイン', '軽やかな白ワイン'],
+    correctAnswer: 2,
+    explanation: 'マルサンヌはローヌ地方の白ワイン品種で、厚みがありリッチな白ワインを生み出します。'
+  },
 
-  // 難易度3: 中級編 (60問)
+  // 難易度3: 中級編 (70問)
   {
     id: 'inter_201',
     difficulty: 3,
@@ -800,8 +935,98 @@ export const SAMPLE_QUIZ_QUESTIONS: QuizQuestion[] = [
     correctAnswer: 1,
     explanation: 'テロワールは土壌と気候を反映し、ミネラル感と酸味に最も現れます。'
   },
+  {
+    id: 'inter_221',
+    difficulty: 3,
+    category: 'ワイン製造',
+    question: 'カーボニック・マセレーション法の特徴は？',
+    options: ['高温発酵', '二酸化炭素中での発酵', '長期醸し', '低温発酵'],
+    correctAnswer: 1,
+    explanation: 'カーボニック・マセレーション法は二酸化炭素雰囲気下でブドウを発酵させ、軽やかで果実味豊かなワインを造ります。'
+  },
+  {
+    id: 'inter_222',
+    difficulty: 3,
+    category: 'ワイン産地',
+    question: 'プリオラートはどこの国のワイン産地？',
+    options: ['フランス', 'イタリア', 'スペイン', 'ポルトガル'],
+    correctAnswer: 2,
+    explanation: 'プリオラートはスペイン・カタルーニャ地方の高級ワイン産地で、DOCaに認定されています。'
+  },
+  {
+    id: 'inter_223',
+    difficulty: 3,
+    category: 'テイスティング',
+    question: 'ワインの「第三アロマ」とは何ですか？',
+    options: ['ブドウ由来の香り', '発酵由来の香り', '熟成由来の香り', '酸化による香り'],
+    correctAnswer: 2,
+    explanation: '第三アロマは樽熟成やボトル熟成により発達する複雑で上品な香りのことです。'
+  },
+  {
+    id: 'inter_224',
+    difficulty: 3,
+    category: 'ワイン法',
+    question: 'ドイツワインのグローセ・ラーゲの意味は？',
+    options: ['大きな畑', '特級畑', '一級畑', '村名畑'],
+    correctAnswer: 1,
+    explanation: 'グローセ・ラーゲはVDP分類における特級畑で、最高品質のワインを生み出す畑です。'
+  },
+  {
+    id: 'inter_225',
+    difficulty: 3,
+    category: 'ワイン製造',
+    question: 'ソレラシステムで有名なワインは？',
+    options: ['シャンパーニュ', 'シェリー', 'ポート', 'マデイラ'],
+    correctAnswer: 1,
+    explanation: 'ソレラシステムはシェリー酒の伝統的な熟成システムで、異なる年代のワインをブレンドします。'
+  },
+  {
+    id: 'inter_226',
+    difficulty: 3,
+    category: 'テイスティング',
+    question: 'ワインの「アタック」とは何ですか？',
+    options: ['最初の香り', '口に含んだ瞬間の印象', '飲み込む瞬間', '余韻'],
+    correctAnswer: 1,
+    explanation: 'アタックは口に含んだ瞬間の第一印象のことで、ワインの力強さや繊細さを表現します。'
+  },
+  {
+    id: 'inter_227',
+    difficulty: 3,
+    category: 'ワイン産地',
+    question: 'アマローネで有名なイタリアの産地は？',
+    options: ['ピエモンテ', 'トスカーナ', 'ヴェネト', 'ウンブリア'],
+    correctAnswer: 2,
+    explanation: 'アマローネはヴェネト州ヴァルポリチェッラ地区の伝統的な乾燥ブドウから造る高級ワインです。'
+  },
+  {
+    id: 'inter_228',
+    difficulty: 3,
+    category: 'ワイン製造',
+    question: 'パッシートワインの製造方法は？',
+    options: ['早期収穫', 'ブドウを乾燥させる', '冷凍収穫', '貴腐菌利用'],
+    correctAnswer: 1,
+    explanation: 'パッシートワインはブドウを天日や室内で乾燥させて糖度を濃縮してから醸造するワインです。'
+  },
+  {
+    id: 'inter_229',
+    difficulty: 3,
+    category: 'テイスティング',
+    question: 'ワインの「グリップ」という表現が指すものは？',
+    options: ['甘味の強さ', 'タンニンの質感', '酸味の鋭さ', 'アルコール感'],
+    correctAnswer: 1,
+    explanation: 'グリップはタンニンが口中を引き締める感覚を表現するテイスティング用語です。'
+  },
+  {
+    id: 'inter_230',
+    difficulty: 3,
+    category: 'ワイン産地',
+    question: 'モーゼル川流域の急斜面畑の特徴は？',
+    options: ['粘土質土壌', 'スレート土壌', '石灰質土壌', '火山灰土壌'],
+    correctAnswer: 1,
+    explanation: 'モーゼル地方の急斜面畑はスレート土壌が特徴で、リースリングに優雅なミネラル感を与えます。'
+  },
 
-  // 難易度4: 上級編 (40問)
+  // 難易度4: 上級編 (50問)
   {
     id: 'adv_301',
     difficulty: 4,
@@ -893,8 +1118,53 @@ export const SAMPLE_QUIZ_QUESTIONS: QuizQuestion[] = [
     correctAnswer: 3,
     explanation: 'ドン・ペリニョンはシャンパーニュの製造技術を体系化し、現在の基礎を築きました。'
   },
+  {
+    id: 'adv_311',
+    difficulty: 4,
+    category: 'ワイン製造',
+    question: '醸造におけるエステル化反応の重要性は？',
+    options: ['色素の安定', '香りの複雑化', '酸度の調整', 'アルコール度数の向上'],
+    correctAnswer: 1,
+    explanation: 'エステル化反応により果実香と酸が結合し、ワインの香りがより複雑になります。'
+  },
+  {
+    id: 'adv_312',
+    difficulty: 4,
+    category: 'ワイン法',
+    question: 'シャンパーニュの「ピュピトル」の役割は？',
+    options: ['発酵管理', '動瓶作業', '温度調整', '圧搾作業'],
+    correctAnswer: 1,
+    explanation: 'ピュピトルは動瓶作業（リムーザージュ）で使用する木製の台で、瓶を段階的に傾けます。'
+  },
+  {
+    id: 'adv_313',
+    difficulty: 4,
+    category: 'テイスティング',
+    question: 'ワインの「収斂性」の化学的原因は？',
+    options: ['糖分の結合', 'タンニンとタンパク質の結合', '酸の結晶化', 'アルコールの蒸発'],
+    correctAnswer: 1,
+    explanation: '収斂性はタンニンが口中のタンパク質と結合することで生じる感覚です。'
+  },
+  {
+    id: 'adv_314',
+    difficulty: 4,
+    category: 'ワイン歴史',
+    question: 'クローナル選抜が本格化した時代は？',
+    options: ['19世紀', '20世紀前半', '20世紀後半', '21世紀'],
+    correctAnswer: 2,
+    explanation: 'クローナル選抜は20世紀後半に科学的アプローチにより本格化し、品質向上に貢献しました。'
+  },
+  {
+    id: 'adv_315',
+    difficulty: 4,
+    category: 'ワイン製造',
+    question: 'コールドソーク（低温浸漬）の主な目的は？',
+    options: ['アルコール抽出', '色素とアロマの穏やかな抽出', 'タンニンの強化', '酸度の向上'],
+    correctAnswer: 1,
+    explanation: 'コールドソークは発酵前に低温で色素とアロマを穏やかに抽出する技術です。'
+  },
 
-  // 難易度5: 専門級 (30問)
+  // 難易度5: 専門級 (40問)
   {
     id: 'exp_401',
     difficulty: 5,
@@ -1030,6 +1300,96 @@ export const SAMPLE_QUIZ_QUESTIONS: QuizQuestion[] = [
     options: ['pH値とSO2のバランス', 'アルコール度数のみ', '糖分含有量', '色の濃さ'],
     correctAnswer: 0,
     explanation: 'pH値と二酸化硫黄（SO2）のバランスがワインの微生物学的安定性を決定します。'
+  },
+  {
+    id: 'exp_416',
+    difficulty: 5,
+    category: 'ワイン製造',
+    question: 'マイクロオキシジェネーションの効果として正しいのは？',
+    options: ['色素の安定化', 'タンニンの重合', 'アロマの保護', 'すべて'],
+    correctAnswer: 3,
+    explanation: 'マイクロオキシジェネーションは微量の酸素供給により、色素安定化、タンニン重合、アロマ保護を同時に実現します。'
+  },
+  {
+    id: 'exp_417',
+    difficulty: 5,
+    category: 'ワイン化学',
+    question: 'ワインの「レデュクティブ」な状態の原因は？',
+    options: ['過度の酸素接触', '硫黄化合物の生成', '糖分の残存', '酸度の低下'],
+    correctAnswer: 1,
+    explanation: 'レデュクティブ状態は酸素不足により硫黄化合物が生成され、不快な香りが発生する状態です。'
+  },
+  {
+    id: 'exp_418',
+    difficulty: 5,
+    category: 'テイスティング',
+    question: 'ワインの「パーカーポイント」システムの特徴は？',
+    options: ['20点満点', '50点満点', '100点満点', '1000点満点'],
+    correctAnswer: 2,
+    explanation: 'パーカーポイントは100点満点のワイン評価システムで、世界的な影響力を持ちます。'
+  },
+  {
+    id: 'exp_419',
+    difficulty: 5,
+    category: 'ワイン法',
+    question: 'EU規則におけるワインの「地理的表示保護（PGI）」の略称は？',
+    options: ['AOP', 'IGP', 'VQA', 'AVA'],
+    correctAnswer: 1,
+    explanation: 'IGP（Indication Géographique Protégée）は地理的表示保護のEU統一略称です。'
+  },
+  {
+    id: 'exp_420',
+    difficulty: 5,
+    category: 'ワイン歴史',
+    question: '「ジュジメント・オブ・パリ」が開催された年は？',
+    options: ['1973年', '1976年', '1982年', '1985年'],
+    correctAnswer: 1,
+    explanation: '1976年のジュジメント・オブ・パリでカリフォルニアワインがフランスワインに勝利し、ワイン界に衝撃を与えました。'
+  },
+  {
+    id: 'exp_421',
+    difficulty: 5,
+    category: 'ワイン化学',
+    question: 'ワインの「フェノリック成熟度」の指標として重要なのは？',
+    options: ['糖度', 'タンニンの質', '酸度', 'pH値'],
+    correctAnswer: 1,
+    explanation: 'フェノリック成熟度はタンニンの質的変化を示し、収穫タイミングの重要な指標です。'
+  },
+  {
+    id: 'exp_422',
+    difficulty: 5,
+    category: 'ワイン製造',
+    question: 'プレリューズ（前搾り）の目的は？',
+    options: ['収量増加', '高品質ジュースの抽出', '色素抽出', '酸度調整'],
+    correctAnswer: 1,
+    explanation: 'プレリューズは圧搾前に自重でジュースを抽出し、最高品質の成分を得る技術です。'
+  },
+  {
+    id: 'exp_423',
+    difficulty: 5,
+    category: 'テイスティング',
+    question: 'ワインの「アンフォラ」熟成の特徴は？',
+    options: ['オーク樽と同じ', 'ニュートラルで微細な酸素供給', '金属的な味', '強い木の香り'],
+    correctAnswer: 1,
+    explanation: 'アンフォラ熟成はニュートラルでありながら微細な酸素供給により、独特の質感とミネラル感を与えます。'
+  },
+  {
+    id: 'exp_424',
+    difficulty: 5,
+    category: 'ワイン法',
+    question: 'シャンパーニュの「コミュナル分類」で最高ランクは？',
+    options: ['プルミエ・クリュ', 'グラン・クリュ', 'ヴィラージュ', 'スペシャル・クリュ'],
+    correctAnswer: 1,
+    explanation: 'シャンパーニュのコミュナル分類でグラン・クリュ（特級）が最高ランクです。'
+  },
+  {
+    id: 'exp_425',
+    difficulty: 5,
+    category: 'ワイン化学',
+    question: 'ワインの「ポリフェノール指数」が示すものは？',
+    options: ['甘さの度合い', '抗酸化能力', '酸度レベル', '色の濃さ'],
+    correctAnswer: 1,
+    explanation: 'ポリフェノール指数はワインの抗酸化能力と品質を示す重要な化学的指標です。'
   }
 ];
 
