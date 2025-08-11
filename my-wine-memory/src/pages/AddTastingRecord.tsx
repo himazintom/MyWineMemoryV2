@@ -299,7 +299,7 @@ const AddTastingRecord: React.FC = () => {
         const tastingDataRaw = {
           wineId: finalWineId,
           overallRating: formData.overallRating,
-          tastingDate: new Date(formData.tastingDate),
+          tastingDate: formData.tastingDate,
           recordMode,
           notes: formData.notes || undefined,
           price: formData.price ? parseFloat(formData.price) : undefined,

@@ -57,7 +57,7 @@ export interface TastingRecord {
   
   // Required tasting info
   overallRating: number; // 0.0-10.0
-  tastingDate: Date;
+  tastingDate: Date | string;
   recordMode: 'quick' | 'detailed';
   
   // Optional tasting-specific info

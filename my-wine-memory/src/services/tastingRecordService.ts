@@ -33,18 +33,16 @@ class TastingRecordService {
         updatedAt: new Date()
       };
 
-      // Ensure tastingDate is a valid Date object
-      let tastingDate = tastingData.tastingDate;
-      if (typeof tastingDate === 'string') {
-        tastingDate = new Date(tastingDate);
-      }
-      if (!tastingDate || !(tastingDate instanceof Date) || isNaN(tastingDate.getTime())) {
-        tastingDate = new Date(); // Fallback to current date if invalid
-      }
+      // Convert tastingDate string to Date and validate
+      const tastingDate = new Date(tastingData.tastingDate);
+      const now = new Date();
+      
+      // Use current date if invalid or future date
+      const validTastingDate = (isNaN(tastingDate.getTime()) || tastingDate > now) ? now : tastingDate;
 
       const docRef = await addDoc(collection(db, this.collection), {
         ...tastingData,
-        tastingDate: Timestamp.fromDate(tastingDate),
+        tastingDate: Timestamp.fromDate(validTastingDate),
         createdAt: Timestamp.fromDate(tastingData.createdAt),
         updatedAt: Timestamp.fromDate(tastingData.updatedAt)
       });
@@ -208,15 +206,12 @@ class TastingRecordService {
         updatedAt: Timestamp.fromDate(new Date())
       };
 
-      // Convert Date objects to Timestamps
+      // Convert tastingDate to Timestamp if provided
       if (data.tastingDate) {
-        let tastingDate = data.tastingDate;
-        if (typeof tastingDate === 'string') {
-          tastingDate = new Date(tastingDate);
-        }
-        if (tastingDate instanceof Date && !isNaN(tastingDate.getTime())) {
-          updateData.tastingDate = Timestamp.fromDate(tastingDate);
-        }
+        const tastingDate = new Date(data.tastingDate);
+        const now = new Date();
+        const validTastingDate = (isNaN(tastingDate.getTime()) || tastingDate > now) ? now : tastingDate;
+        updateData.tastingDate = Timestamp.fromDate(validTastingDate);
       }
 
       await updateDoc(docRef, updateData);
