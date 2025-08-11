@@ -28,7 +28,7 @@ const AddTastingRecord: React.FC = () => {
   const [formData, setFormData] = useState({
     overallRating: 5.0,
     notes: '',
-    price: '3000',
+    price: '',
     purchaseLocation: '',
     tastingDate: new Date().toISOString().split('T')[0],
     images: [] as File[],
@@ -209,14 +209,6 @@ const AddTastingRecord: React.FC = () => {
     setFormData(prev => ({ ...prev, overallRating: rating }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setFormData(prev => ({ 
-        ...prev, 
-        images: Array.from(e.target.files || []) 
-      }));
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
