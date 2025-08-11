@@ -262,7 +262,7 @@ class TastingRecordService {
       const downloadURL = await getDownloadURL(snapshot.ref);
       
       // Use alternative URL format to avoid CORS issues
-      const bucketName = 'mywinememory-4bdf9';
+      const bucketName = 'mywinememory-4bdf9.firebasestorage.app';
       const encodedPath = encodeURIComponent(fileName);
       const alternativeURL = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedPath}?alt=media`;
       
