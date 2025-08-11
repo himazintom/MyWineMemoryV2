@@ -33,12 +33,9 @@ class TastingRecordService {
         updatedAt: new Date()
       };
 
-      // Convert tastingDate string to Date and validate
+      // Convert tastingDate string to Date - temporarily disable validation
       const tastingDate = new Date(tastingData.tastingDate);
-      const now = new Date();
-      
-      // Use current date if invalid or future date
-      const validTastingDate = (isNaN(tastingDate.getTime()) || tastingDate > now) ? now : tastingDate;
+      const validTastingDate = isNaN(tastingDate.getTime()) ? new Date() : tastingDate;
 
       const firestoreData = {
         ...tastingData,
