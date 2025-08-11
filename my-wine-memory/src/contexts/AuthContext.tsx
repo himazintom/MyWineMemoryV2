@@ -145,24 +145,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return unsubscribe;
   }, []);
 
-  // Handle redirect result on component mount
-  useEffect(() => {
-    const handleRedirectResult = async () => {
-      try {
-        const result = await getRedirectResult(auth);
-        if (result) {
-          console.log('Redirect sign-in successful');
-          // Create or update user profile in Firestore
-          const userProfile = await userService.createOrUpdateUser(result.user);
-          setUserProfile(userProfile);
-        }
-      } catch (error) {
-        console.error('Redirect result error:', error);
-      }
-    };
-    
-    handleRedirectResult();
-  }, []);
 
   const value: AuthContextType = {
     currentUser,
