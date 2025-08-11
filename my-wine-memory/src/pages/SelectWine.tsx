@@ -88,7 +88,7 @@ const SelectWine: React.FC = () => {
     // Remove undefined values
     const newWineData = Object.fromEntries(
       Object.entries(newWineDataRaw).filter(([_, value]) => value !== undefined)
-    );
+    ) as Omit<WineMaster, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'referenceCount'>;
 
     try {
       // Need currentUser for wine creation, show login prompt if not available

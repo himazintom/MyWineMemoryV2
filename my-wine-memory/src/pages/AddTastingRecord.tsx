@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthHooks';
 import { wineMasterService } from '../services/wineMasterService';
 import { tastingRecordService } from '../services/tastingRecordService';
 import { userService, goalService } from '../services/userService';
-import type { WineMaster, TastingRecord } from '../types';
+import type { WineMaster } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import LoginPrompt from '../components/LoginPrompt';
