@@ -236,12 +236,32 @@ export const goalService = {
 
   // Update daily goal progress
   async updateGoalProgress(userId: string, type: 'wine' | 'quiz', amount: number = 1): Promise<void> {
-    const today = new Date().toISOString().substring(0, 10);
-    const goalRef = doc(db, 'daily_goals', `${userId}_${today}`);
-    
-    const field = type === 'wine' ? 'wineRecordingCompleted' : 'quizCompleted';
-    await updateDoc(goalRef, {
-      [field]: increment(amount)
-    });
+    try {
+      const today = new Date().toISOString().substring(0, 10);
+      const goalRef = doc(db, 'daily_goals', `${userId}_${today}`);
+      
+      // Try to update first
+      const field = type === 'wine' ? 'wineRecordingCompleted' : 'quizCompleted';
+      await updateDoc(goalRef, {
+        [field]: increment(amount)
+      });
+    } catch (error: any) {
+      // If document doesn't exist, initialize it first
+      if (error?.code === 'not-found') {
+        console.log('Daily goal document not found, initializing...');
+        await this.initializeTodayGoal(userId);
+        
+        // Retry the update
+        const today = new Date().toISOString().substring(0, 10);
+        const goalRef = doc(db, 'daily_goals', `${userId}_${today}`);
+        const field = type === 'wine' ? 'wineRecordingCompleted' : 'quizCompleted';
+        await updateDoc(goalRef, {
+          [field]: increment(amount)
+        });
+      } else {
+        // Re-throw other errors
+        throw error;
+      }
+    }
   }
 };

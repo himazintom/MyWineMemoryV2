@@ -1,0 +1,45 @@
+良い質問です！この3つは役割が全く違うサービスです：
+
+  📊 Firestore Database（データベース）
+
+  役割：構造化データの保存
+  保存するもの：テキスト、数値、日付、配列、オブジェクト
+  例：ユーザー情報、ワイン記録、評価、メモ
+
+  {
+    "wineName": "シャトー・マルゴー",
+    "rating": 8.5,
+    "price": 15000,
+    "tastingDate": "2025-08-11"
+  }
+
+  📁 Firebase Storage（ファイルストレージ）
+
+  役割：ファイルの保存・配信
+  保存するもの：画像、動画、PDF、音声ファイル
+  例：ワイン写真、ボトル画像、手書きスケッチ
+
+  wine-images/user123/photo1.jpg
+  wine-images/user123/photo2.jpg
+
+  ☁️ Google Cloud（インフラ基盤）
+
+  役割：FirebaseのバックエンドインフラNW
+  実体：Google Cloudのサービス群を使いやすくパッケージ化
+
+  Firebase Storage → Google Cloud Storage
+  Firestore → Google Cloud Firestore
+  Firebase Hosting → Google Cloud CDN
+
+  🍷 MyWineMemoryでの使い分け：
+
+  Firestore：ワイン名、評価、価格、メモ
+  Storage：ワイン写真、スケッチ
+  Google Cloud：裏で動いている基盤
+
+  🔗 関係性：
+
+  Firebase = Google Cloudの簡単版
+  Google Cloud = 本格的なクラウドサービス
+
+  つまり、FirebaseはGoogle Cloudを簡単に使えるようにした開発者向けパッケージです！
