@@ -975,6 +975,8 @@ body {
   background: var(--bg-primary, white);
   border-top: 1px solid var(--border-color, #e0e0e0);
   margin: 0 -1rem -2rem;
+  justify-content: center;
+  align-items: center;
 }
 
 .btn-primary,
@@ -1024,6 +1026,47 @@ body {
 .btn-draft:hover:not(:disabled) {
   background: var(--warning-text);
   transform: translateY(-1px);
+}
+
+/* Prevent button size changes on click/focus */
+.btn-primary:active,
+.btn-secondary:active,
+.btn-draft:active,
+.btn-primary:focus,
+.btn-secondary:focus,
+.btn-draft:focus {
+  transform: none !important;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(114, 47, 55, 0.3);
+}
+
+/* Wine record card background image styling */
+.wine-group-card {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.wine-group-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Ensure text is readable over background images */
+.wine-group-card .wine-group-header,
+.wine-group-card .tasting-summary,
+.wine-group-card .recent-tastings {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(5px);
+  margin: 0;
+  padding: 1rem;
+}
+
+.wine-group-card .recent-tastings {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .auto-save-indicator {

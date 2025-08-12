@@ -234,6 +234,14 @@ const Records: React.FC = () => {
               <div 
                 key={group.wine.id} 
                 className="wine-group-card"
+                style={{
+                  backgroundImage: group.tastingRecords[0]?.images?.[0] 
+                    ? `linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url(${group.tastingRecords[0].images[0]})`
+                    : undefined,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat'
+                }}
                 onClick={() => handleWineClick(group.wine.id)}
               >
                 <div className="wine-group-header">
