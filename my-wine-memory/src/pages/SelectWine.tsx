@@ -195,7 +195,7 @@ const SelectWine: React.FC = () => {
 
         {/* New Wine Form Modal */}
         {showNewWineForm && (
-          <div className="modal-backdrop" onClick={() => setShowNewWineForm(false)}>
+          <div className="modal-backdrop">
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
                 <h2>新しいワインを登録</h2>
@@ -269,7 +269,7 @@ const SelectWine: React.FC = () => {
                       name="vintage"
                       type="number"
                       placeholder="2020"
-                      min="2020"
+                      min="1900"
                       max={new Date().getFullYear()}
                     />
                   </div>
