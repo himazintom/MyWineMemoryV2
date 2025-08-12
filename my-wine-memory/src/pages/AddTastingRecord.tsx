@@ -521,32 +521,6 @@ const AddTastingRecord: React.FC = () => {
           <div className="form-section">
             <h3>追加情報</h3>
             
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="price">購入価格（円）</label>
-                <input
-                  id="price"
-                  name="price"
-                  type="number"
-                  value={formData.price}
-                  onChange={handleInputChange}
-                  placeholder="3000"
-                  min="0"
-                />
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="purchaseLocation">購入場所</label>
-                <input
-                  id="purchaseLocation"
-                  name="purchaseLocation"
-                  type="text"
-                  value={formData.purchaseLocation}
-                  onChange={handleInputChange}
-                  placeholder="例: 〇〇酒店"
-                />
-              </div>
-            </div>
             
             <div className="form-group">
               <label htmlFor="notes">テイスティングメモ</label>
