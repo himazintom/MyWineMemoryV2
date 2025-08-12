@@ -812,6 +812,19 @@ body {
   transition: all 0.2s ease;
 }
 
+/* Light mode specific styles for mode buttons */
+[data-theme="light"] .mode-button {
+  border: 2px solid var(--border-color);
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+}
+
+[data-theme="light"] .mode-button:hover {
+  background: var(--primary-color);
+  color: var(--btn-primary-text);
+  border-color: var(--primary-color);
+}
+
 .mode-button.active {
   background: rgba(255, 255, 255, 0.2);
   border-color: rgba(255, 255, 255, 0.5);

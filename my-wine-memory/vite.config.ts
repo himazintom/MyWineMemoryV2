@@ -8,8 +8,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'prompt',
-      disable: true, // Temporarily disable PWA for debugging
+      registerType: 'autoUpdate',
       includeAssets: ['logo-icon.svg', 'playstore-icon.png'],
       manifest: {
         name: 'MyWineMemory',
@@ -68,7 +67,14 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,woff,ttf}'],
-        navigateFallbackDenylist: [/^\/__\/.*$/, /^\/google\.firestore\.v1\.Firestore/], // Exclude Firebase paths
+        navigateFallbackDenylist: [
+          /^\/__\/.*$/, 
+          /^\/google\.firestore\.v1\.Firestore/,
+          /^\/v1\/projects\/.*\/databases\/.*\/documents\/.*/, // Firestore REST API
+          /^\/google\.firestore\.v1beta1\.Firestore/, // Firestore WebChannel
+          /^.*\.firebasestorage\.app\/_.*/, // Firebase Storage internal
+          /^.*\.googleapis\.com\/.*/ // All Google APIs
+        ],
         runtimeCaching: [
           // Firebase Storage images
           {
@@ -106,26 +112,10 @@ export default defineConfig({
               }
             }
           },
-          // Firestore API - NetworkOnly to avoid WebChannel issues
-          {
-            urlPattern: /^https:\/\/firestore\.googleapis\.com\/.*/i,
-            handler: 'NetworkOnly',
-            options: {
-              cacheName: 'firestore-api'
-            }
-          },
-          // Other Firebase APIs
+          // Firebase APIs - NetworkOnly to prevent interference
           {
             urlPattern: /^https:\/\/.*\.googleapis\.com\/.*/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-cache',
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 // 1 day
-              },
-              networkTimeoutSeconds: 5
-            }
+            handler: 'NetworkOnly' // Never cache Firebase API calls
           },
           // App shell
           {
