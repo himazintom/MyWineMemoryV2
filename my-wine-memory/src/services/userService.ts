@@ -245,9 +245,9 @@ export const goalService = {
       await updateDoc(goalRef, {
         [field]: increment(amount)
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       // If document doesn't exist, initialize it first
-      if (error?.code === 'not-found') {
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'not-found') {
         console.log('Daily goal document not found, initializing...');
         await this.initializeTodayGoal(userId);
         
