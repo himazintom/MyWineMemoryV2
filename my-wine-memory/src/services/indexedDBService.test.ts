@@ -5,25 +5,9 @@
 import { indexedDBService } from './indexedDBService';
 import type { WineMaster, TastingRecord } from '../types';
 
-// Mock IndexedDB for testing
-const mockDB = {
-  objectStoreNames: {
-    contains: jest.fn()
-  },
-  createObjectStore: jest.fn(),
-  transaction: jest.fn()
-};
-
-const mockRequest = {
-  result: mockDB,
-  onsuccess: null as any,
-  onerror: null as any,
-  onupgradeneeded: null as any
-};
-
-// Mock IndexedDB globally
+// Mock IndexedDB for testing environment
 global.indexedDB = {
-  open: jest.fn(() => mockRequest),
+  open: jest.fn(),
   deleteDatabase: jest.fn()
 } as any;
 
