@@ -326,7 +326,7 @@ class TastingRecordService {
       
       // Add metadata to help with CORS
       const metadata = {
-        contentType: imageFile.type,
+        contentType: fileToUpload.type,
         customMetadata: {
           'uploadedBy': userId,
           'uploadedAt': new Date().toISOString()
