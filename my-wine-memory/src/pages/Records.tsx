@@ -236,7 +236,7 @@ const Records: React.FC = () => {
                 className="wine-group-card"
                 style={{
                   backgroundImage: group.tastingRecords[0]?.images?.[0] 
-                    ? `linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url(${group.tastingRecords[0].images[0]})`
+                    ? `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.4)), url(${group.tastingRecords[0].images[0]})`
                     : `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
