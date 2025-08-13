@@ -289,7 +289,7 @@ const AddTastingRecord: React.FC = () => {
             if (cleaned[key] === undefined) {
               delete cleaned[key];
             } else if (cleaned[key] && typeof cleaned[key] === 'object' && !Array.isArray(cleaned[key])) {
-              cleaned[key] = removeUndefined(cleaned[key] as Record<string, unknown>) as T[Extract<keyof T, string>];
+              (cleaned as Record<string, unknown>)[key] = removeUndefined(cleaned[key] as Record<string, unknown>);
             }
           });
           return cleaned;
