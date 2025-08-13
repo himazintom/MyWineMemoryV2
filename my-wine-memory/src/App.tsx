@@ -4,6 +4,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import BottomNavigation from './components/BottomNavigation';
 import LoadingSpinner from './components/LoadingSpinner';
+import { OfflineIndicator } from './components/OfflineIndicator';
 import './App.css';
 
 // スクロール位置をリセットするコンポーネント
