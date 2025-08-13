@@ -28,23 +28,76 @@ const SelectWine: React.FC = () => {
 
   const loadPopularWines = useCallback(async () => {
     try {
-      const wines = await executeLoadPopular(() => wineMasterService.getPopularWines(10));
-      setPopularWines(wines || []);
+      if (isOnline) {
+        // Load from server and cache
+        const wines = await executeLoadPopular(() => wineMasterService.getPopularWines(10));
+        if (wines && wines.length > 0) {
+          await cacheWines(wines);
+          setPopularWines(wines);
+          setIsUsingOfflineData(false);
+        }
+      } else {
+        // Load from cache
+        try {
+          const cachedWines = await getCachedWines();
+          const popularCached = cachedWines.slice(0, 10); // Take first 10 as "popular"
+          setPopularWines(popularCached);
+          setIsUsingOfflineData(true);
+        } catch (cacheError) {
+          console.error('Failed to load cached wines:', cacheError);
+        }
+      }
     } catch (error) {
       console.error('Failed to load popular wines:', error);
+      // Fallback to cache on error
+      try {
+        const cachedWines = await getCachedWines();
+        const popularCached = cachedWines.slice(0, 10);
+        setPopularWines(popularCached);
+        setIsUsingOfflineData(true);
+      } catch (cacheError) {
+        console.error('Failed to load cached wines as fallback:', cacheError);
+      }
     }
-  }, [executeLoadPopular]);
+  }, [executeLoadPopular, isOnline, cacheWines, getCachedWines]);
 
   const searchWines = useCallback(async () => {
     if (!searchTerm.trim()) return;
 
     try {
-      const results = await executeSearch(() => wineMasterService.searchWineMasters(searchTerm, 20));
-      setSearchResults(results || []);
+      if (isOnline) {
+        // Search online and cache results
+        const results = await executeSearch(() => wineMasterService.searchWineMasters(searchTerm, 20));
+        if (results && results.length > 0) {
+          await cacheWines(results);
+          setSearchResults(results);
+          setIsUsingOfflineData(false);
+        } else {
+          setSearchResults([]);
+        }
+      } else {
+        // Search in cache
+        try {
+          const cachedResults = await searchCachedWines(searchTerm);
+          setSearchResults(cachedResults);
+          setIsUsingOfflineData(true);
+        } catch (cacheError) {
+          console.error('Failed to search cached wines:', cacheError);
+          setSearchResults([]);
+        }
+      }
     } catch (error) {
       console.error('Failed to search wines:', error);
+      // Fallback to cache on error
+      try {
+        const cachedResults = await searchCachedWines(searchTerm);
+        setSearchResults(cachedResults);
+        setIsUsingOfflineData(true);
+      } catch (cacheError) {
+        console.error('Failed to search cached wines as fallback:', cacheError);
+      }
     }
-  }, [searchTerm, executeSearch]);
+  }, [searchTerm, executeSearch, isOnline, cacheWines, searchCachedWines]);
 
   useEffect(() => {
     loadPopularWines();
