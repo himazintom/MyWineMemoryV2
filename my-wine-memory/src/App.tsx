@@ -36,6 +36,7 @@ function App() {
         <Router>
           <ScrollToTop />
           <div className="app">
+            <OfflineIndicator />
             <main className="main-content">
               <Suspense fallback={
                 <div style={{ 
