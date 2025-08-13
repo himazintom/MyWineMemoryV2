@@ -33,6 +33,23 @@ const WineDetail = React.lazy(() => import('./pages/WineDetail'));
 const QuizGame = React.lazy(() => import('./pages/QuizGame'));
 
 function App() {
+  // Initialize monitoring services
+  useEffect(() => {
+    // Initialize error tracking
+    errorTrackingService.initialize({
+      environment: import.meta.env.VITE_NODE_ENV || 'development',
+      release: import.meta.env.VITE_BUILD_VERSION,
+    });
+
+    // Start session tracking
+    errorTrackingService.startSession();
+
+    // Cleanup on unmount
+    return () => {
+      errorTrackingService.endSession();
+    };
+  }, []);
+
   return (
     <ThemeProvider>
       <ErrorProvider>
