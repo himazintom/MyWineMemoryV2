@@ -66,8 +66,9 @@ function App() {
             </main>
             <BottomNavigation />
           </div>
-        </Router>
-      </AuthProvider>
+          </Router>
+        </AuthProvider>
+      </ErrorProvider>
     </ThemeProvider>
   );
 }
