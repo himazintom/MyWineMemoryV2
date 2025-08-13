@@ -7,6 +7,8 @@ import type { WineMaster, TastingRecord } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import { useAsyncOperation } from '../hooks/useAsyncOperation';
+import { useOfflineSync } from '../hooks/useOfflineSync';
+import { useNetworkStatus } from '../hooks/useNetworkStatus';
 
 interface WineWithTastings {
   wine: WineMaster;
