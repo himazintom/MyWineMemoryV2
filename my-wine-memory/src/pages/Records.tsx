@@ -237,7 +237,7 @@ const Records: React.FC = () => {
                 style={{
                   backgroundImage: group.tastingRecords[0]?.images?.[0] 
                     ? `linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url(${group.tastingRecords[0].images[0]})`
-                    : undefined,
+                    : `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   backgroundRepeat: 'no-repeat'
