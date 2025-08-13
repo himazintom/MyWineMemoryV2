@@ -1069,6 +1069,36 @@ body {
   border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
+/* Additional images as icons */
+.additional-images {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+  margin: 0.5rem 0;
+}
+
+.image-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.image-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.more-images {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
 .auto-save-indicator {
   text-align: center;
   padding: 0.75rem;
