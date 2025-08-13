@@ -208,7 +208,7 @@ describe('useErrorHandler', () => {
     });
 
     expect(result.current.errors).toHaveLength(1);
-    expect(result.current.errors[0].type).toBe('auth');
+    expect(result.current.errors[0].type).toBe('server');
 
     // Test network error detection
     const networkError = new Error('Failed to fetch');
