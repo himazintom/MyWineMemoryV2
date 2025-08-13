@@ -87,7 +87,7 @@ const SelectWine: React.FC = () => {
 
     // Remove undefined values
     const newWineData = Object.fromEntries(
-      Object.entries(newWineDataRaw).filter(([_, value]) => value !== undefined)
+      Object.entries(newWineDataRaw).filter(([, value]) => value !== undefined)
     ) as Omit<WineMaster, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'referenceCount'>;
 
     try {
