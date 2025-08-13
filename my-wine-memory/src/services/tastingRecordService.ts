@@ -333,7 +333,7 @@ class TastingRecordService {
         }
       };
       
-      const snapshot = await uploadBytes(storageRef, imageFile, metadata);
+      const snapshot = await uploadBytes(storageRef, fileToUpload, metadata);
       const downloadURL = await getDownloadURL(snapshot.ref);
       
       // Use alternative URL format to avoid CORS issues
