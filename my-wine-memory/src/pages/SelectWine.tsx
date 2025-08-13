@@ -18,9 +18,12 @@ const SelectWine: React.FC = () => {
   const [popularWines, setPopularWines] = useState<WineMaster[]>([]);
   const [showNewWineForm, setShowNewWineForm] = useState(false);
   const [grapeVarieties, setGrapeVarieties] = useState<string[]>([]);
+  const [isUsingOfflineData, setIsUsingOfflineData] = useState(false);
   
   const { loading: searchLoading, error: searchError, execute: executeSearch } = useAsyncOperation<WineMaster[]>();
   const { loading: popularLoading, error: popularError, execute: executeLoadPopular } = useAsyncOperation<WineMaster[]>();
+  const { isOnline } = useNetworkStatus();
+  const { searchCachedWines, getCachedWines, cacheWines } = useOfflineSync(currentUser?.uid);
 
 
   const loadPopularWines = useCallback(async () => {
