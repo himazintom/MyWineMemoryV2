@@ -20,6 +20,7 @@ const AddTastingRecord: React.FC = () => {
   const location = useLocation();
   const { currentUser } = useAuth();
   
+  
   const [wine, setWine] = useState<WineMaster | null>(null);
   const [recordMode, setRecordMode] = useState<'quick' | 'detailed'>('quick');
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
@@ -35,8 +36,6 @@ const AddTastingRecord: React.FC = () => {
   const [formData, setFormData] = useState({
     overallRating: 5.0,
     notes: '',
-    price: '',
-    purchaseLocation: '',
     tastingDate: new Date().toISOString().split('T')[0],
     images: [] as File[],
     drawingDataUrl: '' as string,
@@ -309,8 +308,6 @@ const AddTastingRecord: React.FC = () => {
           tastingDate: formData.tastingDate,
           recordMode,
           notes: formData.notes || undefined,
-          price: formData.price ? parseFloat(formData.price) : undefined,
-          purchaseLocation: formData.purchaseLocation || undefined,
           images: imageUrls.length > 0 ? imageUrls : undefined,
           isPublic: false, // Default to private
           
@@ -496,32 +493,6 @@ const AddTastingRecord: React.FC = () => {
               />
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="price">購入価格（円）</label>
-                <input
-                  id="price"
-                  name="price"
-                  type="number"
-                  value={formData.price}
-                  onChange={handleInputChange}
-                  placeholder="3000"
-                  min="0"
-                />
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="purchaseLocation">購入場所</label>
-                <input
-                  id="purchaseLocation"
-                  name="purchaseLocation"
-                  type="text"
-                  value={formData.purchaseLocation}
-                  onChange={handleInputChange}
-                  placeholder="例: 〇〇酒店"
-                />
-              </div>
-            </div>
 
             {/* Rating Slider */}
             <div className="form-group">

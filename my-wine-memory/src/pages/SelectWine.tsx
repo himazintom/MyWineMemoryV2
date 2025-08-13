@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthHooks';
 import { wineMasterService } from '../services/wineMasterService';
+import { tastingRecordService } from '../services/tastingRecordService';
 import type { WineMaster } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
@@ -148,6 +149,28 @@ const SelectWine: React.FC = () => {
       Object.entries(newWineDataRaw).filter(([, value]) => value !== undefined)
     ) as Omit<WineMaster, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'referenceCount'>;
 
+    // Prepare initial tasting record data with purchase info
+    const price = formData.get('price');
+    const purchaseLocation = formData.get('purchaseLocation') as string;
+    const purchaseDate = formData.get('purchaseDate') as string;
+
+    let initialRecordData = null;
+    if (price || purchaseLocation || purchaseDate) {
+      initialRecordData = {
+        price: price ? parseInt(price as string) : undefined,
+        purchaseLocation: purchaseLocation || undefined,
+        tastingDate: purchaseDate ? new Date(purchaseDate) : new Date(),
+        recordMode: 'quick' as const,
+        overallRating: 5.0, // Default rating
+        notes: '購入記録として登録'
+      };
+
+      // Remove undefined values
+      initialRecordData = Object.fromEntries(
+        Object.entries(initialRecordData).filter(([, value]) => value !== undefined)
+      );
+    }
+
     try {
       // Need currentUser for wine creation, show login prompt if not available
       if (!currentUser) {
@@ -158,8 +181,26 @@ const SelectWine: React.FC = () => {
       // First save the wine to Firestore
       const savedWine = await wineMasterService.createWineMaster(newWineData, currentUser.uid);
       
-      // Then navigate to tasting record page with the saved wine ID
-      navigate(`/add-tasting-record/${savedWine.id}`);
+      // If initial record data is provided, create the tasting record
+      if (initialRecordData) {
+        try {
+          await tastingRecordService.createTastingRecord({
+            ...initialRecordData,
+            wineId: savedWine.id,
+            userId: currentUser.uid
+          });
+          
+          // Navigate to records page to show the created record
+          navigate('/records');
+        } catch (recordError) {
+          console.error('Failed to create initial tasting record:', recordError);
+          // Still navigate to add tasting record page if record creation fails
+          navigate(`/add-tasting-record/${savedWine.id}`);
+        }
+      } else {
+        // Navigate to tasting record page with the saved wine ID
+        navigate(`/add-tasting-record/${savedWine.id}`);
+      }
     } catch (error) {
       console.error('Failed to create new wine:', error);
       alert('ワインの登録に失敗しました。再度お試しください。');
@@ -354,6 +395,47 @@ const SelectWine: React.FC = () => {
                     placeholder="例: カベルネ・ソーヴィニヨン（Enterで追加）"
                   />
                   <small className="field-help">Enterまたはカンマで区切って複数入力できます</small>
+                </div>
+
+                <div className="form-section">
+                  <h3>購入情報</h3>
+                  <small className="field-help">価格と購入店舗を入力してください（任意）</small>
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label htmlFor="price">価格</label>
+                        <div className="input-with-unit">
+                          <input
+                            id="price"
+                            name="price"
+                            type="number"
+                            placeholder="3000"
+                            min="0"
+                            step="10"
+                          />
+                          <span className="input-unit">円</span>
+                        </div>
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="purchaseLocation">購入店舗</label>
+                        <input
+                          id="purchaseLocation"
+                          name="purchaseLocation"
+                          type="text"
+                          placeholder="例: ワインショップ○○"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label htmlFor="purchaseDate">購入日</label>
+                      <input
+                        id="purchaseDate"
+                        name="purchaseDate"
+                        type="date"
+                        defaultValue={new Date().toISOString().split('T')[0]}
+                      />
+                    </div>
                 </div>
 
                 <div className="modal-actions">
