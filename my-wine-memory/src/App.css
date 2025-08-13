@@ -1059,14 +1059,48 @@ body {
 .wine-group-card .wine-group-header,
 .wine-group-card .tasting-summary,
 .wine-group-card .recent-tastings {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(5px);
+  background: rgba(255, 255, 255, 0.75); /* More transparent */
+  backdrop-filter: blur(8px); /* Stronger blur for readability */
+  -webkit-backdrop-filter: blur(8px); /* Safari support */
   margin: 0;
   padding: 1rem;
+  transition: background 0.3s ease;
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .wine-group-card .wine-group-header,
+[data-theme="dark"] .wine-group-card .tasting-summary,
+[data-theme="dark"] .wine-group-card .recent-tastings {
+  background: rgba(0, 0, 0, 0.65);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* Hover effect for better readability */
+.wine-group-card:hover .wine-group-header,
+.wine-group-card:hover .tasting-summary,
+.wine-group-card:hover .recent-tastings {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+[data-theme="dark"] .wine-group-card:hover .wine-group-header,
+[data-theme="dark"] .wine-group-card:hover .tasting-summary,
+[data-theme="dark"] .wine-group-card:hover .recent-tastings {
+  background: rgba(0, 0, 0, 0.75);
 }
 
 .wine-group-card .recent-tastings {
   border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Text shadows for better readability */
+.wine-group-card .wine-name {
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  font-weight: 600;
+}
+
+.wine-group-card .wine-producer,
+.wine-group-card .wine-location {
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
 }
 
 /* Additional images as icons */
