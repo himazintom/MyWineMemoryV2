@@ -16,9 +16,27 @@ dist-ssr
 .env
 .env.local
 .env.production
+.env.staging
+.env.development
+.env.test
 
 # Firebase
 .firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# Security & Secrets
+*.pem
+*.key
+*.p12
+*.pfx
+service-account-*.json
+firebase-service-account-*.json
+
+# CI/CD
+.github/workflows/*.yml.backup
+deployment-config.json
 
 # Editor directories and files
 .vscode/*

@@ -1,17 +1,40 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    // Temporary: Allow all authenticated users to test upload
-    match /{allPaths=**} {
-      allow read: if true;
-      allow write: if request.auth != null;
+    // Wine images - authenticated users can upload, public read
+    match /wine-images/{userId}/{imageId} {
+      allow read: if true; // Public read for wine images
+      allow write: if request.auth != null && 
+        request.auth.uid == userId &&
+        request.resource.size < 10 * 1024 * 1024 && // 10MB limit
+        request.resource.contentType.matches('image/.*') &&
+        // Allowed image formats
+        (request.resource.contentType == 'image/jpeg' || 
+         request.resource.contentType == 'image/png' || 
+         request.resource.contentType == 'image/webp');
     }
     
-    // User avatars - users can only manage their own avatars
+    // User avatars - strict user-only access
     match /user-avatars/{userId}/{allPaths=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId
-                         && request.resource.size < 2 * 1024 * 1024 // 2MB limit
-                         && request.resource.contentType.matches('image/.*');
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null && 
+        request.auth.uid == userId &&
+        request.resource.size < 2 * 1024 * 1024 && // 2MB limit
+        request.resource.contentType.matches('image/.*') &&
+        (request.resource.contentType == 'image/jpeg' || 
+         request.resource.contentType == 'image/png' || 
+         request.resource.contentType == 'image/webp');
+    }
+    
+    // App assets - public read only
+    match /app-assets/{allPaths=**} {
+      allow read: if true;
+      allow write: if false; // System only
+    }
+    
+    // Deny all other operations
+    match /{allPaths=**} {
+      allow read, write: if false;
     }
   }
 }

@@ -1,0 +1,158 @@
+/**
+ * Offline Indicator Styles
+ */
+
+.offline-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Offline state */
+.offline-indicator.offline {
+  background: linear-gradient(135deg, #ff4444, #cc3333);
+  color: white;
+  animation: slideDown 0.3s ease;
+}
+
+/* Online/reconnected state */
+.offline-indicator.online.reconnected {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  animation: slideDown 0.3s ease;
+}
+
+/* Slow connection warning */
+.offline-indicator .slow-connection {
+  background: linear-gradient(135deg, #ff9800, #f57c00);
+  color: white;
+}
+
+/* Status sections */
+.offline-status,
+.reconnected-status,
+.slow-connection,
+.syncing-status,
+.draft-count {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.status-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.status-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.status-title {
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.status-subtitle {
+  font-size: 12px;
+  opacity: 0.9;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+/* Spinner animation */
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Slide down animation */
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Multiple status items */
+.offline-indicator.offline .reconnected-status,
+.offline-indicator.offline .slow-connection {
+  display: none;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .offline-indicator {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  
+  .status-icon {
+    font-size: 16px;
+  }
+  
+  .status-subtitle {
+    font-size: 11px;
+  }
+}
+
+/* Dark theme adjustments */
+@media (prefers-color-scheme: dark) {
+  .offline-indicator {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .offline-indicator {
+    transition: none;
+    animation: none;
+  }
+  
+  .spinner {
+    animation: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .offline-indicator {
+    border: 2px solid;
+    backdrop-filter: none;
+  }
+  
+  .offline-indicator.offline {
+    background: #cc0000;
+    border-color: #ffffff;
+  }
+  
+  .offline-indicator.online.reconnected {
+    background: #008000;
+    border-color: #ffffff;
+  }
+}

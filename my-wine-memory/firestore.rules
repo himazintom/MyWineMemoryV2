@@ -1,91 +1,181 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // TEMPORARY DEBUG: Allow all operations
-    match /{document=**} {
-      allow read, write: if true;
+    // Security helper functions
+    function isAuthenticated() {
+      return request.auth != null;
     }
-    // Wine master data - public read, authenticated write with validation
+    
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+    
+    function isValidEmail() {
+      return request.auth != null && request.auth.token.email != null;
+    }
+    
+    function isValidRating(rating) {
+      return rating is number && rating >= 0 && rating <= 10;
+    }
+    
+    function isValidRecordMode(mode) {
+      return mode == 'quick' || mode == 'detailed';
+    }
+    
+    function hasValidStringFields(data, requiredFields) {
+      return requiredFields.hasAll() &&
+        requiredFields.hasAll(function(field) {
+          return field in data && data[field] is string && data[field].size() > 0;
+        });
+    }
+    
+    function isValidWineMasterData(data) {
+      return 'wineName' in data && data.wineName is string && data.wineName.size() > 0 &&
+        'producer' in data && data.producer is string && data.producer.size() > 0 &&
+        'country' in data && data.country is string && data.country.size() > 0 &&
+        'region' in data && data.region is string && data.region.size() > 0;
+    }
+    // Wine master data - public read, authenticated write with strict validation
     match /wines_master/{wineId} {
-      allow read: if true;
-      allow create: if request.auth != null &&
-        request.resource.data.wineName != null &&
-        request.resource.data.producer != null &&
-        request.resource.data.country != null &&
-        request.resource.data.region != null &&
-        request.resource.data.createdBy == request.auth.uid;
+      allow read: if true; // Wine data is publicly readable
+      
+      allow create: if isAuthenticated() && isValidEmail() &&
+        // Required fields validation
+        isValidWineMasterData(request.resource.data) &&
+        request.resource.data.createdBy == request.auth.uid &&
+        request.resource.data.referenceCount == 1 &&
+        // Optional field validation
+        (!('vintage' in request.resource.data) || (request.resource.data.vintage is int && request.resource.data.vintage > 1800 && request.resource.data.vintage <= 2030)) &&
+        (!('wineType' in request.resource.data) || request.resource.data.wineType in ['red', 'white', 'rose', 'sparkling', 'dessert', 'fortified']) &&
+        (!('grapeVarieties' in request.resource.data) || (request.resource.data.grapeVarieties is list && request.resource.data.grapeVarieties.size() <= 10));
 
-      allow update: if request.auth != null &&
+      allow update: if isAuthenticated() &&
         resource.data.createdBy == request.auth.uid &&
-        // Immutable fields
+        // Immutable fields protection
         request.resource.data.createdBy == resource.data.createdBy &&
-        request.resource.data.createdAt == resource.data.createdAt;
+        request.resource.data.createdAt == resource.data.createdAt &&
+        request.resource.data.referenceCount == resource.data.referenceCount &&
+        // Field validation on update
+        isValidWineMasterData(request.resource.data);
 
-      allow delete: if request.auth != null && resource.data.createdBy == request.auth.uid;
+      allow delete: if false; // Wine masters should never be deleted due to referential integrity
     }
 
-    // Tasting records - only the owner can access with validation
+    // Tasting records - strict owner-only access with comprehensive validation
     match /tasting_records/{recordId} {
-      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow read: if isAuthenticated() && isOwner(resource.data.userId);
 
-      allow create: if true; // Debug: Allow all creates to isolate the issue
+      allow create: if isAuthenticated() && isValidEmail() &&
+        // Owner validation
+        request.resource.data.userId == request.auth.uid &&
+        // Required fields validation
+        'wineId' in request.resource.data && request.resource.data.wineId is string && request.resource.data.wineId.size() > 0 &&
+        'overallRating' in request.resource.data && isValidRating(request.resource.data.overallRating) &&
+        'tastingDate' in request.resource.data && request.resource.data.tastingDate is timestamp &&
+        'recordMode' in request.resource.data && isValidRecordMode(request.resource.data.recordMode) &&
+        'isPublic' in request.resource.data && request.resource.data.isPublic is bool &&
+        // Optional fields validation
+        (!('notes' in request.resource.data) || (request.resource.data.notes is string && request.resource.data.notes.size() <= 2000)) &&
+        (!('price' in request.resource.data) || (request.resource.data.price is number && request.resource.data.price >= 0 && request.resource.data.price <= 1000000)) &&
+        (!('purchaseLocation' in request.resource.data) || (request.resource.data.purchaseLocation is string && request.resource.data.purchaseLocation.size() <= 200)) &&
+        (!('images' in request.resource.data) || (request.resource.data.images is list && request.resource.data.images.size() <= 10));
 
-      allow update: if request.auth != null && resource.data.userId == request.auth.uid &&
+      allow update: if isAuthenticated() && isOwner(resource.data.userId) &&
+        // Immutable fields protection
+        request.resource.data.userId == resource.data.userId &&
+        request.resource.data.wineId == resource.data.wineId &&
+        request.resource.data.createdAt == resource.data.createdAt &&
+        // Re-validate all constraints on update
+        isValidRating(request.resource.data.overallRating) &&
+        isValidRecordMode(request.resource.data.recordMode) &&
+        request.resource.data.tastingDate is timestamp &&
+        request.resource.data.isPublic is bool;
+
+      allow delete: if isAuthenticated() && isOwner(resource.data.userId);
+    }
+    // Users can only access their own user document with validation
+    match /users/{userId} {
+      allow read: if isAuthenticated() && isOwner(userId);
+      allow create: if isAuthenticated() && isValidEmail() && isOwner(userId) &&
+        'email' in request.resource.data && request.resource.data.email == request.auth.token.email &&
+        'displayName' in request.resource.data && request.resource.data.displayName is string &&
+        'level' in request.resource.data && request.resource.data.level is int && request.resource.data.level >= 1 &&
+        'xp' in request.resource.data && request.resource.data.xp is int && request.resource.data.xp >= 0;
+      allow update: if isAuthenticated() && isOwner(userId) &&
+        // Immutable fields
+        request.resource.data.id == resource.data.id &&
+        request.resource.data.email == resource.data.email &&
+        request.resource.data.createdAt == resource.data.createdAt;
+    }
+    
+    // User stats - strict owner-only access
+    match /user_stats/{userId} {
+      allow read, write: if isAuthenticated() && isOwner(userId);
+    }
+    
+    // Legacy wine records - deprecated, read-only for migration
+    match /wines/{wineId} {
+      allow read: if (resource.data.isPublic == true) || (isAuthenticated() && isOwner(resource.data.userId));
+      allow create: if false; // Deprecated - use tasting_records instead
+      allow update, delete: if isAuthenticated() && isOwner(resource.data.userId);
+    }
+    
+    // Drafts - owner-only with size limits
+    match /drafts/{draftId} {
+      allow read, write: if isAuthenticated() && isOwner(resource.data.userId);
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userId) &&
+        request.resource.data.userId == request.auth.uid &&
+        // Limit draft size to prevent abuse
+        request.resource.data.size() <= 50;
+    }
+    
+    // User badges - owner read-only (badges granted by system)
+    match /user_badges/{badgeId} {
+      allow read: if isAuthenticated() && isOwner(resource.data.userId);
+      allow create, update, delete: if false; // System-only operations
+    }
+    
+    // Daily goals - owner-only with validation
+    match /daily_goals/{goalId} {
+      allow read: if isAuthenticated() && isOwner(resource.data.userId);
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userId) &&
+        request.resource.data.userId == request.auth.uid &&
+        'date' in request.resource.data && request.resource.data.date is string &&
+        'wineRecordingGoal' in request.resource.data && request.resource.data.wineRecordingGoal is int && request.resource.data.wineRecordingGoal > 0 &&
+        'quizGoal' in request.resource.data && request.resource.data.quizGoal is int && request.resource.data.quizGoal > 0;
+      allow update: if isAuthenticated() && isOwner(resource.data.userId) &&
+        // Allow updating progress only
+        request.resource.data.userId == resource.data.userId &&
+        request.resource.data.date == resource.data.date;
+      allow delete: if isAuthenticated() && isOwner(resource.data.userId);
+    }
+    
+    // Quiz progress - owner-only with validation
+    match /quiz_progress/{progressId} {
+      allow read: if isAuthenticated() && isOwner(resource.data.userId);
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userId) &&
+        'questionId' in request.resource.data && request.resource.data.questionId is string &&
+        'correctCount' in request.resource.data && request.resource.data.correctCount is int && request.resource.data.correctCount >= 0 &&
+        'incorrectCount' in request.resource.data && request.resource.data.incorrectCount is int && request.resource.data.incorrectCount >= 0;
+      allow update: if isAuthenticated() && isOwner(resource.data.userId) &&
         // Immutable fields
         request.resource.data.userId == resource.data.userId &&
-        request.resource.data.createdAt == resource.data.createdAt &&
-        // Re-validate constraints on update
-        request.resource.data.overallRating >= 0 && request.resource.data.overallRating <= 10 &&
-        (request.resource.data.recordMode == 'quick' || request.resource.data.recordMode == 'detailed') &&
-        (request.resource.data.images == null || request.resource.data.images.size() <= 10);
-
-      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
-    }
-    // Users can only access their own user document
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+        request.resource.data.questionId == resource.data.questionId;
+      allow delete: if isAuthenticated() && isOwner(resource.data.userId);
     }
     
-    // User stats - only the owner can read/write
-    match /user_stats/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-    
-    // Wine records (legacy) - only the owner can read/write their records
-    match /wines/{wineId} {
-      allow read: if resource.data.isPublic == true || (request.auth != null && resource.data.userId == request.auth.uid);
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
-    }
-    
-    // Drafts - only the owner can access
-    match /drafts/{draftId} {
-      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null && request.auth.uid == resource.data.userId;
-    }
-    
-    // User badges - only the owner can read, system can write
-    match /user_badges/{badgeId} {
-      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null && request.auth.uid == resource.data.userId;
-    }
-    
-    // Daily goals - only the owner can access
-    match /daily_goals/{goalId} {
-      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null && request.auth.uid == resource.data.userId;
-    }
-    
-    // Quiz progress - only the owner can access
-    match /quiz_progress/{progressId} {
-      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null && request.auth.uid == resource.data.userId;
-    }
-    
-    // Deleted items with TTL - only the owner can access
+    // Deleted items - owner-only, auto-cleanup after TTL
     match /deleted_items/{itemId} {
-      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null;
+      allow read: if isAuthenticated() && isOwner(resource.data.userId);
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userId) &&
+        'originalCollection' in request.resource.data && request.resource.data.originalCollection is string &&
+        'deletedAt' in request.resource.data && request.resource.data.deletedAt is timestamp;
+      allow update, delete: if isAuthenticated() && isOwner(resource.data.userId);
+    }
+    
+    // Deny all other operations by default
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

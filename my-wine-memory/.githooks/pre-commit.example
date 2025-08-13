@@ -1,0 +1,48 @@
+#!/bin/sh
+# Git pre-commit hook example
+# To activate: cp .githooks/pre-commit.example .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+
+echo "🔍 Running pre-commit checks..."
+
+# Check for environment variables in staged files
+if git diff --cached --name-only | grep -E '\.(js|ts|tsx)$' | xargs grep -l "VITE_" | grep -v "\.example\|\.test\|\.spec" | head -1; then
+    echo "⚠️  Environment variables detected in staged files"
+    echo "🔒 Validating environment variables..."
+    
+    # Run environment validation
+    npm run validate:env
+    if [ $? -ne 0 ]; then
+        echo "❌ Environment validation failed"
+        echo "💡 Fix environment issues before committing"
+        exit 1
+    fi
+fi
+
+# Check for common secret patterns
+echo "🔒 Checking for potential secrets..."
+if git diff --cached --name-only | xargs grep -l -E "(password|secret|key|token).*[:=].*['\"][^'\"]{10,}" 2>/dev/null; then
+    echo "❌ Potential secrets detected in staged files"
+    echo "🚨 Review and remove any hardcoded secrets"
+    exit 1
+fi
+
+# Run linting
+echo "🧹 Running linter..."
+npm run lint
+if [ $? -ne 0 ]; then
+    echo "❌ Linting failed"
+    echo "💡 Fix linting issues before committing"
+    exit 1
+fi
+
+# Run tests
+echo "🧪 Running tests..."
+npm test
+if [ $? -ne 0 ]; then
+    echo "❌ Tests failed"
+    echo "💡 Fix failing tests before committing"
+    exit 1
+fi
+
+echo "✅ All pre-commit checks passed!"
+echo "🚀 Ready to commit"

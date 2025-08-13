@@ -75,6 +75,9 @@ export default defineConfig({
           /^.*\.firebasestorage\.app\/_.*/, // Firebase Storage internal
           /^.*\.googleapis\.com\/.*/ // All Google APIs
         ],
+        // Enhanced offline functionality
+        navigationFallback: '/',
+        navigateFallback: '/',
         runtimeCaching: [
           // Firebase Storage images
           {
@@ -138,9 +141,10 @@ export default defineConfig({
     }),
     visualizer({
       filename: 'dist/stats.html',
-      open: true,
+      open: false, // Don't open automatically in CLI
       gzipSize: true,
       brotliSize: true,
+      template: 'treemap', // Use treemap for better visualization
     })
   ],
   build: {
@@ -148,7 +152,7 @@ export default defineConfig({
       output: {
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
-            // Separate vendor chunks for better caching
+            // More granular vendor chunks for better caching
             if (id.includes('react') || id.includes('react-dom')) {
               return 'vendor-react';
             }
@@ -158,23 +162,51 @@ export default defineConfig({
             if (id.includes('firebase')) {
               return 'vendor-firebase';
             }
+            if (id.includes('chart.js') || id.includes('react-chartjs-2')) {
+              return 'vendor-charts';
+            }
             // Other third party libraries
             return 'vendor-other';
           }
           
-          // Split app code by feature
+          // Split app code by feature for better lazy loading
           if (id.includes('/pages/')) {
+            // Individual page chunks for optimal lazy loading
+            if (id.includes('Home.tsx')) return 'page-home';
+            if (id.includes('SelectWine.tsx') || id.includes('AddTastingRecord.tsx')) return 'page-wine-recording';
+            if (id.includes('Records.tsx') || id.includes('WineDetail.tsx')) return 'page-wine-viewing';
+            if (id.includes('Quiz.tsx') || id.includes('QuizGame.tsx')) return 'page-quiz';
+            if (id.includes('Stats.tsx') || id.includes('Profile.tsx')) return 'page-user';
             return 'pages';
           }
           if (id.includes('/services/')) {
+            // Separate core services from specialized ones
+            if (id.includes('firebase.ts') || id.includes('auth')) return 'services-core';
+            if (id.includes('wine') || id.includes('tasting')) return 'services-wine';
             return 'services';
           }
           if (id.includes('/contexts/')) {
             return 'contexts';
           }
+          if (id.includes('/components/')) {
+            // Keep frequently used components in main bundle
+            if (id.includes('BottomNavigation') || id.includes('LoadingSpinner') || id.includes('ErrorMessage')) {
+              return undefined; // Include in main bundle
+            }
+            return 'components';
+          }
         }
       }
     },
-    chunkSizeWarningLimit: 1000
+    chunkSizeWarningLimit: 1000,
+    // Additional build optimizations
+    target: 'es2015',
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true, // Remove console.log in production
+        drop_debugger: true,
+      },
+    }
   }
 })
