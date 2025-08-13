@@ -7,6 +7,8 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import TagInput from '../components/TagInput';
 import { useAsyncOperation } from '../hooks/useAsyncOperation';
+import { useOfflineSync } from '../hooks/useOfflineSync';
+import { useNetworkStatus } from '../hooks/useNetworkStatus';
 
 const SelectWine: React.FC = () => {
   const navigate = useNavigate();
