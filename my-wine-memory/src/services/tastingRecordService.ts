@@ -260,12 +260,67 @@ class TastingRecordService {
     throw new Error('Max retries exceeded');
   }
 
+  // Optimize image to WebP format
+  private async optimizeImage(imageFile: File, maxWidth: number = 1920, quality: number = 0.8): Promise<File> {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculate new dimensions
+        const { width, height } = img;
+        const aspectRatio = width / height;
+        
+        let newWidth = width;
+        let newHeight = height;
+        
+        if (width > maxWidth) {
+          newWidth = maxWidth;
+          newHeight = maxWidth / aspectRatio;
+        }
+        
+        canvas.width = newWidth;
+        canvas.height = newHeight;
+        
+        // Draw and compress
+        ctx?.drawImage(img, 0, 0, newWidth, newHeight);
+        
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const optimizedFile = new File([blob], `${imageFile.name.split('.')[0]}.webp`, {
+              type: 'image/webp'
+            });
+            resolve(optimizedFile);
+          } else {
+            reject(new Error('画像の最適化に失敗しました'));
+          }
+        }, 'image/webp', quality);
+      };
+      
+      img.onerror = () => reject(new Error('画像の読み込みに失敗しました'));
+      img.src = URL.createObjectURL(imageFile);
+    });
+  }
+
   // Upload wine image
   async uploadWineImage(imageFile: File, userId: string): Promise<string> {
     return this.retry(async () => {
+      // Optimize image to WebP if it's not already WebP
+      let fileToUpload = imageFile;
+      if (!imageFile.type.includes('webp') && imageFile.type.startsWith('image/')) {
+        try {
+          fileToUpload = await this.optimizeImage(imageFile);
+          console.log(`Image optimized: ${imageFile.size} bytes -> ${fileToUpload.size} bytes`);
+        } catch (optimizationError) {
+          console.warn('Image optimization failed, uploading original:', optimizationError);
+          fileToUpload = imageFile;
+        }
+      }
+      
       const timestamp = Date.now();
       // Sanitize filename to avoid special characters
-      const sanitizedFileName = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const sanitizedFileName = fileToUpload.name.replace(/[^a-zA-Z0-9.-]/g, '_');
       const fileName = `wine-images/${userId}/${timestamp}_${sanitizedFileName}`;
       const storageRef = ref(storage, fileName);
       
