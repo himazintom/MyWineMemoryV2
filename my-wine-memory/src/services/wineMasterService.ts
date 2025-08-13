@@ -48,7 +48,7 @@ class WineMasterService {
 
       // Remove undefined fields before sending to Firestore
       const cleanedData = Object.fromEntries(
-        Object.entries(wineMasterData).filter(([_, value]) => value !== undefined)
+        Object.entries(wineMasterData).filter(([, value]) => value !== undefined)
       );
 
       const docRef = await addDoc(collection(db, this.collection), {
@@ -294,7 +294,7 @@ class WineMasterService {
 
       // Remove undefined fields before sending to Firestore
       const cleanedData = Object.fromEntries(
-        Object.entries(wineMasterData).filter(([_, value]) => value !== undefined)
+        Object.entries(wineMasterData).filter(([, value]) => value !== undefined)
       );
 
       const docRef = await addDoc(collection(db, this.collection), {
