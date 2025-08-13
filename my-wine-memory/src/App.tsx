@@ -33,12 +33,13 @@ const QuizGame = React.lazy(() => import('./pages/QuizGame'));
 function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <Router>
-          <ScrollToTop />
-          <div className="app">
-            <OfflineIndicator />
-            <main className="main-content">
+      <ErrorProvider>
+        <AuthProvider>
+          <Router>
+            <ScrollToTop />
+            <div className="app">
+              <OfflineIndicator />
+              <main className="main-content">
               <Suspense fallback={
                 <div style={{ 
                   display: 'flex', 
