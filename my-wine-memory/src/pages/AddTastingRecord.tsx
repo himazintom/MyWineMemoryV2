@@ -30,6 +30,7 @@ const AddTastingRecord: React.FC = () => {
   const { loading: saveLoading, error: saveError, execute: executeSave } = useAsyncOperation<void>();
   const { isOnline } = useNetworkStatus();
   const { saveDraft, updateDraft, queueOfflineOperation, getCachedWines } = useOfflineSync(currentUser?.uid);
+  const { handleError } = useError();
 
   const [formData, setFormData] = useState({
     overallRating: 5.0,
