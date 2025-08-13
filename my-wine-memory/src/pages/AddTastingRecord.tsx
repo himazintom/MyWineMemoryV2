@@ -283,13 +283,13 @@ const AddTastingRecord: React.FC = () => {
         }
 
         // Helper function to remove undefined values
-        const removeUndefined = (obj: any): any => {
+        const removeUndefined = <T extends Record<string, unknown>>(obj: T): T => {
           const cleaned = { ...obj };
           Object.keys(cleaned).forEach(key => {
             if (cleaned[key] === undefined) {
               delete cleaned[key];
             } else if (cleaned[key] && typeof cleaned[key] === 'object' && !Array.isArray(cleaned[key])) {
-              cleaned[key] = removeUndefined(cleaned[key]);
+              cleaned[key] = removeUndefined(cleaned[key] as Record<string, unknown>) as T[Extract<keyof T, string>];
             }
           });
           return cleaned;
@@ -374,7 +374,7 @@ const AddTastingRecord: React.FC = () => {
         };
 
         // Clean the data by removing undefined values
-        const tastingData: any = removeUndefined(tastingDataRaw);
+        const tastingData = removeUndefined(tastingDataRaw);
 
         await tastingRecordService.createTastingRecord(currentUser.uid, tastingData);
 
