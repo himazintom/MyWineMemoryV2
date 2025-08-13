@@ -252,7 +252,7 @@ const Records: React.FC = () => {
                     {group.wine.vintage && (
                       <p className="wine-vintage">{group.wine.vintage}年</p>
                     )}
-                    {group.tastingRecords[0]?.price && (
+                    {group.tastingRecords[0]?.price && group.tastingRecords[0].price > 0 && (
                       <p className="wine-price">価格: ¥{group.tastingRecords[0].price.toLocaleString()}</p>
                     )}
                     {group.tastingRecords[0]?.purchaseLocation && (
@@ -280,31 +280,6 @@ const Records: React.FC = () => {
                   <div className="latest-tasting">
                     <span className="date">最新: {formatDate(group.latestTasting)}</span>
                   </div>
-                  
-                  {/* Additional Images as Icons */}
-                  {(() => {
-                    const allImages = group.tastingRecords.flatMap(record => record.images || []);
-                    const remainingImages = allImages.slice(1); // Skip first image (used as background)
-                    
-                    if (remainingImages.length > 0) {
-                      return (
-                        <div className="additional-images">
-                          {remainingImages.slice(0, 3).map((imageUrl, index) => (
-                            <div key={index} className="image-icon">
-                              <img src={imageUrl} alt={`画像 ${index + 2}`} />
-                            </div>
-                          ))}
-                          {remainingImages.length > 3 && (
-                            <div className="more-images">
-                              +{remainingImages.length - 3}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    }
-                    return null;
-                  })()}
-                  
                   <button 
                     className="add-tasting-btn"
                     onClick={(e) => handleAddTasting(group.wine.id, e)}
