@@ -173,6 +173,7 @@ describe('IndexedDBService', () => {
         wineType: 'red',
         referenceCount: 1,
         createdAt: new Date(),
+        updatedAt: new Date(),
         createdBy: 'user_123'
       }
     ];
