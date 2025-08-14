@@ -10,9 +10,9 @@ import ErrorMessage from '../components/ErrorMessage';
 import LoginPrompt from '../components/LoginPrompt';
 import DrawingCanvas from '../components/DrawingCanvas';
 import { useAsyncOperation } from '../hooks/useAsyncOperation';
-import { useOfflineSync } from '../hooks/useOfflineSync';
-import { useNetworkStatus } from '../hooks/useNetworkStatus';
-import { useError } from '../contexts/ErrorContext';
+// import { useOfflineSync } from '../hooks/useOfflineSync';
+// import { useNetworkStatus } from '../hooks/useNetworkStatus';
+// import { useError } from '../contexts/ErrorContext';
 
 const AddTastingRecord: React.FC = () => {
   const navigate = useNavigate();

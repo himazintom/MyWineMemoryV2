@@ -89,10 +89,9 @@ class ErrorTrackingService {
     };
   }
 
-  // Error boundary component (React)
-  ErrorBoundary = ({ children }: { children: React.ReactNode }) => {
-    return <>{children}</>;
-  };
+  // Error boundary component (React) - placeholder
+  // In a real implementation, this would be a React component
+  ErrorBoundary = null as any;
 
   // Quiz-specific error tracking
   trackQuizError(error: Error, quizContext: {
