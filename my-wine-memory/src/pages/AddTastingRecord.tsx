@@ -25,13 +25,13 @@ const AddTastingRecord: React.FC = () => {
   const [recordMode, setRecordMode] = useState<'quick' | 'detailed'>('quick');
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [pendingSave, setPendingSave] = useState(false);
-  const [currentDraftId, setCurrentDraftId] = useState<string | null>(null);
+  // const [currentDraftId, setCurrentDraftId] = useState<string | null>(null);
   
   const { loading: wineLoading, error: wineError, execute: executeLoadWine } = useAsyncOperation<WineMaster | null>();
   const { loading: saveLoading, error: saveError, execute: executeSave } = useAsyncOperation<void>();
-  const { isOnline } = useNetworkStatus();
-  const { saveDraft, updateDraft, queueOfflineOperation, getCachedWines } = useOfflineSync(currentUser?.uid);
-  const { handleError } = useError();
+  // const { isOnline } = useNetworkStatus();
+  // const { saveDraft, updateDraft, queueOfflineOperation, getCachedWines } = useOfflineSync(currentUser?.uid);
+  // const { handleError } = useError();
 
   const [formData, setFormData] = useState({
     overallRating: 5.0,

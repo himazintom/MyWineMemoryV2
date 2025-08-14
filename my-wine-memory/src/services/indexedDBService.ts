@@ -3,7 +3,7 @@
  * Stores draft tasting records and wine data for offline access
  */
 
-import { TastingRecord, WineMaster } from '../types';
+import type { TastingRecord, WineMaster } from '../types';
 
 const DB_NAME = 'MyWineMemoryDB';
 const DB_VERSION = 1;

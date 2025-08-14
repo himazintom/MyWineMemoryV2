@@ -24,11 +24,11 @@ const Records: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'date' | 'rating' | 'count'>('date');
   const [filteredWineGroups, setFilteredWineGroups] = useState<WineWithTastings[]>([]);
-  const [isUsingOfflineData, setIsUsingOfflineData] = useState(false);
+  // const [isUsingOfflineData, setIsUsingOfflineData] = useState(false);
 
   const { loading, error, execute: executeLoadRecords } = useAsyncOperation<WineWithTastings[]>();
-  const { isOnline } = useNetworkStatus();
-  const { getCachedTastingRecords, getCachedWines, cacheTastingRecords, cacheWines } = useOfflineSync(currentUser?.uid);
+  // const { isOnline } = useNetworkStatus();
+  // const { getCachedTastingRecords, getCachedWines, cacheTastingRecords, cacheWines } = useOfflineSync(currentUser?.uid);
 
   const loadRecords = useCallback(async () => {
     if (!currentUser) return;

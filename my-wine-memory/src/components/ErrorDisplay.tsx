@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { AppError } from '../hooks/useErrorHandler';
+import type { AppError } from '../hooks/useErrorHandler';
 import './ErrorDisplay.css';
 
 interface ErrorDisplayProps {

@@ -2,7 +2,8 @@
  * Error Context for Global Error Handling
  */
 
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext } from 'react';
+import type { ReactNode } from 'react';
 import { useErrorHandler } from '../hooks/useErrorHandler';
 import { ErrorDisplay } from '../components/ErrorDisplay';
 

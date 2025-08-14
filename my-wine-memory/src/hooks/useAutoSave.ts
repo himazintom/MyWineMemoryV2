@@ -51,7 +51,7 @@ export const useAutoSave = ({
 
     try {
       const currentDataString = JSON.stringify(formData);
-      if (currentDataString === lastSavedRef.current) return draftId;
+      if (currentDataString === lastSavedRef.current) return draftId ?? null;
 
       let savedDraftId: string;
 
@@ -124,7 +124,8 @@ export const useAutoSave = ({
     saveTimeoutRef.current = setTimeout(async () => {
       try {
         // Always save to IndexedDB first (offline-first)
-        const savedDraftId = await saveToIndexedDB();
+        // const savedDraftId = await saveToIndexedDB();
+        await saveToIndexedDB();
         
         // Also try to save to cloud if online
         if (isOnline) {

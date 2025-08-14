@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import WineCard from '../WineCard';
-import { WineRecord } from '../../types';
+import type { WineRecord } from '../../types';
 
 const mockWineRecord: WineRecord = {
   id: '123',

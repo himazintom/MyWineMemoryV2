@@ -4,9 +4,10 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { indexedDBService, DraftRecord, SyncQueueItem } from '../services/indexedDBService';
+import { indexedDBService } from '../services/indexedDBService';
+import type { DraftRecord, SyncQueueItem } from '../services/indexedDBService';
 import { useNetworkStatus } from './useNetworkStatus';
-import { TastingRecord, WineMaster } from '../types';
+import type { TastingRecord, WineMaster } from '../types';
 
 export interface OfflineSyncState {
   isInitialized: boolean;

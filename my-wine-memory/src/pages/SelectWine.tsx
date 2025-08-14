@@ -19,7 +19,8 @@ const SelectWine: React.FC = () => {
   const [popularWines, setPopularWines] = useState<WineMaster[]>([]);
   const [showNewWineForm, setShowNewWineForm] = useState(false);
   const [grapeVarieties, setGrapeVarieties] = useState<string[]>([]);
-  const [isUsingOfflineData, setIsUsingOfflineData] = useState(false);
+  // const [isUsingOfflineData, setIsUsingOfflineData] = useState(false);
+  const [isUsingOfflineData] = useState(false);
   
   const { loading: searchLoading, error: searchError, execute: executeSearch } = useAsyncOperation<WineMaster[]>();
   const { loading: popularLoading, error: popularError, execute: executeLoadPopular } = useAsyncOperation<WineMaster[]>();
@@ -184,7 +185,7 @@ const SelectWine: React.FC = () => {
       // If initial record data is provided, create the tasting record
       if (initialRecordData) {
         try {
-          await tastingRecordService.createTastingRecord({
+          await tastingRecordService.createTastingRecord(currentUser.uid, {
             ...initialRecordData,
             wineId: savedWine.id,
             userId: currentUser.uid

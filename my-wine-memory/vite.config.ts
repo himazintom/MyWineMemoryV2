@@ -76,7 +76,6 @@ export default defineConfig({
           /^.*\.googleapis\.com\/.*/ // All Google APIs
         ],
         // Enhanced offline functionality
-        navigationFallback: '/',
         navigateFallback: '/',
         runtimeCaching: [
           // Firebase Storage images

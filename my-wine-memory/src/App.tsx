@@ -6,7 +6,7 @@ import { ErrorProvider } from './contexts/ErrorContext';
 import BottomNavigation from './components/BottomNavigation';
 import LoadingSpinner from './components/LoadingSpinner';
 import { OfflineIndicator } from './components/OfflineIndicator';
-import { analyticsService } from './services/analyticsService';
+// import { analyticsService } from './services/analyticsService';
 import { errorTrackingService } from './services/errorTrackingService';
 import './App.css';
 
