@@ -18,42 +18,32 @@ export interface User {
     allowPublicProfile: boolean;
     pushNotifications: boolean;
   };
+  // Public sharing
+  isPublic?: boolean;
+  publicSlug?: string;
 }
 
-// Wine Master Data (shared across users)
-export interface WineMaster {
+// Unified wine record (all data per user)
+export interface TastingRecord {
   id: string;
+  userId: string;
+  wineId: string; // Reference to WineMaster
   
-  // Basic wine information (required)
+  // Wine basic information (user-specific)
   wineName: string;
   producer: string;
   country: string;
   region: string;
-  
-  // Optional wine information
   vintage?: number;
   grapeVarieties?: string[];
   wineType?: 'red' | 'white' | 'rose' | 'sparkling' | 'dessert' | 'fortified';
   alcoholContent?: number;
   
-  // Technical wine info
+  // Technical wine info (optional)
   soilInfo?: string;
   climate?: string;
   wineHistory?: string;
   winemaker?: string;
-  
-  // Metadata
-  createdAt: Date;
-  createdBy: string; // user ID who first added this wine
-  referenceCount: number; // how many users have tasted this wine
-  updatedAt: Date;
-}
-
-// Individual tasting records (user-specific experiences)
-export interface TastingRecord {
-  id: string;
-  userId: string;
-  wineId: string; // reference to WineMaster
   
   // Required tasting info
   overallRating: number; // 0.0-10.0
@@ -131,34 +121,64 @@ export interface TastingRecord {
   updatedAt: Date;
 }
 
-// Legacy WineRecord type for backward compatibility
-export interface WineRecord extends TastingRecord {
-  // Include wine master data for easy access
+// Legacy WineRecord type for backward compatibility (now same as TastingRecord)
+export interface WineRecord extends TastingRecord {}
+
+// Legacy WineMaster type for backward compatibility
+export interface WineMaster {
+  id: string;
   wineName: string;
   producer: string;
   country: string;
   region: string;
   vintage?: number;
   grapeVarieties?: string[];
-  wineType?: string;
+  wineType?: 'red' | 'white' | 'rose' | 'sparkling' | 'dessert' | 'fortified';
   alcoholContent?: number;
+  soilInfo?: string;
+  climate?: string;
+  wineHistory?: string;
+  winemaker?: string;
+  createdAt: Date;
+  createdBy: string;
+  referenceCount: number;
+  updatedAt: Date;
 }
 
 // Draft types (for auto-save functionality)
 export interface WineDraft {
   id: string;
   userId: string;
-  data: Partial<WineRecord>;
+  data: Partial<TastingRecord>;
   lastSaved: Date;
 }
 
 export interface TastingDraft {
   id: string;
   userId: string;
-  wineId?: string; // if wine is already selected
-  wineMasterData?: Partial<WineMaster>; // if creating new wine
-  tastingData: Partial<TastingRecord>;
+  data: Partial<TastingRecord>;
   lastSaved: Date;
+}
+
+// Public sharing types
+export interface PublicWineRecord {
+  id: string;
+  wineName: string;
+  producer: string;
+  country: string;
+  region: string;
+  vintage?: number;
+  grapeVarieties?: string[];
+  wineType?: 'red' | 'white' | 'rose' | 'sparkling' | 'dessert' | 'fortified';
+  alcoholContent?: number;
+  overallRating: number;
+  tastingDate: Date;
+  recordMode: 'quick' | 'detailed';
+  notes?: string;
+  images?: string[];
+  detailedAnalysis?: TastingRecord['detailedAnalysis'];
+  environment?: TastingRecord['environment'];
+  createdAt: Date;
 }
 
 // Badge system

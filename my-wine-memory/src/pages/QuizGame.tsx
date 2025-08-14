@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthHooks';
 import type { QuizQuestion } from '../types';
 import { getRandomQuestions } from '../data/sampleQuestions';
+import { quizProgressService } from '../services/quizProgressService';
 
 const QuizGame: React.FC = () => {
   const navigate = useNavigate();
@@ -18,6 +19,8 @@ const QuizGame: React.FC = () => {
   const [hearts, setHearts] = useState(5);
   const [showExplanation, setShowExplanation] = useState(false);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+  const [answeredQuestions, setAnsweredQuestions] = useState<string[]>([]);
+  const [correctAnswers, setCorrectAnswers] = useState<string[]>([]);
 
   useEffect(() => {
     if (!currentUser) {
@@ -25,10 +28,35 @@ const QuizGame: React.FC = () => {
       return;
     }
 
-    // Initialize quiz
-    const difficultyNum = parseInt(difficulty || '1');
-    const quizQuestions = getRandomQuestions(difficultyNum, 10);
-    setQuestions(quizQuestions);
+    const initializeQuiz = async () => {
+      try {
+        // Get user's current hearts
+        const userStats = await quizProgressService.getUserQuizStats(currentUser.uid);
+        if (userStats) {
+          const recoveredHearts = await quizProgressService.recoverHearts(currentUser.uid);
+          setHearts(recoveredHearts);
+          
+          if (recoveredHearts <= 0) {
+            alert('ハートがありません。\n時間を置いてから再度挑戦してください。');
+            navigate('/quiz');
+            return;
+          }
+        }
+        
+        // Initialize quiz
+        const difficultyNum = parseInt(difficulty || '1');
+        const quizQuestions = getRandomQuestions(difficultyNum, 10);
+        setQuestions(quizQuestions);
+      } catch (error) {
+        console.error('Failed to initialize quiz:', error);
+        // Fallback to default initialization
+        const difficultyNum = parseInt(difficulty || '1');
+        const quizQuestions = getRandomQuestions(difficultyNum, 10);
+        setQuestions(quizQuestions);
+      }
+    };
+    
+    initializeQuiz();
   }, [currentUser, difficulty, navigate]);
 
   const nextQuestion = useCallback(() => {
@@ -46,9 +74,25 @@ const QuizGame: React.FC = () => {
     }
   }, [currentQuestionIndex, questions.length, gameStatus]);
 
-  const handleTimeUp = useCallback(() => {
+  const handleTimeUp = useCallback(async () => {
     setGameStatus('timeup');
+    
+    // Record time up as wrong answer
+    const currentQuestion = questions[currentQuestionIndex];
+    if (currentUser && currentQuestion) {
+      try {
+        await Promise.all([
+          quizProgressService.recordWrongAnswer(currentUser.uid, currentQuestion, -1), // -1 indicates timeout
+          quizProgressService.useHeart(currentUser.uid)
+        ]);
+      } catch (error) {
+        console.error('Failed to record timeout:', error);
+      }
+    }
+    
     setHearts(hearts - 1);
+    setAnsweredQuestions([...answeredQuestions, currentQuestion?.id || '']);
+    
     if (hearts <= 1) {
       setGameStatus('finished');
     } else {
@@ -57,7 +101,7 @@ const QuizGame: React.FC = () => {
         nextQuestion();
       }, 2000);
     }
-  }, [hearts, nextQuestion]);
+  }, [hearts, nextQuestion, currentQuestionIndex, questions, currentUser, answeredQuestions]);
 
   useEffect(() => {
     if (gameStatus === 'playing' && timeLeft > 0) {
@@ -70,17 +114,42 @@ const QuizGame: React.FC = () => {
     }
   }, [timeLeft, gameStatus, handleTimeUp]);
 
-  const handleAnswerSelect = (answerIndex: number) => {
+  const handleAnswerSelect = async (answerIndex: number) => {
     if (selectedAnswer !== null || showExplanation) return;
     
     setSelectedAnswer(answerIndex);
     const currentQuestion = questions[currentQuestionIndex];
     const correct = answerIndex === currentQuestion.correctAnswer;
     setIsCorrect(correct);
-
+    
+    // Track answered questions
+    const newAnsweredQuestions = [...answeredQuestions, currentQuestion.id];
+    setAnsweredQuestions(newAnsweredQuestions);
+    
     if (correct) {
       setScore(score + 1);
+      setCorrectAnswers([...correctAnswers, currentQuestion.id]);
+      
+      // Mark wrong answer as resolved if it was previously wrong
+      if (currentUser) {
+        try {
+          await quizProgressService.resolveWrongAnswer(currentUser.uid, currentQuestion.id);
+        } catch (error) {
+          console.error('Failed to resolve wrong answer:', error);
+        }
+      }
     } else {
+      // Record wrong answer and use heart
+      if (currentUser) {
+        try {
+          await Promise.all([
+            quizProgressService.recordWrongAnswer(currentUser.uid, currentQuestion, answerIndex),
+            quizProgressService.useHeart(currentUser.uid)
+          ]);
+        } catch (error) {
+          console.error('Failed to record wrong answer or use heart:', error);
+        }
+      }
       setHearts(hearts - 1);
     }
 
@@ -104,7 +173,43 @@ const QuizGame: React.FC = () => {
     setGameStatus('playing');
     setShowExplanation(false);
     setIsCorrect(null);
+    setAnsweredQuestions([]);
+    setCorrectAnswers([]);
   };
+  
+  // Save progress when game ends
+  useEffect(() => {
+    if (gameStatus === 'finished' && currentUser && answeredQuestions.length > 0) {
+      const saveProgress = async () => {
+        try {
+          const difficultyNum = parseInt(difficulty || '1');
+          const isStreak = score === questions.length; // Perfect score
+          
+          await Promise.all([
+            quizProgressService.updateProgress(
+              currentUser.uid,
+              difficultyNum,
+              answeredQuestions,
+              score,
+              questions.length
+            ),
+            quizProgressService.updateUserQuizStats(
+              currentUser.uid,
+              score,
+              questions.length,
+              isStreak
+            )
+          ]);
+          
+          console.log('Progress saved successfully');
+        } catch (error) {
+          console.error('Failed to save quiz progress:', error);
+        }
+      };
+      
+      saveProgress();
+    }
+  }, [gameStatus, currentUser, answeredQuestions, score, questions.length, difficulty]);
 
   const goBack = () => {
     navigate('/quiz');
@@ -122,11 +227,16 @@ const QuizGame: React.FC = () => {
 
   if (gameStatus === 'finished') {
     const percentage = (score / questions.length) * 100;
+    const difficultyNum = parseInt(difficulty || '1');
+    
     return (
       <div className="page-container">
         <div className="quiz-result">
           <h1>クイズ終了！</h1>
           <div className="result-stats">
+            <div className="difficulty-info">
+              <span className="difficulty-badge">難易度 {difficultyNum}</span>
+            </div>
             <div className="score">
               <span className="score-number">{score}</span>
               <span className="score-total">/ {questions.length}</span>

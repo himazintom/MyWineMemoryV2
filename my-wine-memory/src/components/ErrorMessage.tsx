@@ -4,6 +4,7 @@ interface ErrorMessageProps {
   title?: string;
   message: string;
   onRetry?: () => void;
+  retryText?: string;
   showIcon?: boolean;
 }
 
@@ -11,6 +12,7 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
   title = 'エラーが発生しました',
   message,
   onRetry,
+  retryText = '再試行',
   showIcon = true
 }) => {
   return (
@@ -20,7 +22,7 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
       <p className="error-text">{message}</p>
       {onRetry && (
         <button className="retry-button" onClick={onRetry}>
-          🔄 再試行
+          🔄 {retryText}
         </button>
       )}
     </div>

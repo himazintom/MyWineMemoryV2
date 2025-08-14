@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthHooks';
-import { wineMasterService } from '../services/wineMasterService';
 import { tastingRecordService } from '../services/tastingRecordService';
+import { wineMasterService } from '../services/wineMasterService';
 import { userService, goalService } from '../services/userService';
 import type { WineMaster } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -16,12 +16,13 @@ import { useAsyncOperation } from '../hooks/useAsyncOperation';
 
 const AddTastingRecord: React.FC = () => {
   const navigate = useNavigate();
-  const { wineId } = useParams<{ wineId: string }>();
   const location = useLocation();
+  const { wineId } = useParams<{ wineId: string }>();
   const { currentUser } = useAuth();
   
-  
+  // Wine state
   const [wine, setWine] = useState<WineMaster | null>(null);
+  
   const [recordMode, setRecordMode] = useState<'quick' | 'detailed'>('quick');
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [pendingSave, setPendingSave] = useState(false);
@@ -304,6 +305,14 @@ const AddTastingRecord: React.FC = () => {
         // Create tasting record (before cleaning)
         const tastingDataRaw = {
           wineId: finalWineId,
+          wineName: wine.wineName,
+          producer: wine.producer,
+          country: wine.country,
+          region: wine.region,
+          vintage: wine.vintage,
+          grapeVarieties: wine.grapeVarieties,
+          wineType: wine.wineType,
+          alcoholContent: wine.alcoholContent,
           overallRating: formData.overallRating,
           tastingDate: formData.tastingDate,
           recordMode,
@@ -637,14 +646,68 @@ const AddTastingRecord: React.FC = () => {
                 <div className="form-row">
                   <div className="form-group">
                     <label htmlFor="color">色合い</label>
+                    <select
+                      id="colorSelect"
+                      name="colorSelect"
+                      value={formData.visualAnalysis.color}
+                      onChange={(e) => handleNestedInputChange('visualAnalysis', 'color', e.target.value)}
+                      style={{ marginBottom: '0.5rem' }}
+                    >
+                      <option value="">選択してください</option>
+                      {/* 赤ワイン */}
+                      {(!wine?.wineType || wine.wineType === 'red') && (
+                        <>
+                          <option value="鮮やかな紫">鮮やかな紫（若い赤ワイン）</option>
+                          <option value="深い紫">深い紫（ミディアムボディ）</option>
+                          <option value="鮮やかなルビー">鮮やかなルビー（ピノ・ノワール系）</option>
+                          <option value="深いガーネット">深いガーネット（カベルネ系）</option>
+                          <option value="茶色がかった赤">茶色がかった赤（熟成）</option>
+                          <option value="レンガ色">レンガ色（経年変化）</option>
+                          <option value="深いマホガニー">深いマホガニー（長期熟成）</option>
+                          <option value="灰色がかった赤">灰色がかった赤（ヴィンテージ）</option>
+                        </>
+                      )}
+                      {/* 白ワイン */}
+                      {(!wine?.wineType || wine.wineType === 'white') && (
+                        <>
+                          <option value="透明に近い無色">透明に近い無色（若い白ワイン）</option>
+                          <option value="淡いレモンイエロー">淡いレモンイエロー（ソーヴィニヨンブラン系）</option>
+                          <option value="黄金色">黄金色（シャルドネ系）</option>
+                          <option value="緑がかった黄色">緑がかった黄色（サンセール系）</option>
+                          <option value="黄緑色">黄緑色（リースリング系）</option>
+                          <option value="深い黄金色">深い黄金色（樽熟成）</option>
+                          <option value="琥珀色">琥珀色（甘口ワイン）</option>
+                          <option value="茶色がかった黄色">茶色がかった黄色（長期熟成）</option>
+                        </>
+                      )}
+                      {/* ロゼワイン */}
+                      {(!wine?.wineType || wine.wineType === 'rose') && (
+                        <>
+                          <option value="淡いサーモンピンク">淡いサーモンピンク</option>
+                          <option value="玄黒ピンク">玄黒ピンク</option>
+                          <option value="鮮やかなローズ色">鮮やかなローズ色</option>
+                          <option value="オレンジがかったピンク">オレンジがかったピンク</option>
+                        </>
+                      )}
+                      {/* スパークリング */}
+                      {(!wine?.wineType || wine.wineType === 'sparkling') && (
+                        <>
+                          <option value="淡いゴールド（泡付き）">淡いゴールド（泡付き）</option>
+                          <option value="銀白色（泡付き）">銀白色（泡付き）</option>
+                          <option value="鮮やかなピンク（泡付き）">鮮やかなピンク（泡付き）</option>
+                        </>
+                      )}
+                    </select>
                     <input
                       id="color"
                       name="color"
                       type="text"
                       value={formData.visualAnalysis.color}
                       onChange={(e) => handleNestedInputChange('visualAnalysis', 'color', e.target.value)}
-                      placeholder="例: 濃い赤紫、黄金色"
+                      placeholder="または自由記入"
+                      style={{ fontSize: '0.9rem' }}
                     />
+                    <small className="field-help">選択肢から選ぶか、自由に記入してください</small>
                   </div>
                   <div className="form-group">
                     <label htmlFor="clarity">透明度</label>
@@ -664,14 +727,33 @@ const AddTastingRecord: React.FC = () => {
                 </div>
                 <div className="form-group">
                   <label htmlFor="viscosity">粘性（脚の様子）</label>
+                  <select
+                    id="viscositySelect"
+                    name="viscositySelect"
+                    value={formData.visualAnalysis.viscosity}
+                    onChange={(e) => handleNestedInputChange('visualAnalysis', 'viscosity', e.target.value)}
+                    style={{ marginBottom: '0.5rem' }}
+                  >
+                    <option value="">選択してください</option>
+                    <option value="非常に軽い（水のよう）">非常に軽い（水のよう）</option>
+                    <option value="軽い（細い脚が素早く落ちる）">軽い（細い脚が素早く落ちる）</option>
+                    <option value="やや軽い（適度な脚）">やや軽い（適度な脚）</option>
+                    <option value="中程度（ゆっくりとした脚）">中程度（ゆっくりとした脚）</option>
+                    <option value="やや重い（太めの脚がゆっくり）">やや重い（太めの脚がゆっくり）</option>
+                    <option value="重い（非常に太い脚）">重い（非常に太い脚）</option>
+                    <option value="非常に重い（シロップのよう）">非常に重い（シロップのよう）</option>
+                    <option value="油性（グリセリンのよう）">油性（グリセリンのよう）</option>
+                  </select>
                   <textarea
                     id="viscosity"
                     name="viscosity"
                     value={formData.visualAnalysis.viscosity}
                     onChange={(e) => handleNestedInputChange('visualAnalysis', 'viscosity', e.target.value)}
-                    placeholder="例: ゆっくりと落ちる太い脚、サラサラとした軽い脚"
+                    placeholder="または自由記入（例: ゆっくりと落ちる太い脚）"
                     rows={2}
+                    style={{ fontSize: '0.9rem' }}
                   />
+                  <small className="field-help">選択肢から選ぶか、自由に記入してください</small>
                 </div>
               </div>
 
@@ -680,25 +762,63 @@ const AddTastingRecord: React.FC = () => {
                 <h3>香り分析</h3>
                 <div className="form-group">
                   <label htmlFor="firstImpression">第一印象</label>
+                  <select
+                    id="firstImpressionSelect"
+                    value={formData.aromaAnalysis.firstImpression}
+                    onChange={(e) => handleNestedInputChange('aromaAnalysis', 'firstImpression', e.target.value)}
+                    style={{ marginBottom: '0.5rem' }}
+                  >
+                    <option value="">選択してください</option>
+                    <option value="非常に弱い（ほとんど香らない）">非常に弱い（ほとんど香らない）</option>
+                    <option value="弱い（かすかに香る）">弱い（かすかに香る）</option>
+                    <option value="中程度（適度に香る）">中程度（適度に香る）</option>
+                    <option value="強い（はっきりと香る）">強い（はっきりと香る）</option>
+                    <option value="非常に強い（非常に香りが高い）">非常に強い（非常に香りが高い）</option>
+                    <option value="若々しい果実の香り">若々しい果実の香り</option>
+                    <option value="花のような上品な香り">花のような上品な香り</option>
+                    <option value="熻製香やバニラの香り">熻製香やバニラの香り</option>
+                    <option value="土やミネラルの香り">土やミネラルの香り</option>
+                  </select>
                   <textarea
                     id="firstImpression"
                     name="firstImpression"
                     value={formData.aromaAnalysis.firstImpression}
                     onChange={(e) => handleNestedInputChange('aromaAnalysis', 'firstImpression', e.target.value)}
-                    placeholder="グラスに注いだ直後の香りの印象"
+                    placeholder="または自由記入（グラスに注いだ直後の香りの印象）"
                     rows={2}
+                    style={{ fontSize: '0.9rem' }}
                   />
+                  <small className="field-help">選択肢から選ぶか、自由に記入してください</small>
                 </div>
                 <div className="form-group">
                   <label htmlFor="afterSwirling">スワリング後</label>
+                  <select
+                    id="afterSwirlingSelect"
+                    value={formData.aromaAnalysis.afterSwirling}
+                    onChange={(e) => handleNestedInputChange('aromaAnalysis', 'afterSwirling', e.target.value)}
+                    style={{ marginBottom: '0.5rem' }}
+                  >
+                    <option value="">選択してください</option>
+                    <option value="香りが強くなった">香りが強くなった</option>
+                    <option value="香りが弱くなった">香りが弱くなった</option>
+                    <option value="新しい香りが登場した">新しい香りが登場した</option>
+                    <option value="香りの層が展開した">香りの層が展開した</option>
+                    <option value="果実の香りが際立つ">果実の香りが際立つ</option>
+                    <option value="スパイシーな香りが登場">スパイシーな香りが登場</option>
+                    <option value="ミネラルや土の香りが登場">ミネラルや土の香りが登場</option>
+                    <option value="樽の香りが際立つ">樽の香りが際立つ</option>
+                    <option value="あまり変化なし">あまり変化なし</option>
+                  </select>
                   <textarea
                     id="afterSwirling"
                     name="afterSwirling"
                     value={formData.aromaAnalysis.afterSwirling}
                     onChange={(e) => handleNestedInputChange('aromaAnalysis', 'afterSwirling', e.target.value)}
-                    placeholder="グラスを回した後の香りの変化"
+                    placeholder="または自由記入（グラスを回した後の香りの変化）"
                     rows={2}
+                    style={{ fontSize: '0.9rem' }}
                   />
+                  <small className="field-help">選択肢から選ぶか、自由に記入してください</small>
                 </div>
                 
                 <div className="form-group">
@@ -740,36 +860,92 @@ const AddTastingRecord: React.FC = () => {
                 <h3>味わい分析</h3>
                 <div className="form-group">
                   <label htmlFor="attack">アタック（第一印象）</label>
+                  <select
+                    id="attackSelect"
+                    value={formData.tasteAnalysis.attack}
+                    onChange={(e) => handleNestedInputChange('tasteAnalysis', 'attack', e.target.value)}
+                    style={{ marginBottom: '0.5rem' }}
+                  >
+                    <option value="">選択してください</option>
+                    <option value="弱い（あっさりとした入り）">弱い（あっさりとした入り）</option>
+                    <option value="中程度（バランスの良い入り）">中程度（バランスの良い入り）</option>
+                    <option value="強い（インパクトのある入り）">強い（インパクトのある入り）</option>
+                    <option value="果実味が前面に">果実味が前面に</option>
+                    <option value="酸味が際立つ">酸味が際立つ</option>
+                    <option value="タンニンが前面に">タンニンが前面に</option>
+                    <option value="ミネラルや土の味">ミネラルや土の味</option>
+                    <option value="アルコール感が強い">アルコール感が強い</option>
+                  </select>
                   <textarea
                     id="attack"
                     name="attack"
                     value={formData.tasteAnalysis.attack}
                     onChange={(e) => handleNestedInputChange('tasteAnalysis', 'attack', e.target.value)}
-                    placeholder="口に含んだ瞬間の印象"
+                    placeholder="または自由記入（口に含んだ瞬間の印象）"
                     rows={2}
+                    style={{ fontSize: '0.9rem' }}
                   />
+                  <small className="field-help">選択肢から選ぶか、自由に記入してください</small>
                 </div>
                 <div className="form-group">
                   <label htmlFor="development">展開</label>
+                  <select
+                    id="developmentSelect"
+                    value={formData.tasteAnalysis.development}
+                    onChange={(e) => handleNestedInputChange('tasteAnalysis', 'development', e.target.value)}
+                    style={{ marginBottom: '0.5rem' }}
+                  >
+                    <option value="">選択してください</option>
+                    <option value="シンプル（変化が少ない）">シンプル（変化が少ない）</option>
+                    <option value="複雑（層が展開する）">複雑（層が展開する）</option>
+                    <option value="非常に複雑（多層的）">非常に複雑（多層的）</option>
+                    <option value="果実味が展開">果実味が展開</option>
+                    <option value="スパイシーな味が登場">スパイシーな味が登場</option>
+                    <option value="ミネラルや土の味が登場">ミネラルや土の味が登場</option>
+                    <option value="樽由来の味が登場">樽由来の味が登場</option>
+                    <option value="タンニンが展開">タンニンが展開</option>
+                    <option value="酸味が際立つ">酸味が際立つ</option>
+                  </select>
                   <textarea
                     id="development"
                     name="development"
                     value={formData.tasteAnalysis.development}
                     onChange={(e) => handleNestedInputChange('tasteAnalysis', 'development', e.target.value)}
-                    placeholder="口の中での味わいの変化"
+                    placeholder="または自由記入（口の中での味わいの変化）"
                     rows={2}
+                    style={{ fontSize: '0.9rem' }}
                   />
+                  <small className="field-help">選択肢から選ぶか、自由に記入してください</small>
                 </div>
                 <div className="form-group">
                   <label htmlFor="finish">フィニッシュ</label>
+                  <select
+                    id="finishSelect"
+                    value={formData.tasteAnalysis.finish}
+                    onChange={(e) => handleNestedInputChange('tasteAnalysis', 'finish', e.target.value)}
+                    style={{ marginBottom: '0.5rem' }}
+                  >
+                    <option value="">選択してください</option>
+                    <option value="クリーン（すっきりとした終わり）">クリーン（すっきりとした終わり）</option>
+                    <option value="スムース（穏やかな終わり）">スムース（穏やかな終わり）</option>
+                    <option value="エレガント（上品な終わり）">エレガント（上品な終わり）</option>
+                    <option value="果実味が残る">果実味が残る</option>
+                    <option value="スパイシーな余韻">スパイシーな余韻</option>
+                    <option value="ミネラルや土の余韻">ミネラルや土の余韻</option>
+                    <option value="樽由来の余韻">樽由来の余韻</option>
+                    <option value="タンニンが残る">タンニンが残る</option>
+                    <option value="苦味が残る">苦味が残る</option>
+                  </select>
                   <textarea
                     id="finish"
                     name="finish"
                     value={formData.tasteAnalysis.finish}
                     onChange={(e) => handleNestedInputChange('tasteAnalysis', 'finish', e.target.value)}
-                    placeholder="飲み込んだ後の余韻"
+                    placeholder="または自由記入（飲み込んだ後の余韻）"
                     rows={2}
+                    style={{ fontSize: '0.9rem' }}
                   />
+                  <small className="field-help">選択肢から選ぶか、自由に記入してください</small>
                 </div>
                 <div className="form-group">
                   <label>余韻の長さ ({formData.tasteAnalysis.finishLength}/10)</label>

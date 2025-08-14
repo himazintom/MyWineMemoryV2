@@ -4,7 +4,11 @@ import {
   setDoc, 
   updateDoc, 
   Timestamp,
-  increment 
+  increment,
+  query,
+  where,
+  collection,
+  getDocs 
 } from 'firebase/firestore';
 import { db } from './firebase';
 import type { User as FirebaseUser } from 'firebase/auth';
@@ -49,7 +53,9 @@ export const userService = {
         totalRecords: 0,
         badges: [],
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        isPublic: false,
+        publicSlug: undefined
       };
 
       await setDoc(userRef, {
@@ -193,6 +199,108 @@ export const userService = {
     } catch (error) {
       console.error('Error updating user privacy settings:', error);
       throw new Error('プライバシー設定の更新に失敗しました');
+    }
+  },
+
+  // Set user public sharing settings
+  async setPublicSharing(userId: string, isPublic: boolean, publicSlug?: string): Promise<void> {
+    try {
+      const userRef = doc(db, 'users', userId);
+      
+      // Check if slug is unique (if provided)
+      if (isPublic && publicSlug) {
+        const existingUser = await this.getUserByPublicSlug(publicSlug);
+        if (existingUser && existingUser.id !== userId) {
+          throw new Error('この公開URLは既に使用されています');
+        }
+      }
+      
+      await updateDoc(userRef, {
+        isPublic,
+        publicSlug: isPublic ? publicSlug : undefined,
+        updatedAt: Timestamp.fromDate(new Date())
+      });
+    } catch (error) {
+      console.error('Error setting public sharing:', error);
+      throw error;
+    }
+  },
+
+  // Get user by public slug
+  async getUserByPublicSlug(publicSlug: string): Promise<User | null> {
+    try {
+      const q = query(
+        collection(db, 'users'),
+        where('publicSlug', '==', publicSlug),
+        where('isPublic', '==', true)
+      );
+      
+      const querySnapshot = await getDocs(q);
+      
+      if (!querySnapshot.empty) {
+        const doc = querySnapshot.docs[0];
+        return {
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate() || new Date(),
+          updatedAt: doc.data().updatedAt?.toDate() || new Date()
+        } as User;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error getting user by public slug:', error);
+      return null;
+    }
+  },
+
+  // Generate unique public slug
+  async generateUniqueSlug(userId: string, displayName: string): Promise<string> {
+    const baseSlug = displayName
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+      .substring(0, 20) || 'wine-lover';
+    
+    let slug = baseSlug;
+    let counter = 1;
+    
+    while (true) {
+      const existingUser = await this.getUserByPublicSlug(slug);
+      if (!existingUser || existingUser.id === userId) {
+        return slug;
+      }
+      
+      slug = `${baseSlug}-${counter}`;
+      counter++;
+      
+      if (counter > 999) {
+        // Fallback with random number
+        slug = `${baseSlug}-${Math.floor(Math.random() * 10000)}`;
+        break;
+      }
+    }
+    
+    return slug;
+  }
+};
+
+export const publicSharingService = {
+  // Get public user profile
+  async getPublicUserProfile(publicSlug: string): Promise<{ user: User; stats: UserStats | null } | null> {
+    try {
+      const user = await userService.getUserByPublicSlug(publicSlug);
+      if (!user) {
+        return null;
+      }
+      
+      const stats = await userService.getUserStats(user.id);
+      
+      return { user, stats };
+    } catch (error) {
+      console.error('Error getting public user profile:', error);
+      return null;
     }
   }
 };

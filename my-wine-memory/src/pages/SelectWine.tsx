@@ -1,104 +1,61 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthHooks';
-import { wineMasterService } from '../services/wineMasterService';
 import { tastingRecordService } from '../services/tastingRecordService';
-import type { WineMaster } from '../types';
+import type { TastingRecord } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import TagInput from '../components/TagInput';
 import { useAsyncOperation } from '../hooks/useAsyncOperation';
-import { useOfflineSync } from '../hooks/useOfflineSync';
-import { useNetworkStatus } from '../hooks/useNetworkStatus';
+// import { useOfflineSync } from '../hooks/useOfflineSync';
+// import { useNetworkStatus } from '../hooks/useNetworkStatus';
 
 const SelectWine: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<WineMaster[]>([]);
-  const [popularWines, setPopularWines] = useState<WineMaster[]>([]);
+  const [searchResults, setSearchResults] = useState<TastingRecord[]>([]);
+  const [popularWines, setPopularWines] = useState<{wineName: string; producer: string; count: number; lastRecord: TastingRecord}[]>([]);
   const [showNewWineForm, setShowNewWineForm] = useState(false);
   const [grapeVarieties, setGrapeVarieties] = useState<string[]>([]);
   const [, setIsUsingOfflineData] = useState(false);
   
-  const { loading: searchLoading, error: searchError, execute: executeSearch } = useAsyncOperation<WineMaster[]>();
-  const { loading: popularLoading, error: popularError, execute: executeLoadPopular } = useAsyncOperation<WineMaster[]>();
-  const { isOnline } = useNetworkStatus();
-  const { searchCachedWines, getCachedWines, cacheWines } = useOfflineSync(currentUser?.uid);
+  const { loading: searchLoading, error: searchError, execute: executeSearch } = useAsyncOperation<TastingRecord[]>();
+  const { loading: popularLoading, error: popularError, execute: executeLoadPopular } = useAsyncOperation<{wineName: string; producer: string; count: number; lastRecord: TastingRecord}[]>();
+  // const { isOnline } = useNetworkStatus();
+  // const { searchCachedWines, getCachedWines, cacheWines } = useOfflineSync(currentUser?.uid);
 
 
   const loadPopularWines = useCallback(async () => {
+    if (!currentUser) return;
+    
     try {
-      if (isOnline) {
-        // Load from server and cache
-        const wines = await executeLoadPopular(() => wineMasterService.getPopularWines(10));
-        if (wines && wines.length > 0) {
-          await cacheWines(wines);
-          setPopularWines(wines);
-          setIsUsingOfflineData(false);
-        }
-      } else {
-        // Load from cache
-        try {
-          const cachedWines = await getCachedWines();
-          const popularCached = cachedWines.slice(0, 10); // Take first 10 as "popular"
-          setPopularWines(popularCached);
-          setIsUsingOfflineData(true);
-        } catch (cacheError) {
-          console.error('Failed to load cached wines:', cacheError);
-        }
+      const wines = await executeLoadPopular(() => tastingRecordService.getUserPopularWines(currentUser.uid, 10));
+      if (wines) {
+        setPopularWines(wines);
+        setIsUsingOfflineData(false);
       }
     } catch (error) {
       console.error('Failed to load popular wines:', error);
-      // Fallback to cache on error
-      try {
-        const cachedWines = await getCachedWines();
-        const popularCached = cachedWines.slice(0, 10);
-        setPopularWines(popularCached);
-        setIsUsingOfflineData(true);
-      } catch (cacheError) {
-        console.error('Failed to load cached wines as fallback:', cacheError);
-      }
     }
-  }, [executeLoadPopular, isOnline, cacheWines, getCachedWines]);
+  }, [executeLoadPopular, currentUser]);
 
   const searchWines = useCallback(async () => {
-    if (!searchTerm.trim()) return;
+    if (!searchTerm.trim() || !currentUser) return;
 
     try {
-      if (isOnline) {
-        // Search online and cache results
-        const results = await executeSearch(() => wineMasterService.searchWineMasters(searchTerm, 20));
-        if (results && results.length > 0) {
-          await cacheWines(results);
-          setSearchResults(results);
-          setIsUsingOfflineData(false);
-        } else {
-          setSearchResults([]);
-        }
+      const results = await executeSearch(() => tastingRecordService.searchUserWines(currentUser.uid, searchTerm, 20));
+      if (results) {
+        setSearchResults(results);
+        setIsUsingOfflineData(false);
       } else {
-        // Search in cache
-        try {
-          const cachedResults = await searchCachedWines(searchTerm);
-          setSearchResults(cachedResults);
-          setIsUsingOfflineData(true);
-        } catch (cacheError) {
-          console.error('Failed to search cached wines:', cacheError);
-          setSearchResults([]);
-        }
+        setSearchResults([]);
       }
     } catch (error) {
       console.error('Failed to search wines:', error);
-      // Fallback to cache on error
-      try {
-        const cachedResults = await searchCachedWines(searchTerm);
-        setSearchResults(cachedResults);
-        setIsUsingOfflineData(true);
-      } catch (cacheError) {
-        console.error('Failed to search cached wines as fallback:', cacheError);
-      }
+      setSearchResults([]);
     }
-  }, [searchTerm, executeSearch, isOnline, cacheWines, searchCachedWines]);
+  }, [searchTerm, executeSearch, currentUser]);
 
   useEffect(() => {
     loadPopularWines();
@@ -116,8 +73,13 @@ const SelectWine: React.FC = () => {
     }
   }, [searchTerm, searchWines]);
 
-  const handleSelectWine = (wineId: string) => {
-    navigate(`/add-tasting-record/${wineId}`);
+  const handleSelectWine = (wineName: string, producer: string) => {
+    // Navigate with wine info as URL params
+    const params = new URLSearchParams({
+      wineName,
+      producer
+    });
+    navigate(`/add-tasting-record?${params.toString()}`);
   };
 
   const handleCreateNewWine = () => {
@@ -147,7 +109,7 @@ const SelectWine: React.FC = () => {
     // Remove undefined values
     const newWineData = Object.fromEntries(
       Object.entries(newWineDataRaw).filter(([, value]) => value !== undefined)
-    ) as Omit<WineMaster, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'referenceCount'>;
+    );
 
     // Prepare initial tasting record data with purchase info
     const price = formData.get('price');
@@ -178,27 +140,28 @@ const SelectWine: React.FC = () => {
         return;
       }
       
-      // First save the wine to Firestore
-      const savedWine = await wineMasterService.createWineMaster(newWineData, currentUser.uid);
+      // Create tasting record with all wine info included
+      const recordData = {
+        ...newWineData,
+        ...initialRecordData,
+        isPublic: false
+      };
       
-      // If initial record data is provided, create the tasting record
       if (initialRecordData) {
-        try {
-          await tastingRecordService.createTastingRecord(currentUser.uid, {
-            ...initialRecordData,
-            wineId: savedWine.id
-          } as any);
-          
-          // Navigate to records page to show the created record
-          navigate('/records');
-        } catch (recordError) {
-          console.error('Failed to create initial tasting record:', recordError);
-          // Still navigate to add tasting record page if record creation fails
-          navigate(`/add-tasting-record/${savedWine.id}`);
-        }
+        // Create record with initial data
+        await tastingRecordService.createTastingRecord(currentUser.uid, recordData as any);
+        navigate('/records');
       } else {
-        // Navigate to tasting record page with the saved wine ID
-        navigate(`/add-tasting-record/${savedWine.id}`);
+        // Navigate to add tasting record page with wine data
+        const params = new URLSearchParams();
+        params.set('wineName', String(newWineData.wineName || ''));
+        params.set('producer', String(newWineData.producer || ''));
+        params.set('country', String(newWineData.country || ''));
+        params.set('region', String(newWineData.region || ''));
+        if (newWineData.vintage) params.set('vintage', newWineData.vintage.toString());
+        if (newWineData.wineType) params.set('wineType', String(newWineData.wineType));
+        if (newWineData.grapeVarieties) params.set('grapeVarieties', JSON.stringify(newWineData.grapeVarieties));
+        navigate(`/add-tasting-record?${params.toString()}`);
       }
     } catch (error) {
       console.error('Failed to create new wine:', error);
@@ -206,7 +169,7 @@ const SelectWine: React.FC = () => {
     }
   };
 
-  const displayedWines = searchTerm.trim() ? searchResults : popularWines;
+  const displayedWines = searchTerm.trim() ? searchResults : popularWines.map(w => w.lastRecord);
   const isLoading = searchTerm.trim() ? searchLoading : popularLoading;
   const error = searchTerm.trim() ? searchError : popularError;
 
@@ -265,28 +228,31 @@ const SelectWine: React.FC = () => {
 
           {!isLoading && !error && displayedWines.length > 0 && (
             <div className="wine-list">
-              {displayedWines.map((wine) => (
-                <div 
-                  key={wine.id} 
-                  className="wine-list-item"
-                  onClick={() => handleSelectWine(wine.id)}
-                >
-                  <div className="wine-info">
-                    <h3 className="wine-name">{wine.wineName}</h3>
-                    <p className="wine-producer">{wine.producer}</p>
-                    <p className="wine-location">{wine.country} - {wine.region}</p>
-                    {wine.vintage && (
-                      <p className="wine-vintage">{wine.vintage}年</p>
-                    )}
+              {displayedWines.map((wine, index) => {
+                const popularWine = searchTerm.trim() ? null : popularWines[index];
+                return (
+                  <div 
+                    key={wine.id} 
+                    className="wine-list-item"
+                    onClick={() => handleSelectWine(wine.wineName, wine.producer)}
+                  >
+                    <div className="wine-info">
+                      <h3 className="wine-name">{wine.wineName}</h3>
+                      <p className="wine-producer">{wine.producer}</p>
+                      <p className="wine-location">{wine.country} - {wine.region}</p>
+                      {wine.vintage && (
+                        <p className="wine-vintage">{wine.vintage}年</p>
+                      )}
+                    </div>
+                    <div className="wine-stats">
+                      <span className="reference-count">
+                        {popularWine ? `${popularWine.count}回記録` : '既に記録済み'}
+                      </span>
+                      <span className="select-arrow">→</span>
+                    </div>
                   </div>
-                  <div className="wine-stats">
-                    <span className="reference-count">
-                      {wine.referenceCount}人が記録
-                    </span>
-                    <span className="select-arrow">→</span>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

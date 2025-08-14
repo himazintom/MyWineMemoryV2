@@ -38,7 +38,7 @@ const WineDetail: React.FC = () => {
     
     try {
       const records = await executeLoadRecords(() => 
-        tastingRecordService.getTastingRecordsForWine(currentUser.uid, wineId, 100)
+        tastingRecordService.getUserTastingRecords(currentUser.uid, 'date', 100)
       );
       setTastingRecords(records);
     } catch (error) {

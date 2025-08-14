@@ -11,6 +11,8 @@ const Profile: React.FC = () => {
   const [stats, setStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [localPrivacySettings, setLocalPrivacySettings] = useState(userProfile?.privacySettings);
+  // const [isPublic, setIsPublic] = useState(userProfile?.isPublic || false);
+  // const [publicSlug, setPublicSlug] = useState(userProfile?.publicSlug || '');
 
   const loadUserData = useCallback(async () => {
     if (!currentUser) return;
@@ -39,6 +41,8 @@ const Profile: React.FC = () => {
 
   useEffect(() => {
     setLocalPrivacySettings(userProfile?.privacySettings);
+    // setIsPublic(userProfile?.isPublic || false);
+    // setPublicSlug(userProfile?.publicSlug || '');
   }, [userProfile?.privacySettings]);
 
   const handleGoogleSignIn = async () => {
