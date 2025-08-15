@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthHooks';
 import { badgeService } from '../services/badgeService';
 import { userService } from '../services/userService';
 import ThemeToggle from '../components/ThemeToggle';
+import NotificationSettings from '../components/NotificationSettings';
 import type { Badge, UserStats } from '../types';
 
 const Profile: React.FC = () => {
@@ -11,8 +12,9 @@ const Profile: React.FC = () => {
   const [stats, setStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [localPrivacySettings, setLocalPrivacySettings] = useState(userProfile?.privacySettings);
-  // const [isPublic, setIsPublic] = useState(userProfile?.isPublic || false);
-  // const [publicSlug, setPublicSlug] = useState(userProfile?.publicSlug || '');
+  const [showShareUrl, setShowShareUrl] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
+  const [notificationExpanded, setNotificationExpanded] = useState(false);
 
   const loadUserData = useCallback(async () => {
     if (!currentUser) return;
@@ -41,8 +43,7 @@ const Profile: React.FC = () => {
 
   useEffect(() => {
     setLocalPrivacySettings(userProfile?.privacySettings);
-    // setIsPublic(userProfile?.isPublic || false);
-    // setPublicSlug(userProfile?.publicSlug || '');
+    setShowShareUrl(userProfile?.privacySettings?.allowPublicProfile || false);
   }, [userProfile?.privacySettings]);
 
   const handleGoogleSignIn = async () => {
@@ -83,6 +84,11 @@ const Profile: React.FC = () => {
       // Update local state immediately for responsive UI
       setLocalPrivacySettings(updatedSettings);
       
+      // Handle public profile visibility change
+      if (setting === 'allowPublicProfile') {
+        setShowShareUrl(value as boolean);
+      }
+      
       // Update database
       await userService.updateUserPrivacySettings(currentUser.uid, updatedSettings);
       
@@ -90,7 +96,37 @@ const Profile: React.FC = () => {
       console.error('Failed to update privacy settings:', error);
       // Revert local state on error
       setLocalPrivacySettings(userProfile?.privacySettings);
+      setShowShareUrl(userProfile?.privacySettings?.allowPublicProfile || false);
       alert('プライバシー設定の更新に失敗しました。');
+    }
+  };
+
+  const generateShareUrl = () => {
+    if (!currentUser) return '';
+    return `${window.location.origin}/profile/${currentUser.uid}`;
+  };
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(generateShareUrl());
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy to clipboard:', error);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = generateShareUrl();
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        setCopySuccess(true);
+        setTimeout(() => setCopySuccess(false), 2000);
+      } catch (fallbackError) {
+        console.error('Fallback copy failed:', fallbackError);
+      }
+      document.body.removeChild(textArea);
     }
   };
 
@@ -198,21 +234,14 @@ const Profile: React.FC = () => {
         <div className="settings">
           <h3>設定</h3>
           
-          <div className="setting-item">
-            <label className="setting-label">
-              <span>プッシュ通知</span>
-              <input 
-                type="checkbox" 
-                checked={localPrivacySettings?.pushNotifications ?? false}
-                onChange={(e) => handlePrivacySettingChange('pushNotifications', e.target.checked)}
-                className="setting-checkbox"
-              />
-            </label>
-          </div>
+          <NotificationSettings 
+            isExpanded={notificationExpanded}
+            onToggle={() => setNotificationExpanded(!notificationExpanded)}
+          />
           
           <div className="setting-item">
             <label className="setting-label">
-              <span>記録をデフォルトで公開する</span>
+              <span>ほかの人も記録を見れるようにする</span>
               <input 
                 type="checkbox" 
                 checked={localPrivacySettings?.defaultRecordVisibility === 'public'}
@@ -232,6 +261,23 @@ const Profile: React.FC = () => {
                 className="setting-checkbox"
               />
             </label>
+            {showShareUrl && (
+              <div className="share-url-container">
+                <div className="share-url-box">
+                  <span className="share-url-text">{generateShareUrl()}</span>
+                  <button 
+                    className={`copy-button ${copySuccess ? 'copied' : ''}`}
+                    onClick={copyToClipboard}
+                    title="クリップボードにコピー"
+                  >
+                    {copySuccess ? '✅' : '📋'}
+                  </button>
+                </div>
+                <p className="share-url-description">
+                  この URL をシェアして、あなたのワイン記録を友達に見せましょう！
+                </p>
+              </div>
+            )}
           </div>
           
           <div className="setting-item">

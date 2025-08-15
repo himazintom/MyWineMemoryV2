@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthHooks';
-import { getTotalQuestionsByDifficulty } from '../data/sampleQuestions';
+import { QUIZ_LEVELS, initializeQuizQuestions } from '../data/quiz';
 import { quizProgressService, type QuizProgress, type UserQuizStats } from '../services/quizProgressService';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const Quiz: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
-  const questionStats = getTotalQuestionsByDifficulty();
   
   const [userProgress, setUserProgress] = useState<QuizProgress[]>([]);
   const [userStats, setUserStats] = useState<UserQuizStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [hearts, setHearts] = useState(5);
+  const [quizInitialized, setQuizInitialized] = useState(false);
   
   const startQuiz = (difficulty: number) => {
     navigate(`/quiz/play/${difficulty}`);
@@ -52,6 +52,12 @@ const Quiz: React.FC = () => {
   
   useEffect(() => {
     const loadUserData = async () => {
+      // Initialize quiz questions
+      if (!quizInitialized) {
+        await initializeQuizQuestions();
+        setQuizInitialized(true);
+      }
+      
       if (!currentUser) {
         setLoading(false);
         return;
@@ -79,7 +85,7 @@ const Quiz: React.FC = () => {
     };
     
     loadUserData();
-  }, [currentUser]);
+  }, [currentUser, quizInitialized]);
   
   const getProgressForDifficulty = (difficulty: number) => {
     return userProgress.find(p => p.difficulty === difficulty);
@@ -112,78 +118,105 @@ const Quiz: React.FC = () => {
         ) : (
         <>
         <div className="difficulty-levels">
-          <h2>難易度を選択</h2>
-          <div className="level-grid">
-            <button 
-              className={`level-button ${canPlayQuiz() ? 'available' : 'disabled'}`} 
-              onClick={() => canPlayQuiz() && startQuiz(1)}
-              disabled={!canPlayQuiz()}
-            >
-              <span className="level-number">1</span>
-              <span className="level-name">入門編</span>
-              <span className="level-progress">
-                {getProgressForDifficulty(1)?.completedQuestions.length || 0}/{questionStats.find(s => s.difficulty === 1)?.count || 0}
-              </span>
-              {getProgressForDifficulty(1) && (
-                <span className="level-score">最高: {getProgressForDifficulty(1)!.bestScore}%</span>
-              )}
-            </button>
-            <button 
-              className={`level-button ${canPlayQuiz() ? 'available' : 'disabled'}`} 
-              onClick={() => canPlayQuiz() && startQuiz(2)}
-              disabled={!canPlayQuiz()}
-            >
-              <span className="level-number">2</span>
-              <span className="level-name">初級編</span>
-              <span className="level-progress">
-                {getProgressForDifficulty(2)?.completedQuestions.length || 0}/{questionStats.find(s => s.difficulty === 2)?.count || 0}
-              </span>
-              {getProgressForDifficulty(2) && (
-                <span className="level-score">最高: {getProgressForDifficulty(2)!.bestScore}%</span>
-              )}
-            </button>
-            <button 
-              className={`level-button ${canPlayQuiz() ? 'available' : 'disabled'}`} 
-              onClick={() => canPlayQuiz() && startQuiz(3)}
-              disabled={!canPlayQuiz()}
-            >
-              <span className="level-number">3</span>
-              <span className="level-name">中級編</span>
-              <span className="level-progress">
-                {getProgressForDifficulty(3)?.completedQuestions.length || 0}/{questionStats.find(s => s.difficulty === 3)?.count || 0}
-              </span>
-              {getProgressForDifficulty(3) && (
-                <span className="level-score">最高: {getProgressForDifficulty(3)!.bestScore}%</span>
-              )}
-            </button>
-            <button 
-              className={`level-button ${canPlayQuiz() ? 'available' : 'disabled'}`} 
-              onClick={() => canPlayQuiz() && startQuiz(4)}
-              disabled={!canPlayQuiz()}
-            >
-              <span className="level-number">4</span>
-              <span className="level-name">上級編</span>
-              <span className="level-progress">
-                {getProgressForDifficulty(4)?.completedQuestions.length || 0}/{questionStats.find(s => s.difficulty === 4)?.count || 0}
-              </span>
-              {getProgressForDifficulty(4) && (
-                <span className="level-score">最高: {getProgressForDifficulty(4)!.bestScore}%</span>
-              )}
-            </button>
-            <button 
-              className={`level-button ${canPlayQuiz() ? 'available' : 'disabled'}`} 
-              onClick={() => canPlayQuiz() && startQuiz(5)}
-              disabled={!canPlayQuiz()}
-            >
-              <span className="level-number">5</span>
-              <span className="level-name">専門級</span>
-              <span className="level-progress">
-                {getProgressForDifficulty(5)?.completedQuestions.length || 0}/{questionStats.find(s => s.difficulty === 5)?.count || 0}
-              </span>
-              {getProgressForDifficulty(5) && (
-                <span className="level-score">最高: {getProgressForDifficulty(5)!.bestScore}%</span>
-              )}
-            </button>
+          <h2>レベルを選択</h2>
+          <p className="level-info">20レベル × 各100問 = 2000問の包括的なワイン学習システム</p>
+          
+          <div className="level-sections">
+            <div className="level-section">
+              <h3>🌱 初心者 (レベル1-5)</h3>
+              <div className="level-grid">
+                {QUIZ_LEVELS.slice(0, 5).map(level => (
+                  <button 
+                    key={level.level}
+                    className={`level-button ${canPlayQuiz() ? 'available' : 'disabled'}`} 
+                    onClick={() => canPlayQuiz() && startQuiz(level.level)}
+                    disabled={!canPlayQuiz()}
+                  >
+                    <span className="level-number">{level.level}</span>
+                    <span className="level-name">{level.name}</span>
+                    <span className="level-description">{level.description}</span>
+                    <span className="level-progress">
+                      {getProgressForDifficulty(level.level)?.completedQuestions.length || 0}/100
+                    </span>
+                    {getProgressForDifficulty(level.level) && (
+                      <span className="level-score">最高: {getProgressForDifficulty(level.level)!.bestScore}%</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="level-section">
+              <h3>📚 中級 (レベル6-10)</h3>
+              <div className="level-grid">
+                {QUIZ_LEVELS.slice(5, 10).map(level => (
+                  <button 
+                    key={level.level}
+                    className={`level-button ${canPlayQuiz() ? 'available' : 'disabled'}`} 
+                    onClick={() => canPlayQuiz() && startQuiz(level.level)}
+                    disabled={!canPlayQuiz()}
+                  >
+                    <span className="level-number">{level.level}</span>
+                    <span className="level-name">{level.name}</span>
+                    <span className="level-description">{level.description}</span>
+                    <span className="level-progress">
+                      {getProgressForDifficulty(level.level)?.completedQuestions.length || 0}/100
+                    </span>
+                    {getProgressForDifficulty(level.level) && (
+                      <span className="level-score">最高: {getProgressForDifficulty(level.level)!.bestScore}%</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="level-section">
+              <h3>🎓 上級 (レベル11-15)</h3>
+              <div className="level-grid">
+                {QUIZ_LEVELS.slice(10, 15).map(level => (
+                  <button 
+                    key={level.level}
+                    className={`level-button ${canPlayQuiz() ? 'available' : 'disabled'}`} 
+                    onClick={() => canPlayQuiz() && startQuiz(level.level)}
+                    disabled={!canPlayQuiz()}
+                  >
+                    <span className="level-number">{level.level}</span>
+                    <span className="level-name">{level.name}</span>
+                    <span className="level-description">{level.description}</span>
+                    <span className="level-progress">
+                      {getProgressForDifficulty(level.level)?.completedQuestions.length || 0}/100
+                    </span>
+                    {getProgressForDifficulty(level.level) && (
+                      <span className="level-score">最高: {getProgressForDifficulty(level.level)!.bestScore}%</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="level-section">
+              <h3>🏆 エキスパート (レベル16-20)</h3>
+              <div className="level-grid">
+                {QUIZ_LEVELS.slice(15, 20).map(level => (
+                  <button 
+                    key={level.level}
+                    className={`level-button ${canPlayQuiz() ? 'available' : 'disabled'}`} 
+                    onClick={() => canPlayQuiz() && startQuiz(level.level)}
+                    disabled={!canPlayQuiz()}
+                  >
+                    <span className="level-number">{level.level}</span>
+                    <span className="level-name">{level.name}</span>
+                    <span className="level-description">{level.description}</span>
+                    <span className="level-progress">
+                      {getProgressForDifficulty(level.level)?.completedQuestions.length || 0}/100
+                    </span>
+                    {getProgressForDifficulty(level.level) && (
+                      <span className="level-score">最高: {getProgressForDifficulty(level.level)!.bestScore}%</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
         

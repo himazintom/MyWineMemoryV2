@@ -567,19 +567,13 @@ class TastingRecordService {
           country: record.country,
           region: record.region,
           vintage: record.vintage,
-          grapeVarieties: record.grapeVarieties,
-          wineType: record.wineType,
-          alcoholContent: record.alcoholContent,
           overallRating: record.overallRating,
           tastingDate: record.tastingDate instanceof Date ? record.tastingDate : new Date(record.tastingDate),
           recordMode: record.recordMode,
           notes: record.notes,
-          images: record.images,
-          detailedAnalysis: record.detailedAnalysis,
-          environment: record.environment,
-          createdAt: record.createdAt
-          // Exclude: price, purchaseLocation
-        }));
+          images: record.images
+          // Exclude: price, purchaseLocation, and other private data
+        } as PublicWineRecord));
     } catch (error) {
       console.error('Error getting public records:', error);
       return [];

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthHooks';
 import type { QuizQuestion } from '../types';
-import { getRandomQuestions } from '../data/sampleQuestions';
+import { loadQuestionsByLevel } from '../data/quiz';
 import { quizProgressService } from '../services/quizProgressService';
 
 const QuizGame: React.FC = () => {
@@ -45,14 +45,16 @@ const QuizGame: React.FC = () => {
         
         // Initialize quiz
         const difficultyNum = parseInt(difficulty || '1');
-        const quizQuestions = getRandomQuestions(difficultyNum, 10);
+        const allQuestions = await loadQuestionsByLevel(difficultyNum);
+        // Randomly select 10 questions
+        const shuffled = [...allQuestions].sort(() => Math.random() - 0.5);
+        const quizQuestions = shuffled.slice(0, 10);
         setQuestions(quizQuestions);
       } catch (error) {
         console.error('Failed to initialize quiz:', error);
-        // Fallback to default initialization
-        const difficultyNum = parseInt(difficulty || '1');
-        const quizQuestions = getRandomQuestions(difficultyNum, 10);
-        setQuestions(quizQuestions);
+        // Fallback: use empty array
+        console.warn('Failed to load questions, using empty array');
+        setQuestions([]);
       }
     };
     
@@ -161,9 +163,11 @@ const QuizGame: React.FC = () => {
     }
   };
 
-  const restartQuiz = () => {
+  const restartQuiz = async () => {
     const difficultyNum = parseInt(difficulty || '1');
-    const newQuestions = getRandomQuestions(difficultyNum, 10);
+    const allQuestions = await loadQuestionsByLevel(difficultyNum);
+    const shuffled = [...allQuestions].sort(() => Math.random() - 0.5);
+    const newQuestions = shuffled.slice(0, 10);
     setQuestions(newQuestions);
     setCurrentQuestionIndex(0);
     setSelectedAnswer(null);

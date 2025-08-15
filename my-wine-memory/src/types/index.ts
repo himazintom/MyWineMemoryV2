@@ -172,7 +172,7 @@ export interface PublicWineRecord {
   wineType?: 'red' | 'white' | 'rose' | 'sparkling' | 'dessert' | 'fortified';
   alcoholContent?: number;
   overallRating: number;
-  tastingDate: Date;
+  tastingDate: Date | string;
   recordMode: 'quick' | 'detailed';
   notes?: string;
   images?: string[];
@@ -234,6 +234,21 @@ export interface DailyGoal {
   wineRecordingCompleted: number;
   quizCompleted: number;
   xpEarned: number;
+}
+
+// Public sharing interface
+export interface PublicWineRecord {
+  id: string;
+  wineName: string;
+  producer: string;
+  country: string;
+  region: string;
+  vintage?: number;
+  overallRating: number;
+  tastingDate: Date | string;
+  recordMode: 'quick' | 'detailed';
+  notes?: string;
+  images?: string[];
 }
 
 // Statistics

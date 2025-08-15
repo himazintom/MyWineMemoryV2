@@ -287,7 +287,7 @@ export const userService = {
 };
 
 export const publicSharingService = {
-  // Get public user profile
+  // Get public user profile by slug
   async getPublicUserProfile(publicSlug: string): Promise<{ user: User; stats: UserStats | null } | null> {
     try {
       const user = await userService.getUserByPublicSlug(publicSlug);
@@ -300,6 +300,23 @@ export const publicSharingService = {
       return { user, stats };
     } catch (error) {
       console.error('Error getting public user profile:', error);
+      return null;
+    }
+  },
+
+  // Get public user profile by userId
+  async getPublicUserProfileByUserId(userId: string): Promise<{ user: User; stats: UserStats | null } | null> {
+    try {
+      const user = await userService.getUserProfile(userId);
+      if (!user || !user.privacySettings?.allowPublicProfile) {
+        return null;
+      }
+      
+      const stats = await userService.getUserStats(user.id);
+      
+      return { user, stats };
+    } catch (error) {
+      console.error('Error getting public user profile by userId:', error);
       return null;
     }
   }

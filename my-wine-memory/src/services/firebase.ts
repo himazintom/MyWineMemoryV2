@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, enableNetwork, disableNetwork } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+import { getMessaging, isSupported } from 'firebase/messaging';
 
 // Validate required environment variables
 const requiredEnvVars = [
@@ -34,6 +35,22 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+
+// Initialize Firebase Messaging (only in supported environments)
+let messaging: ReturnType<typeof getMessaging> | null = null;
+if (typeof window !== 'undefined') {
+  isSupported().then((supported) => {
+    if (supported) {
+      messaging = getMessaging(app);
+    } else {
+      console.warn('Firebase Messaging is not supported in this browser');
+    }
+  }).catch((error) => {
+    console.warn('Error checking Firebase Messaging support:', error);
+  });
+}
+
+export { messaging };
 
 // Handle Service Worker interference with Firestore
 if (typeof window !== 'undefined') {

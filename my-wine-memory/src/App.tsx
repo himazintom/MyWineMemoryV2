@@ -81,7 +81,7 @@ function App() {
                   <Route path="/quiz/play/:difficulty" element={<QuizGame />} />
                   <Route path="/stats" element={<Stats />} />
                   <Route path="/profile" element={<Profile />} />
-                  <Route path="/public/:publicSlug" element={<PublicProfile />} />
+                  <Route path="/profile/:userId" element={<PublicProfile />} />
                 </Routes>
               </Suspense>
             </main>

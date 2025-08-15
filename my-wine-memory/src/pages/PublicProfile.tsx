@@ -7,7 +7,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 
 const PublicProfile: React.FC = () => {
-  const { publicSlug } = useParams<{ publicSlug: string }>();
+  const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [stats, setStats] = useState<UserStats | null>(null);
@@ -17,7 +17,7 @@ const PublicProfile: React.FC = () => {
 
   useEffect(() => {
     const loadPublicProfile = async () => {
-      if (!publicSlug) {
+      if (!userId) {
         setError('無効な公開URLです');
         setLoading(false);
         return;
@@ -27,11 +27,11 @@ const PublicProfile: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        // Get public user profile
-        const profileData = await publicSharingService.getPublicUserProfile(publicSlug);
+        // Get public user profile by userId
+        const profileData = await publicSharingService.getPublicUserProfileByUserId(userId);
         
         if (!profileData) {
-          setError('このユーザーは見つかりませんでした');
+          setError('このユーザーは見つかりませんでした、またはプロフィールが非公開です');
           setLoading(false);
           return;
         }
@@ -52,7 +52,7 @@ const PublicProfile: React.FC = () => {
     };
 
     loadPublicProfile();
-  }, [publicSlug]);
+  }, [userId]);
 
   if (loading) {
     return (
