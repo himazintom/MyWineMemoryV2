@@ -5,7 +5,9 @@
 
 import { 
   getToken, 
-  onMessage, 
+  onMessage
+} from 'firebase/messaging';
+import type { 
   Messaging,
   MessagePayload 
 } from 'firebase/messaging';
@@ -13,7 +15,6 @@ import {
   doc, 
   setDoc, 
   deleteDoc, 
-  updateDoc, 
   getDoc,
   Timestamp 
 } from 'firebase/firestore';

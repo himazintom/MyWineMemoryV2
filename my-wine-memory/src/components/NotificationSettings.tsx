@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthHooks';
 import { 
-  notificationService, 
+  notificationService
+} from '../services/notificationService';
+import type { 
   NotificationSettings as NotificationSettingsType,
   NotificationType 
 } from '../services/notificationService';

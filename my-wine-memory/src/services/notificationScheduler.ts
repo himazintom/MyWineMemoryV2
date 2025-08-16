@@ -3,7 +3,8 @@
  * Handles scheduling and triggering of different notification types
  */
 
-import { notificationService, NotificationType } from './notificationService';
+import { notificationService } from './notificationService';
+import type { NotificationType } from './notificationService';
 import { userService } from './userService';
 import { tastingRecordService } from './tastingRecordService';
 

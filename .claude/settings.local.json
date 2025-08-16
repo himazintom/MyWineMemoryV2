@@ -27,9 +27,15 @@
       "Bash(npm run lint)",
       "Bash(npx depcheck:*)",
       "Bash(gsutil cors:*)",
+<<<<<<< Updated upstream
       "Bash(firebase projects:list:*)",
       "Bash(gsutil ls:*)",
       "Bash(npm test)"
+=======
+      "Bash(git filter-branch:*)",
+      "Bash(git stash:*)",
+      "Bash(FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch my-wine-memory/.env.example' --prune-empty --tag-name-filter cat -- --all)"
+>>>>>>> Stashed changes
     ],
     "deny": []
   },
