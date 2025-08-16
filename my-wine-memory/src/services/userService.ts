@@ -12,7 +12,9 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 import type { User as FirebaseUser } from 'firebase/auth';
-import type { User, UserStats, DailyGoal } from '../types';
+import type { User, UserStats, DailyGoal, Badge } from '../types';
+import { gamificationService } from './gamificationService';
+import { badgeService } from './badgeService';
 
 export const userService = {
   // Create or update user profile
@@ -96,30 +98,23 @@ export const userService = {
     });
   },
 
-  // Add XP and check for level up
-  async addXP(userId: string, xpAmount: number): Promise<{ newLevel: number; leveledUp: boolean }> {
-    const userRef = doc(db, 'users', userId);
-    const userDoc = await getDoc(userRef);
-    
-    if (!userDoc.exists()) {
-      throw new Error('User not found');
-    }
+  // Add XP and check for level up (delegated to gamificationService)
+  async addXP(userId: string, xpAmount: number, reason: string = 'Manual XP award'): Promise<{ newXp: number; newLevel: number; leveledUp: boolean }> {
+    return await gamificationService.awardXP(userId, xpAmount, reason);
+  },
 
-    const currentXP = userDoc.data().xp || 0;
-    const currentLevel = userDoc.data().level || 1;
-    const newXP = currentXP + xpAmount;
-    
-    // Simple level calculation: 1000 XP per level
-    const newLevel = Math.floor(newXP / 1000) + 1;
-    const leveledUp = newLevel > currentLevel;
+  // Get user badges
+  async getUserBadges(userId: string): Promise<Badge[]> {
+    return await badgeService.getUserBadges(userId);
+  },
 
-    await updateDoc(userRef, {
-      xp: newXP,
-      level: newLevel,
-      updatedAt: Timestamp.now()
-    });
-
-    return { newLevel, leveledUp };
+  // Get badge progress
+  async getBadgeProgress(userId: string): Promise<{
+    category: Badge['category'];
+    badges: (Badge & { earned: boolean; progress: number })[];
+  }[]> {
+    const userStats = await gamificationService.getUserStats(userId);
+    return await badgeService.getBadgeProgress(userId, userStats);
   },
 
   // Initialize user statistics

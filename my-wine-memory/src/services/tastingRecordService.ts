@@ -15,6 +15,7 @@ import {
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from './firebase';
 import type { TastingRecord, WineRecord, PublicWineRecord } from '../types';
+import { gamificationService } from './gamificationService';
 
 class TastingRecordService {
   private readonly collection = 'tasting_records';
@@ -172,6 +173,14 @@ class TastingRecordService {
       });
 
       const docRef = await addDoc(collection(db, this.collection), firestoreData);
+
+      // Process gamification after successful record creation
+      try {
+        await gamificationService.processWineRecording(userId, data.recordMode);
+      } catch (gamificationError) {
+        console.error('Error processing gamification for wine record:', gamificationError);
+        // Don't fail the main operation if gamification fails
+      }
 
       return docRef.id;
     } catch (error) {

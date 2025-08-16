@@ -4,12 +4,13 @@ import { useAuth } from '../contexts/AuthHooks';
 import { useTheme } from '../contexts/ThemeHooks';
 import { tastingRecordService } from '../services/tastingRecordService';
 import { draftService } from '../services/wineService';
-// import { goalService } from '../services/userService';
+import { gamificationService } from '../services/gamificationService';
 import { guestDataService } from '../services/guestDataService';
 import type { WineRecord, WineDraft, DailyGoal } from '../types';
 import WineCard from '../components/WineCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
+import { StreakDisplay } from '../components/BadgeDisplay';
 import { useAsyncOperation } from '../hooks/useAsyncOperation';
 import heroDark from '../assets/images/hero/home-hero-desktop-dark.webp';
 import heroLight from '../assets/images/hero/home-hero-desktop-light.webp';
@@ -17,7 +18,7 @@ import brandLogo from '../assets/images/logo-icon/logo-icon.svg';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const { currentUser, signInWithGoogle, loading: authInitializing } = useAuth();
+  const { currentUser, userProfile, signInWithGoogle, loading: authInitializing } = useAuth();
   const { theme } = useTheme();
   const [isMobile, setIsMobile] = useState<boolean>(() =>
     typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(max-width: 767px)').matches : false
@@ -61,15 +62,17 @@ const Home: React.FC = () => {
               console.error('Failed to load drafts:', error);
               return [];
             }),
-            // Temporarily disable goal service to fix permissions error
-            Promise.resolve({
-              userId: currentUser.uid,
-              date: new Date().toISOString().substring(0, 10),
-              wineRecordingGoal: 1,
-              quizGoal: 5,
-              wineRecordingCompleted: 0,
-              quizCompleted: 0,
-              xpEarned: 0
+            gamificationService.getDailyGoal(currentUser.uid).catch(error => {
+              console.error('Failed to load daily goal:', error);
+              return {
+                userId: currentUser.uid,
+                date: new Date().toISOString().substring(0, 10),
+                wineRecordingGoal: 1,
+                quizGoal: 5,
+                wineRecordingCompleted: 0,
+                quizCompleted: 0,
+                xpEarned: 0
+              };
             })
           ]);
           
@@ -186,40 +189,76 @@ const Home: React.FC = () => {
           </div>
         )}
         
-        <div className="daily-goals">
-          <h2>今日の目標</h2>
-          {dailyGoal ? (
-            <>
-              <div className="goal-item">
-                <span>ワイン記録: {dailyGoal.wineRecordingCompleted}/{dailyGoal.wineRecordingGoal}</span>
-                <div className="progress-bar">
-                  <div 
-                    className="progress-fill" 
-                    style={{ width: `${calculateProgress(dailyGoal.wineRecordingCompleted, dailyGoal.wineRecordingGoal)}%` }}
-                  ></div>
+        {/* Gamification Dashboard */}
+        {currentUser && (
+          <div className="gamification-dashboard">
+            <div className="dashboard-header">
+              <h2>今日の状況</h2>
+              <div className="user-level-streak">
+                <div className="level-info">
+                  ⭐ レベル {currentUser ? (userProfile?.level || 1) : 1}
                 </div>
+                <StreakDisplay streak={currentUser ? (userProfile?.streak || 0) : 0} />
               </div>
-              <div className="goal-item">
-                <span>クイズ: {dailyGoal.quizCompleted}/{dailyGoal.quizGoal}</span>
-                <div className="progress-bar">
-                  <div 
-                    className="progress-fill" 
-                    style={{ width: `${calculateProgress(dailyGoal.quizCompleted, dailyGoal.quizGoal)}%` }}
-                  ></div>
+            </div>
+            
+            <div className="daily-goals">
+              {dailyGoal ? (
+                <div className="goals-grid">
+                  <div className="goal-item">
+                    <div className="goal-header">
+                      <span className="goal-icon">🍷</span>
+                      <span className="goal-label">ワイン記録</span>
+                    </div>
+                    <div className="goal-progress">
+                      <span className="goal-numbers">{dailyGoal.wineRecordingCompleted}/{dailyGoal.wineRecordingGoal}</span>
+                      <div className="progress-bar">
+                        <div 
+                          className="progress-fill" 
+                          style={{ width: `${calculateProgress(dailyGoal.wineRecordingCompleted, dailyGoal.wineRecordingGoal)}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="goal-item">
+                    <div className="goal-header">
+                      <span className="goal-icon">🧠</span>
+                      <span className="goal-label">クイズ</span>
+                    </div>
+                    <div className="goal-progress">
+                      <span className="goal-numbers">{dailyGoal.quizCompleted}/{dailyGoal.quizGoal}</span>
+                      <div className="progress-bar">
+                        <div 
+                          className="progress-fill" 
+                          style={{ width: `${calculateProgress(dailyGoal.quizCompleted, dailyGoal.quizGoal)}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              {dailyGoal.xpEarned > 0 && (
-                <div className="xp-earned">
-                  今日獲得したXP: {dailyGoal.xpEarned} XP
+              ) : (
+                <div className="goals-loading">
+                  目標を読み込み中...
                 </div>
               )}
-            </>
-          ) : (
+              
+              {dailyGoal && dailyGoal.xpEarned > 0 && (
+                <div className="xp-earned">
+                  💎 今日獲得したXP: {dailyGoal.xpEarned} XP
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        
+        {!currentUser && (
+          <div className="daily-goals">
+            <h2>今日の目標</h2>
             <div className="goal-item">
               <span>ログインして目標を確認しましょう</span>
             </div>
-          )}
-        </div>
+          </div>
+        )}
         
         <div className="recent-activity">
           <h2>最近の記録</h2>

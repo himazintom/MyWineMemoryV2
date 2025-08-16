@@ -2,32 +2,44 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthHooks';
 import { badgeService } from '../services/badgeService';
 import { userService } from '../services/userService';
+import { gamificationService } from '../services/gamificationService';
 import ThemeToggle from '../components/ThemeToggle';
 import NotificationSettings from '../components/NotificationSettings';
-import type { Badge, UserStats } from '../types';
+import BadgeDisplay, { EarnedBadges, LevelDisplay, StreakDisplay } from '../components/BadgeDisplay';
+import type { Badge, UserStats, DailyGoal } from '../types';
 
 const Profile: React.FC = () => {
   const { currentUser, userProfile, signInWithGoogle, logout } = useAuth();
   const [badges, setBadges] = useState<(Badge & { earnedAt: Date })[]>([]);
+  const [badgeProgress, setBadgeProgress] = useState<{
+    category: Badge['category'];
+    badges: (Badge & { earned: boolean; progress: number })[];
+  }[]>([]);
   const [stats, setStats] = useState<UserStats | null>(null);
+  const [dailyGoal, setDailyGoal] = useState<DailyGoal | null>(null);
   const [loading, setLoading] = useState(false);
   const [localPrivacySettings, setLocalPrivacySettings] = useState(userProfile?.privacySettings);
   const [showShareUrl, setShowShareUrl] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
   const [notificationExpanded, setNotificationExpanded] = useState(false);
+  const [selectedTab, setSelectedTab] = useState<'stats' | 'badges' | 'achievements'>('stats');
 
   const loadUserData = useCallback(async () => {
     if (!currentUser) return;
     
     try {
       setLoading(true);
-      const [userBadges, userStats] = await Promise.all([
+      const [userBadges, userStats, userBadgeProgress, userDailyGoal] = await Promise.all([
         badgeService.getUserBadges(currentUser.uid),
-        userService.getUserStats(currentUser.uid)
+        gamificationService.getUserStats(currentUser.uid),
+        userService.getBadgeProgress(currentUser.uid),
+        gamificationService.getDailyGoal(currentUser.uid)
       ]);
       
       setBadges(userBadges);
       setStats(userStats);
+      setBadgeProgress(userBadgeProgress);
+      setDailyGoal(userDailyGoal);
     } catch (error) {
       console.error('Failed to load user data:', error);
     } finally {
@@ -62,9 +74,6 @@ const Profile: React.FC = () => {
     }
   };
 
-  const getCategoryBadges = (category: Badge['category']) => {
-    return badges.filter(badge => badge.category === category);
-  };
 
   const handlePrivacySettingChange = async (setting: string, value: boolean | string) => {
     if (!currentUser) return;
@@ -146,7 +155,21 @@ const Profile: React.FC = () => {
             )}
           </div>
           <h2>{currentUser?.displayName || 'ゲストユーザー'}</h2>
-          <p>レベル 1 (0 XP)</p>
+          {currentUser && userProfile && (
+            <div className="user-stats-summary">
+              <LevelDisplay 
+                level={userProfile.level} 
+                xp={userProfile.xp} 
+                xpForNextLevel={gamificationService.calculateXpForNextLevel(userProfile.level)}
+              />
+              <div className="stats-row">
+                <StreakDisplay streak={userProfile.streak} />
+                <div className="badges-count">
+                  🏆 {badges.length} バッジ
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         
         {!currentUser ? (
@@ -163,72 +186,148 @@ const Profile: React.FC = () => {
             </button>
           </div>
         )}
-        
-        <div className="badges-section">
-          <h3>獲得バッジ ({badges.length}個)</h3>
-          {loading ? (
-            <p>読み込み中...</p>
-          ) : badges.length > 0 ? (
-            <div className="badge-categories">
-              {['recording', 'streak', 'quiz', 'exploration'].map(category => {
-                const categoryBadges = getCategoryBadges(category as Badge['category']);
-                if (categoryBadges.length === 0) return null;
-                
-                const categoryNames = {
-                  recording: '記録バッジ',
-                  streak: '連続記録バッジ',
-                  quiz: 'クイズバッジ',
-                  exploration: '探求バッジ'
-                };
 
-                return (
-                  <div key={category} className="badge-category">
-                    <h4>{categoryNames[category as keyof typeof categoryNames]}</h4>
-                    <div className="badges-grid">
-                      {categoryBadges.map((badge) => (
-                        <div key={badge.id} className="badge-item">
-                          <span className="badge-icon">{badge.icon}</span>
-                          <div className="badge-info">
-                            <span className="badge-name">{badge.name}</span>
-                            <span className="badge-description">{badge.description}</span>
-                            <span className="badge-date">
-                              {badge.earnedAt.toLocaleDateString('ja-JP')}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+        {/* Daily Goal Display */}
+        {currentUser && dailyGoal && (
+          <div className="daily-goal-section">
+            <h3>今日の目標</h3>
+            <div className="daily-goal-grid">
+              <div className="goal-item">
+                <div className="goal-icon">🍷</div>
+                <div className="goal-progress">
+                  <div className="goal-text">ワイン記録</div>
+                  <div className="goal-numbers">
+                    {dailyGoal.wineRecordingCompleted} / {dailyGoal.wineRecordingGoal}
                   </div>
-                );
-              })}
+                  <div className="goal-bar">
+                    <div 
+                      className="goal-fill" 
+                      style={{ 
+                        width: `${Math.min(100, (dailyGoal.wineRecordingCompleted / dailyGoal.wineRecordingGoal) * 100)}%` 
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="goal-item">
+                <div className="goal-icon">🧠</div>
+                <div className="goal-progress">
+                  <div className="goal-text">クイズ</div>
+                  <div className="goal-numbers">
+                    {dailyGoal.quizCompleted} / {dailyGoal.quizGoal}
+                  </div>
+                  <div className="goal-bar">
+                    <div 
+                      className="goal-fill" 
+                      style={{ 
+                        width: `${Math.min(100, (dailyGoal.quizCompleted / dailyGoal.quizGoal) * 100)}%` 
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-          ) : (
-            <p>まだバッジがありません。ワインを記録してバッジを獲得しましょう！</p>
-          )}
+          </div>
+        )}
+
+        {/* Tab Navigation */}
+        <div className="profile-tabs">
+          <button 
+            className={`tab-button ${selectedTab === 'stats' ? 'active' : ''}`}
+            onClick={() => setSelectedTab('stats')}
+          >
+            統計
+          </button>
+          <button 
+            className={`tab-button ${selectedTab === 'badges' ? 'active' : ''}`}
+            onClick={() => setSelectedTab('badges')}
+          >
+            獲得バッジ
+          </button>
+          <button 
+            className={`tab-button ${selectedTab === 'achievements' ? 'active' : ''}`}
+            onClick={() => setSelectedTab('achievements')}
+          >
+            全バッジ
+          </button>
         </div>
-        
-        <div className="achievements">
-          <h3>実績</h3>
-          <div className="achievement-item">
-            <span>🍷 記録数</span>
-            <span>{stats?.totalRecords || 0}本</span>
-          </div>
-          <div className="achievement-item">
-            <span>🔥 最長ストリーク</span>
-            <span>{stats?.longestStreak || 0}日</span>
-          </div>
-          <div className="achievement-item">
-            <span>🧠 クイズ正答数</span>
-            <span>{stats?.totalQuizzes || 0}問</span>
-          </div>
-          <div className="achievement-item">
-            <span>📊 平均評価</span>
-            <span>{stats?.averageRating ? stats.averageRating.toFixed(1) : '-'}</span>
-          </div>
-          <div className="achievement-item">
-            <span>⭐ 現在のレベル</span>
-            <span>レベル {userProfile?.level || 1}</span>
-          </div>
+
+        {/* Tab Content */}
+        <div className="tab-content">
+          {selectedTab === 'stats' && (
+            <div className="achievements">
+              <h3>実績</h3>
+              <div className="achievement-item">
+                <span>🍷 記録数</span>
+                <span>{stats?.totalRecords || 0}本</span>
+              </div>
+              <div className="achievement-item">
+                <span>🔥 現在のストリーク</span>
+                <span>{stats?.currentStreak || 0}日</span>
+              </div>
+              <div className="achievement-item">
+                <span>🏃 最長ストリーク</span>
+                <span>{stats?.longestStreak || 0}日</span>
+              </div>
+              <div className="achievement-item">
+                <span>🧠 クイズ正答数</span>
+                <span>{stats?.totalQuizzes || 0}問</span>
+              </div>
+              <div className="achievement-item">
+                <span>📊 平均評価</span>
+                <span>{stats?.averageRating ? stats.averageRating.toFixed(1) : '-'}</span>
+              </div>
+              <div className="achievement-item">
+                <span>⭐ 現在のレベル</span>
+                <span>レベル {userProfile?.level || 1}</span>
+              </div>
+              <div className="achievement-item">
+                <span>💎 XP</span>
+                <span>{userProfile?.xp || 0} XP</span>
+              </div>
+            </div>
+          )}
+
+          {selectedTab === 'badges' && (
+            <div className="badges-section">
+              <h3>獲得バッジ ({badges.length}個)</h3>
+              {loading ? (
+                <p>読み込み中...</p>
+              ) : (
+                <EarnedBadges badges={badges} />
+              )}
+            </div>
+          )}
+
+          {selectedTab === 'achievements' && (
+            <div className="all-badges-section">
+              <h3>全バッジ進捗</h3>
+              {loading ? (
+                <p>読み込み中...</p>
+              ) : (
+                <div className="badge-progress-container">
+                  {badgeProgress.map((categoryData) => {
+                    const categoryNames = {
+                      recording: '記録バッジ',
+                      streak: '連続記録バッジ',
+                      quiz: 'クイズバッジ',
+                      exploration: '探求バッジ'
+                    };
+                    
+                    return (
+                      <BadgeDisplay
+                        key={categoryData.category}
+                        badges={categoryData.badges}
+                        category={categoryData.category}
+                        title={categoryNames[categoryData.category as keyof typeof categoryNames]}
+                        showProgress={true}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </div>
         
         <div className="settings">

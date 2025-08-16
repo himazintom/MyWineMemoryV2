@@ -17,6 +17,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 import type { QuizQuestion } from '../types';
+import { gamificationService } from './gamificationService';
 
 export interface QuizProgress {
   id: string;
@@ -303,8 +304,37 @@ class QuizProgressService {
           transaction.set(statsRef, newStats);
         }
       });
+
+      // Process gamification after updating quiz stats
+      try {
+        await gamificationService.processQuizCompletion(userId, correctAnswers, totalAnswers);
+      } catch (gamificationError) {
+        console.error('Error processing gamification for quiz completion:', gamificationError);
+        // Don't fail the main operation if gamification fails
+      }
     } catch (error) {
       console.error('Failed to update user quiz stats:', error);
+      throw error;
+    }
+  }
+
+  // Complete quiz session with gamification
+  async completeQuizSession(
+    userId: string,
+    difficulty: number,
+    questionsAnswered: string[],
+    correctAnswers: number,
+    totalAnswers: number,
+    streakBroken: boolean = false
+  ): Promise<void> {
+    try {
+      // Update progress
+      await this.updateProgress(userId, difficulty, questionsAnswered, correctAnswers, totalAnswers);
+      
+      // Update user stats with gamification
+      await this.updateUserQuizStats(userId, correctAnswers, totalAnswers, !streakBroken);
+    } catch (error) {
+      console.error('Failed to complete quiz session:', error);
       throw error;
     }
   }
