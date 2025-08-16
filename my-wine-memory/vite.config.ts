@@ -73,10 +73,12 @@ export default defineConfig({
           /^\/v1\/projects\/.*\/databases\/.*\/documents\/.*/, // Firestore REST API
           /^\/google\.firestore\.v1beta1\.Firestore/, // Firestore WebChannel
           /^.*\.firebasestorage\.app\/_.*/, // Firebase Storage internal
-          /^.*\.googleapis\.com\/.*/ // All Google APIs
+          /^.*\.googleapis\.com\/.*/, // All Google APIs
+          /^\/assets\/.*/, // Prevent fallback for asset files
+          /\.(?:png|jpg|jpeg|svg|webp|gif|ico|js|css|woff|woff2|ttf|json)$/ // File extensions
         ],
         // Enhanced offline functionality
-        navigateFallback: '/',
+        navigateFallback: '/index.html',
         runtimeCaching: [
           // Firebase Storage images
           {
@@ -135,7 +137,9 @@ export default defineConfig({
         // オフライン機能の拡張
         skipWaiting: true,
         clientsClaim: true,
-        cleanupOutdatedCaches: true
+        cleanupOutdatedCaches: true,
+        // Add fallback routing for SPA
+        navigateFallbackAllowlist: [/^(?!\/__).*/]
       }
     }),
     visualizer({
@@ -203,7 +207,7 @@ export default defineConfig({
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: true, // Remove console.log in production
+        drop_console: false, // Keep console.log for debugging
         drop_debugger: true,
       },
     }
