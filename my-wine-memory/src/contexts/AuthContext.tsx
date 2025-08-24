@@ -6,6 +6,7 @@ import type { User } from '../types';
 import { userService } from '../services/userService';
 import { guestDataService } from '../services/guestDataService';
 import { wineService } from '../services/wineService';
+import { notificationScheduler } from '../services/notificationScheduler';
 import type { AuthContextType } from './AuthTypes';
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -113,6 +114,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
+      // Cancel all notifications before logging out
+      if (currentUser) {
+        notificationScheduler.cancelAllUserNotifications(currentUser.uid);
+      }
+      
       await signOut(auth);
     } catch (error) {
       console.error('Sign out error:', error);
@@ -132,11 +138,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // Fetch user profile from Firestore
           const profile = await userService.getUserProfile(user.uid);
           setUserProfile(profile);
+          
+          // Initialize notification schedules for the user
+          await notificationScheduler.initializeUserNotifications(user.uid);
         } catch (error) {
           console.error('Failed to load user profile:', error);
         }
       } else {
         setUserProfile(null);
+        
+        // Cancel all notifications when user logs out
+        if (currentUser) {
+          notificationScheduler.cancelAllUserNotifications(currentUser.uid);
+        }
       }
       
       setLoading(false);

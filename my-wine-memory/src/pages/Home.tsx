@@ -11,6 +11,7 @@ import WineCard from '../components/WineCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import { StreakDisplay } from '../components/BadgeDisplay';
+import NotificationPrompt from '../components/NotificationPrompt';
 import { useAsyncOperation } from '../hooks/useAsyncOperation';
 import heroDark from '../assets/images/hero/home-hero-desktop-dark.webp';
 import heroLight from '../assets/images/hero/home-hero-desktop-light.webp';
@@ -330,6 +331,11 @@ const Home: React.FC = () => {
           </div>
         )}
       </main>
+      
+      {/* Notification Permission Prompt */}
+      {currentUser && !currentUser.isAnonymous && (
+        <NotificationPrompt />
+      )}
     </div>
   );
 };

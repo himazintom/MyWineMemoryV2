@@ -7,6 +7,7 @@ import { notificationService } from './notificationService';
 import type { NotificationType } from './notificationService';
 import { userService } from './userService';
 import { tastingRecordService } from './tastingRecordService';
+import { pwaService } from './pwaService';
 
 export interface NotificationTrigger {
   id: string;
@@ -33,6 +34,26 @@ class NotificationScheduler {
     const delay = targetTime.getTime() - Date.now();
     if (delay <= 0) return; // Don't schedule past notifications
 
+    // If PWA is installed, use service worker scheduling
+    if (pwaService.isAppInstalled()) {
+      try {
+        await pwaService.scheduleLocalNotification({
+          id: notificationId,
+          title: 'ワインの記録をお忘れなく！',
+          body: '今日のワイン体験を記録しましょう',
+          scheduledTime: targetTime,
+          type: 'streak_reminder',
+          url: '/select-wine'
+        });
+        console.log(`PWA streak reminder scheduled for ${targetTime.toLocaleString()}`);
+        return;
+      } catch (error) {
+        console.error('Failed to schedule PWA notification:', error);
+        // Fall back to browser notification
+      }
+    }
+
+    // Browser-based scheduling (fallback)
     const timeout = setTimeout(async () => {
       try {
         await this.sendStreakReminder(userId);
@@ -43,7 +64,29 @@ class NotificationScheduler {
     }, delay);
 
     this.scheduledNotifications.set(notificationId, timeout);
-    console.log(`Streak reminder scheduled for ${targetTime.toLocaleString()}`);
+    console.log(`Browser streak reminder scheduled for ${targetTime.toLocaleString()}`);
+  }
+
+  // Schedule a wine memory recall notification
+  async scheduleWineMemoryRecall(userId: string, targetTime: Date): Promise<void> {
+    const notificationId = `memory_${userId}_${targetTime.getTime()}`;
+    
+    this.cancelNotification(notificationId);
+
+    const delay = targetTime.getTime() - Date.now();
+    if (delay <= 0) return;
+
+    const timeout = setTimeout(async () => {
+      try {
+        await this.sendWineMemoryRecall(userId);
+        this.scheduledNotifications.delete(notificationId);
+      } catch (error) {
+        console.error('Failed to send wine memory recall:', error);
+      }
+    }, delay);
+
+    this.scheduledNotifications.set(notificationId, timeout);
+    console.log(`Wine memory recall scheduled for ${targetTime.toLocaleString()}`);
   }
 
   // Schedule quiz reminder notification
@@ -152,9 +195,30 @@ class NotificationScheduler {
       return;
     }
 
+    // Get user's stats to personalize message
+    // const stats = await userService.getUserStats(userId);
+    // TODO: Add quizStreak to UserStats type when quiz tracking is implemented
+    const quizStreak = 0; // Placeholder until quiz streak is tracked
+    
+    const messages = [
+      { title: 'クイズでワイン知識を向上！', body: '今日のクイズにチャレンジして、ワイン知識を深めませんか？' },
+      { title: 'ワインクイズの時間です！', body: '5分間のクイズで新しい知識を身につけましょう' },
+      { title: 'クイズチャレンジ！', body: 'ソムリエレベルの問題に挑戦してみませんか？' },
+      { title: '知識をテストしよう！', body: 'ワインの世界をもっと探索しましょう' }
+    ];
+    
+    if (quizStreak > 0) {
+      messages.push({
+        title: `${quizStreak}日連続クイズ達成中！`,
+        body: '今日もクイズを続けて、連続記録を伸ばしましょう！'
+      });
+    }
+    
+    const message = messages[Math.floor(Math.random() * messages.length)];
+
     await this.showNotification({
-      title: 'クイズでワイン知識を向上！',
-      body: '今日のクイズにチャレンジして、ワイン知識を深めませんか？',
+      title: message.title,
+      body: message.body,
       type: 'quiz_reminder', 
       url: '/quiz',
       icon: '🧠'
@@ -197,6 +261,96 @@ class NotificationScheduler {
       url: '/quiz',
       icon: '❤️'
     });
+  }
+
+  // Send wine memory recall notification
+  private async sendWineMemoryRecall(userId: string): Promise<void> {
+    const settings = await notificationService.getUserNotificationSettings(userId);
+    
+    if (!settings.enabled || !settings.types.streak_reminder) {
+      return;
+    }
+
+    if (this.isInQuietHours(settings.quietHours)) {
+      return;
+    }
+
+    try {
+      // Get a random past wine record
+      const records = await tastingRecordService.getUserTastingRecords(userId, 'date', 100);
+      
+      if (records.length === 0) {
+        // No records yet, encourage first recording
+        await this.showNotification({
+          title: '初めてのワイン記録を作成しましょう！',
+          body: '素晴らしいワインとの出会いを記録してみませんか？',
+          type: 'streak_reminder',
+          url: '/select-wine',
+          icon: '🍷'
+        });
+        return;
+      }
+
+      // Pick a random record from the past
+      const randomRecord = records[Math.floor(Math.random() * records.length)];
+      // Get wine info from wines_master collection
+      const { wineMasterService } = await import('./wineMasterService');
+      const wineInfo = await wineMasterService.getWineMaster(randomRecord.wineId);
+      
+      if (!wineInfo) return;
+
+      const tastingDate = randomRecord.tastingDate instanceof Date 
+        ? randomRecord.tastingDate 
+        : new Date(randomRecord.tastingDate);
+      const daysSince = this.getDaysDifference(tastingDate, new Date());
+      const formattedDate = tastingDate.toLocaleDateString('ja-JP');
+      
+      const messages = [
+        {
+          title: `${wineInfo.wineName}を覚えていますか？`,
+          body: `${formattedDate}に飲んだこのワイン、評価は${randomRecord.overallRating}/10でした。最近同じようなワインを飲みましたか？`
+        },
+        {
+          title: `${daysSince}日前のワイン体験`,
+          body: `${wineInfo.wineName}（${wineInfo.producer}）を飲みましたね。今日は何を飲みますか？`
+        },
+        {
+          title: '過去のお気に入りワイン',
+          body: `${wineInfo.wineName}は${randomRecord.overallRating >= 7 ? '高評価' : '印象的'}でした。新しいワインも記録してみませんか？`
+        }
+      ];
+
+      // Add special message for highly rated wines
+      if (randomRecord.overallRating >= 8) {
+        messages.push({
+          title: `素晴らしいワインでした！`,
+          body: `${wineInfo.wineName}（評価${randomRecord.overallRating}/10）のような素敵なワインにまた出会えるといいですね`
+        });
+      }
+
+      // Add message with notes if available
+      if (randomRecord.notes) {
+        const shortNote = randomRecord.notes.length > 50 
+          ? randomRecord.notes.substring(0, 50) + '...'
+          : randomRecord.notes;
+        messages.push({
+          title: `${wineInfo.wineName}のメモ`,
+          body: `「${shortNote}」と記録していました。懐かしいですね！`
+        });
+      }
+
+      const message = messages[Math.floor(Math.random() * messages.length)];
+
+      await this.showNotification({
+        title: message.title,
+        body: message.body,
+        type: 'streak_reminder',
+        url: `/wine-detail/${randomRecord.wineId}`,
+        icon: '🍷'
+      });
+    } catch (error) {
+      console.error('Error sending wine memory recall:', error);
+    }
   }
 
   // Show browser notification
@@ -296,11 +450,50 @@ class NotificationScheduler {
       await this.scheduleStreakReminder(userId, streakTime);
     }
 
-    // Schedule quiz reminder for afternoon (3 PM)
+    // Schedule quiz reminders at random times (2-3 times per day)
     if (settings.types.quiz_reminder) {
-      const quizTime = new Date(tomorrow);
-      quizTime.setHours(15, 0, 0, 0);
-      await this.scheduleQuizReminder(userId, quizTime);
+      // Morning quiz (9-11 AM)
+      const morningQuizTime = new Date(tomorrow);
+      morningQuizTime.setHours(9 + Math.floor(Math.random() * 3), Math.floor(Math.random() * 60), 0, 0);
+      await this.scheduleQuizReminder(userId, morningQuizTime);
+      
+      // Afternoon quiz (2-4 PM)
+      const afternoonQuizTime = new Date(tomorrow);
+      afternoonQuizTime.setHours(14 + Math.floor(Math.random() * 3), Math.floor(Math.random() * 60), 0, 0);
+      await this.scheduleQuizReminder(userId, afternoonQuizTime);
+      
+      // Sometimes add evening quiz (6-8 PM) - 50% chance
+      if (Math.random() > 0.5) {
+        const eveningQuizTime = new Date(tomorrow);
+        eveningQuizTime.setHours(18 + Math.floor(Math.random() * 3), Math.floor(Math.random() * 60), 0, 0);
+        await this.scheduleQuizReminder(userId, eveningQuizTime);
+      }
+    }
+
+    // Schedule wine memory recall at random time (once per day)
+    if (settings.types.streak_reminder) {
+      const memoryTime = new Date(tomorrow);
+      // Random time between 10 AM and 8 PM
+      memoryTime.setHours(10 + Math.floor(Math.random() * 11), Math.floor(Math.random() * 60), 0, 0);
+      await this.scheduleWineMemoryRecall(userId, memoryTime);
+    }
+  }
+
+  // Initialize notification schedules when user logs in
+  async initializeUserNotifications(userId: string): Promise<void> {
+    try {
+      // Cancel any existing schedules
+      this.cancelAllUserNotifications(userId);
+      
+      // Setup new daily schedules
+      await this.setupDailySchedules(userId);
+      
+      // Check for missed activities
+      await this.checkMissedActivities(userId);
+      
+      console.log(`Notifications initialized for user ${userId}`);
+    } catch (error) {
+      console.error('Error initializing user notifications:', error);
     }
   }
 
@@ -333,9 +526,10 @@ class NotificationScheduler {
     try {
       const records = await tastingRecordService.getUserTastingRecords(userId, 'date', 1);
       if (records.length > 0) {
-        return records[0].tastingDate instanceof Date 
-          ? records[0].tastingDate 
-          : new Date(records[0].tastingDate);
+        const tastingDate = records[0].tastingDate;
+        return tastingDate instanceof Date 
+          ? tastingDate 
+          : new Date(tastingDate);
       }
       return new Date(0); // Far past date if no records
     } catch (error) {

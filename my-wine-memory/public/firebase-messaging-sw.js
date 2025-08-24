@@ -1,6 +1,6 @@
 // firebase-messaging-sw.js
-import { initializeApp } from 'firebase/app';
-import { getMessaging, onBackgroundMessage } from 'firebase/messaging/sw';
+importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
 
 // Firebase configuration (same as main app)
 const firebaseConfig = {
@@ -14,13 +14,13 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig);
 
 // Initialize Firebase Messaging
-const messaging = getMessaging(app);
+const messaging = firebase.messaging();
 
 // Handle background messages
-onBackgroundMessage(messaging, (payload) => {
+messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
 
   const notificationTitle = payload.notification?.title || 'MyWineMemory';
@@ -67,6 +67,8 @@ self.addEventListener('notificationclick', (event) => {
     url = '/quiz';
   } else if (data?.type === 'badge_earned') {
     url = '/profile';
+  } else if (data?.type === 'wine_memory') {
+    url = data.wineUrl || '/records';
   } else if (data?.url) {
     url = data.url;
   }

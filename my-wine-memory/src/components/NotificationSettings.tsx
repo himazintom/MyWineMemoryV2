@@ -8,7 +8,9 @@ import type {
   NotificationType 
 } from '../services/notificationService';
 import { notificationScheduler } from '../services/notificationScheduler';
+import { pwaService } from '../services/pwaService';
 import LoadingSpinner from './LoadingSpinner';
+import './NotificationSettings.css';
 
 interface NotificationSettingsProps {
   isExpanded?: boolean;
@@ -240,7 +242,39 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
               {!hasPermission ? (
                 <div className="permission-section">
                   <h4>通知を有効にする</h4>
-                  <p>ワインの記録やクイズのリマインダーを受け取るために、通知を許可してください。</p>
+                  <div className="notification-explanation">
+                    <div className="explanation-box important">
+                      <span className="icon">⚠️</span>
+                      <div>
+                        <strong>重要：通知を確実に受け取るには</strong>
+                        <p>通知を許可した後、<strong>アプリをインストールすることを強く推奨します</strong>。</p>
+                      </div>
+                    </div>
+                    <div className="comparison-grid">
+                      <div className="option-card">
+                        <h5>🌐 ブラウザのみの場合</h5>
+                        <ul className="pros-cons">
+                          <li className="con">ブラウザを開いている間のみ通知</li>
+                          <li className="con">タブを閉じると通知が届かない</li>
+                          <li className="con">定期的なリマインダーが機能しない</li>
+                        </ul>
+                      </div>
+                      <div className="option-card recommended">
+                        <h5>📱 アプリをインストール（推奨）</h5>
+                        <ul className="pros-cons">
+                          <li className="pro">アプリを閉じても通知が届く</li>
+                          <li className="pro">毎日決まった時間に自動通知</li>
+                          <li className="pro">Duolingoのような体験が可能</li>
+                          <li className="pro">オフラインでも動作</li>
+                        </ul>
+                      </div>
+                    </div>
+                    <p className="install-instruction">
+                      <strong>インストール方法：</strong>
+                      Chrome/Edge: アドレスバーの「⊕」アイコンをクリック<br/>
+                      iOS Safari: 共有ボタン → ホーム画面に追加
+                    </p>
+                  </div>
                   <button 
                     className="btn-primary"
                     onClick={handleEnableNotifications}
@@ -251,6 +285,30 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
                 </div>
               ) : (
                 <>
+                  {/* PWA Install Status */}
+                  {!pwaService.isAppInstalled() && (
+                    <div className="pwa-status-banner">
+                      <span className="warning-icon">⚠️</span>
+                      <div className="banner-content">
+                        <p><strong>アプリがインストールされていません</strong></p>
+                        <p>ブラウザを閉じると通知が届かなくなります。アプリをインストールすることをお勧めします。</p>
+                        {pwaService.canInstall() && (
+                          <button 
+                            className="btn-install" 
+                            onClick={async () => {
+                              const installed = await pwaService.promptInstall();
+                              if (installed) {
+                                await pwaService.enablePeriodicSync();
+                              }
+                            }}
+                          >
+                            今すぐインストール
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Main Toggle */}
                   <div className="setting-item">
                     <label className="setting-label">

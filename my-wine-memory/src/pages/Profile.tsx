@@ -187,6 +187,16 @@ const Profile: React.FC = () => {
           </div>
         )}
 
+        {/* Notification Settings */}
+        {currentUser && (
+          <div className="notification-settings-section">
+            <NotificationSettings 
+              isExpanded={notificationExpanded}
+              onToggle={() => setNotificationExpanded(!notificationExpanded)}
+            />
+          </div>
+        )}
+
         {/* Daily Goal Display */}
         {currentUser && dailyGoal && (
           <div className="daily-goal-section">
