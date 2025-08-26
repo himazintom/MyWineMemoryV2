@@ -31,6 +31,7 @@ const SelectWine = React.lazy(() => import('./pages/SelectWine'));
 const AddTastingRecord = React.lazy(() => import('./pages/AddTastingRecord'));
 const WineDetail = React.lazy(() => import('./pages/WineDetail'));
 const QuizGame = React.lazy(() => import('./pages/QuizGame'));
+const QuizLevelSelect = React.lazy(() => import('./pages/QuizLevelSelect'));
 const PublicProfile = React.lazy(() => import('./pages/PublicProfile'));
 
 function App() {
@@ -78,6 +79,7 @@ function App() {
                   <Route path="/edit-tasting-record/:recordId" element={<AddTastingRecord />} />
                   <Route path="/wine-detail/:wineId" element={<WineDetail />} />
                   <Route path="/quiz" element={<Quiz />} />
+                  <Route path="/quiz/levels" element={<QuizLevelSelect />} />
                   <Route path="/quiz/play/:difficulty" element={<QuizGame />} />
                   <Route path="/stats" element={<Stats />} />
                   <Route path="/profile" element={<Profile />} />

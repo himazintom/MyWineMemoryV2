@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthHooks';
 import type { QuizQuestion } from '../types';
-import { loadQuestionsByLevel } from '../data/quiz';
+import { advancedQuizService } from '../services/advancedQuizService';
 import { quizProgressService } from '../services/quizProgressService';
 
 const QuizGame: React.FC = () => {
@@ -43,12 +43,13 @@ const QuizGame: React.FC = () => {
           }
         }
         
-        // Initialize quiz
+        // Initialize quiz with weighted selection
         const difficultyNum = parseInt(difficulty || '1');
-        const allQuestions = await loadQuestionsByLevel(difficultyNum);
-        // Randomly select 10 questions
-        const shuffled = [...allQuestions].sort(() => Math.random() - 0.5);
-        const quizQuestions = shuffled.slice(0, 10);
+        const quizQuestions = await advancedQuizService.selectQuestionsForLevel(
+          currentUser.uid,
+          difficultyNum,
+          10
+        );
         setQuestions(quizQuestions);
       } catch (error) {
         console.error('Failed to initialize quiz:', error);
@@ -84,7 +85,12 @@ const QuizGame: React.FC = () => {
     if (currentUser && currentQuestion) {
       try {
         await Promise.all([
-          quizProgressService.recordWrongAnswer(currentUser.uid, currentQuestion, -1), // -1 indicates timeout
+          advancedQuizService.updateQuestionStatus(
+            currentUser.uid,
+            parseInt(difficulty || '1'),
+            currentQuestion.id,
+            false
+          ),
           quizProgressService.useHeart(currentUser.uid)
         ]);
       } catch (error) {
@@ -131,30 +137,28 @@ const QuizGame: React.FC = () => {
     if (correct) {
       setScore(score + 1);
       setCorrectAnswers([...correctAnswers, currentQuestion.id]);
-      
-      // Mark wrong answer as resolved if it was previously wrong
-      if (currentUser) {
-        try {
-          await quizProgressService.resolveWrongAnswer(currentUser.uid, currentQuestion.id);
-        } catch (error) {
-          console.error('Failed to resolve wrong answer:', error);
-        }
-      }
     } else {
-      // Record wrong answer and use heart
+      // Use heart
       if (currentUser) {
         try {
-          await Promise.all([
-            quizProgressService.recordWrongAnswer(currentUser.uid, currentQuestion, answerIndex),
-            quizProgressService.useHeart(currentUser.uid)
-          ]);
+          await quizProgressService.useHeart(currentUser.uid);
         } catch (error) {
-          console.error('Failed to record wrong answer or use heart:', error);
+          console.error('Failed to use heart:', error);
         }
       }
       setHearts(hearts - 1);
     }
 
+    // Update question status in advanced quiz service
+    if (currentUser) {
+      await advancedQuizService.updateQuestionStatus(
+        currentUser.uid,
+        parseInt(difficulty || '1'),
+        currentQuestion.id,
+        correct
+      );
+    }
+    
     setShowExplanation(true);
 
     // Check if game should end due to no hearts remaining
@@ -164,10 +168,13 @@ const QuizGame: React.FC = () => {
   };
 
   const restartQuiz = async () => {
+    if (!currentUser) return;
     const difficultyNum = parseInt(difficulty || '1');
-    const allQuestions = await loadQuestionsByLevel(difficultyNum);
-    const shuffled = [...allQuestions].sort(() => Math.random() - 0.5);
-    const newQuestions = shuffled.slice(0, 10);
+    const newQuestions = await advancedQuizService.selectQuestionsForLevel(
+      currentUser.uid,
+      difficultyNum,
+      10
+    );
     setQuestions(newQuestions);
     setCurrentQuestionIndex(0);
     setSelectedAnswer(null);
