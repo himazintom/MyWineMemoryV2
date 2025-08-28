@@ -140,11 +140,12 @@ const NotificationPrompt: React.FC<NotificationPromptProps> = ({ onClose }) => {
                     <li>✅ アプリを閉じても通知が届く</li>
                     <li>✅ 毎日決まった時間に自動通知</li>
                     <li>✅ オフラインでも動作</li>
+                    <li>✅ PC/スマホ両方で利用可能</li>
                   </ul>
                 </div>
               </div>
               <p className="install-guide">
-                まず通知を許可し、その後アプリをインストールすることをお勧めします
+                まず通知を許可し、その後アプリをインストールすることをお勧めします（PC/スマホ両対応）
               </p>
             </div>
             <div className="notification-prompt-actions">

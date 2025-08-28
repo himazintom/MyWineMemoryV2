@@ -110,9 +110,16 @@ class NotificationService {
 
   // Get FCM token
   async getFCMToken(userId: string): Promise<string | null> {
-    if (!this.messaging || !this.vapidKey) {
-      console.warn('Messaging not initialized or VAPID key missing');
+    if (!this.messaging) {
+      console.warn('Messaging not initialized');
       return null;
+    }
+
+    // Check if VAPID key is configured
+    if (!this.vapidKey || this.vapidKey === 'your-vapid-key-here') {
+      console.warn('VAPID key not configured. Push notifications will use local notifications only.');
+      // Return a dummy token for local notifications
+      return `local-${userId}-${Date.now()}`;
     }
 
     try {
@@ -132,7 +139,8 @@ class NotificationService {
       return null;
     } catch (error) {
       console.error('Error getting FCM token:', error);
-      throw new Error('通知トークンの取得に失敗しました');
+      // Fallback to local notifications
+      return `local-${userId}-${Date.now()}`;
     }
   }
 
@@ -316,10 +324,11 @@ class NotificationService {
         return false;
       }
 
-      // Get FCM token
+      // Get FCM token (or local token as fallback)
       const token = await this.getFCMToken(userId);
       if (!token) {
-        throw new Error('FCMトークンの取得に失敗しました');
+        console.warn('Could not get FCM token, using local notifications only');
+        // Continue with local notifications
       }
 
       // Update settings

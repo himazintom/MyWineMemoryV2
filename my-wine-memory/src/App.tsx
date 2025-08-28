@@ -5,7 +5,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { ErrorProvider } from './contexts/ErrorContext';
 import BottomNavigation from './components/BottomNavigation';
 import LoadingSpinner from './components/LoadingSpinner';
-import { OfflineIndicator } from './components/OfflineIndicator';
+// import { OfflineIndicator } from './components/OfflineIndicator';
 // import { analyticsService } from './services/analyticsService';
 import { errorTrackingService } from './services/errorTrackingService';
 import './App.css';
@@ -59,7 +59,7 @@ function App() {
           <Router>
             <ScrollToTop />
             <div className="app">
-              <OfflineIndicator />
+              {/* <OfflineIndicator /> */}
               <main className="main-content">
               <Suspense fallback={
                 <div style={{ 
