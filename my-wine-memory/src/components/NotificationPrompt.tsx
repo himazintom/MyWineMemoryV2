@@ -23,13 +23,19 @@ const NotificationPrompt: React.FC<NotificationPromptProps> = ({ onClose }) => {
   const checkNotificationStatus = async () => {
     if (!currentUser) return;
 
-    // Check localStorage for dismiss count
+    // Check localStorage for dismiss count and last dismiss time
     const stored = localStorage.getItem('notification-prompt-dismiss');
     const count = stored ? parseInt(stored, 10) : 0;
+    const nextShowTime = localStorage.getItem('notification-prompt-next');
     setDismissCount(count);
 
     // Don't show if dismissed 3+ times
     if (count >= 3) return;
+
+    // Check if we should wait before showing again
+    if (nextShowTime && Date.now() < parseInt(nextShowTime, 10)) {
+      return;
+    }
 
     // Check if notifications are supported
     if (!notificationService.isSupported()) return;
@@ -37,20 +43,22 @@ const NotificationPrompt: React.FC<NotificationPromptProps> = ({ onClose }) => {
     // Check permission status
     const permission = notificationService.getPermissionStatus();
     
-    // Check if notifications are enabled in settings
-    const settings = await notificationService.getUserNotificationSettings(currentUser.uid);
-
-    // Show prompt if:
-    // 1. Permission is default (never asked)
-    // 2. OR permission granted but notifications disabled in settings
-    if (permission === 'default' || (permission === 'granted' && !settings.enabled)) {
-      // Delay showing to avoid being too aggressive
-      setTimeout(() => setShow(true), 3000);
+    // If already granted, don't show the prompt
+    if (permission === 'granted') {
+      // Check if notifications are enabled in settings
+      const settings = await notificationService.getUserNotificationSettings(currentUser.uid);
+      
+      // Only show PWA prompt if notifications are enabled
+      if (settings.enabled && pwaService.canInstall()) {
+        setShowPWAPrompt(true);
+      }
+      return;
     }
-
-    // Check if PWA can be installed
-    if (pwaService.canInstall() && permission === 'granted' && settings.enabled) {
-      setShowPWAPrompt(true);
+    
+    // Only show notification prompt if permission is 'default' (never asked)
+    if (permission === 'default') {
+      // Delay showing to avoid being too aggressive
+      setTimeout(() => setShow(true), 5000);
     }
   };
 
@@ -95,9 +103,16 @@ const NotificationPrompt: React.FC<NotificationPromptProps> = ({ onClose }) => {
     
     if (onClose) onClose();
 
-    // If dismissed once, try again in 7 days
+    // Set next show time based on dismiss count
+    let nextShowDelay = 0;
     if (newCount === 1) {
-      localStorage.setItem('notification-prompt-next', Date.now() + 7 * 24 * 60 * 60 * 1000 + '');
+      nextShowDelay = 7 * 24 * 60 * 60 * 1000; // 7 days
+    } else if (newCount === 2) {
+      nextShowDelay = 30 * 24 * 60 * 60 * 1000; // 30 days
+    }
+    
+    if (nextShowDelay > 0) {
+      localStorage.setItem('notification-prompt-next', (Date.now() + nextShowDelay).toString());
     }
   };
 

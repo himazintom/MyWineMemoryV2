@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthHooks';
 import { QUIZ_LEVELS } from '../data/quiz';
@@ -23,9 +23,16 @@ const QuizLevelSelect: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
   const [showWrongAnswers, setShowWrongAnswers] = useState(false);
+  const [showMessage, setShowMessage] = useState<{type: 'error' | 'success' | 'info', text: string} | null>(null);
+  const isMountedRef = useRef(true);
 
   useEffect(() => {
+    isMountedRef.current = true;
     loadUserData();
+    
+    return () => {
+      isMountedRef.current = false;
+    };
   }, [currentUser]);
 
   const loadUserData = async () => {
@@ -35,38 +42,71 @@ const QuizLevelSelect: React.FC = () => {
     }
 
     try {
-      // Load all level progress
-      const progress = await advancedQuizService.getAllLevelProgress(currentUser.uid);
+      // Load data in parallel for better performance
+      const [progress, wrongs, userStats] = await Promise.all([
+        advancedQuizService.getAllLevelProgress(currentUser.uid),
+        advancedQuizService.getWrongAnswersForReview(currentUser.uid),
+        quizProgressService.getUserQuizStats(currentUser.uid)
+      ]);
       
-      // Initialize missing levels
+      // Initialize missing levels if needed
       if (progress.length === 0) {
+        const levelPromises = [];
         for (let i = 1; i <= 20; i++) {
-          const levelProg = await advancedQuizService.getLevelProgress(currentUser.uid, i);
-          if (levelProg) progress.push(levelProg);
+          levelPromises.push(advancedQuizService.getLevelProgress(currentUser.uid, i));
         }
+        const levels = await Promise.all(levelPromises);
+        levels.forEach(levelProg => {
+          if (levelProg) progress.push(levelProg);
+        });
       }
       
       setLevelProgress(progress);
-
-      // Load statistics for each level
-      const statsMap = new Map<number, LevelStatistics>();
-      for (const prog of progress) {
-        const stats = await advancedQuizService.getLevelStatistics(currentUser.uid, prog.level);
-        if (stats) {
-          statsMap.set(prog.level, stats);
-        }
-      }
-      setLevelStats(statsMap);
-
-      // Load wrong answers for review
-      const wrongs = await advancedQuizService.getWrongAnswersForReview(currentUser.uid);
       setWrongAnswers(wrongs);
 
+      // Load statistics for visible levels only (defer others)
+      const visibleLevels = progress.slice(0, 6); // Load first 6 levels initially
+      const statsPromises = visibleLevels.map(prog => 
+        advancedQuizService.getLevelStatistics(currentUser.uid, prog.level)
+      );
+      const statsResults = await Promise.all(statsPromises);
+      
+      const statsMap = new Map<number, LevelStatistics>();
+      visibleLevels.forEach((prog, index) => {
+        if (statsResults[index]) {
+          statsMap.set(prog.level, statsResults[index]!);
+        }
+      });
+      setLevelStats(statsMap);
+
       // Get current hearts
-      const userStats = await quizProgressService.getUserQuizStats(currentUser.uid);
       if (userStats) {
         const recoveredHearts = await quizProgressService.recoverHearts(currentUser.uid);
         setHearts(recoveredHearts);
+      }
+      
+      // Load remaining statistics in background
+      if (progress.length > 6) {
+        const remainingLevels = progress.slice(6);
+        const remainingStatsPromises = remainingLevels.map(prog => 
+          advancedQuizService.getLevelStatistics(currentUser.uid, prog.level)
+        );
+        Promise.all(remainingStatsPromises).then(remainingStats => {
+          // Check if component is still mounted before updating state
+          if (isMountedRef.current) {
+            const updatedStatsMap = new Map(statsMap);
+            remainingLevels.forEach((prog, index) => {
+              if (remainingStats[index]) {
+                updatedStatsMap.set(prog.level, remainingStats[index]!);
+              }
+            });
+            setLevelStats(updatedStatsMap);
+          }
+        }).catch(error => {
+          if (isMountedRef.current) {
+            console.error('Failed to load remaining stats:', error);
+          }
+        });
       }
     } catch (error) {
       console.error('Failed to load quiz data:', error);
@@ -77,13 +117,16 @@ const QuizLevelSelect: React.FC = () => {
 
   const startQuiz = async (level: number) => {
     if (!currentUser) {
-      alert('ログインが必要です');
-      navigate('/profile');
+      setShowMessage({type: 'error', text: 'ログインが必要です'});
+      setTimeout(() => {
+        navigate('/profile');
+      }, 2000);
       return;
     }
 
     if (hearts <= 0) {
-      alert('ハートがありません。時間を置いてから再度挑戦してください。');
+      setShowMessage({type: 'error', text: 'ハートがありません。時間を置いてから再度挑戦してください。'});
+      setTimeout(() => setShowMessage(null), 3000);
       return;
     }
 
@@ -96,10 +139,11 @@ const QuizLevelSelect: React.FC = () => {
     const unlocked = await advancedQuizService.unlockLevel(currentUser.uid, level);
     if (unlocked) {
       await loadUserData();
-      alert(`レベル${level}がアンロックされました！`);
+      setShowMessage({type: 'success', text: `レベル${level}がアンロックされました！`});
     } else {
-      alert('アンロック条件を満たしていません');
+      setShowMessage({type: 'error', text: 'アンロック条件を満たしていません'});
     }
+    setTimeout(() => setShowMessage(null), 3000);
   };
 
   const resetLevel = async (level: number) => {
@@ -143,6 +187,11 @@ const QuizLevelSelect: React.FC = () => {
 
   return (
     <div className="quiz-level-select">
+      {showMessage && (
+        <div className={`message-toast message-${showMessage.type}`}>
+          {showMessage.text}
+        </div>
+      )}
       <div className="quiz-header">
         <h1>クイズレベル選択</h1>
         <div className="hearts-display">

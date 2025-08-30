@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthHooks';
 import type { QuizQuestion } from '../types';
@@ -15,12 +15,47 @@ const QuizGame: React.FC = () => {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(30);
-  const [gameStatus, setGameStatus] = useState<'playing' | 'finished' | 'timeup'>('playing');
+  const [gameStatus, setGameStatus] = useState<'playing' | 'finished' | 'timeup' | 'error'>('playing');
   const [hearts, setHearts] = useState(5);
   const [showExplanation, setShowExplanation] = useState(false);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [answeredQuestions, setAnsweredQuestions] = useState<string[]>([]);
   const [correctAnswers, setCorrectAnswers] = useState<string[]>([]);
+  const [loadingError, setLoadingError] = useState<string>('');
+  const [showNoHeartsMessage, setShowNoHeartsMessage] = useState(false);
+  
+  // Sound effects refs
+  const correctSoundRef = useRef<HTMLAudioElement | null>(null);
+  const incorrectSoundRef = useRef<HTMLAudioElement | null>(null);
+  
+  // Initialize sound effects
+  useEffect(() => {
+    // Create audio elements for sound effects
+    correctSoundRef.current = new Audio('/sounds/correct.mp3');
+    incorrectSoundRef.current = new Audio('/sounds/incorrect.mp3');
+    
+    // Set volume
+    if (correctSoundRef.current) {
+      correctSoundRef.current.volume = 0.3;
+      correctSoundRef.current.preload = 'auto';
+    }
+    if (incorrectSoundRef.current) {
+      incorrectSoundRef.current.volume = 0.3;
+      incorrectSoundRef.current.preload = 'auto';
+    }
+    
+    // Clean up on unmount
+    return () => {
+      if (correctSoundRef.current) {
+        correctSoundRef.current.pause();
+        correctSoundRef.current = null;
+      }
+      if (incorrectSoundRef.current) {
+        incorrectSoundRef.current.pause();
+        incorrectSoundRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!currentUser) {
@@ -37,8 +72,10 @@ const QuizGame: React.FC = () => {
           setHearts(recoveredHearts);
           
           if (recoveredHearts <= 0) {
-            alert('ハートがありません。\n時間を置いてから再度挑戦してください。');
-            navigate('/quiz');
+            setShowNoHeartsMessage(true);
+            setTimeout(() => {
+              navigate('/quiz');
+            }, 3000);
             return;
           }
         }
@@ -50,12 +87,16 @@ const QuizGame: React.FC = () => {
           difficultyNum,
           10
         );
-        setQuestions(quizQuestions);
+        if (quizQuestions.length === 0) {
+          setLoadingError('クイズの問題を読み込めませんでした。');
+          setGameStatus('error');
+        } else {
+          setQuestions(quizQuestions);
+        }
       } catch (error) {
         console.error('Failed to initialize quiz:', error);
-        // Fallback: use empty array
-        console.warn('Failed to load questions, using empty array');
-        setQuestions([]);
+        setLoadingError('クイズの初期化に失敗しました。もう一度お試しください。');
+        setGameStatus('error');
       }
     };
     
@@ -82,9 +123,11 @@ const QuizGame: React.FC = () => {
     
     // Record time up as wrong answer
     const currentQuestion = questions[currentQuestionIndex];
+    let newHearts = hearts;
+    
     if (currentUser && currentQuestion) {
       try {
-        await Promise.all([
+        const [, remainingHearts] = await Promise.all([
           advancedQuizService.updateQuestionStatus(
             currentUser.uid,
             parseInt(difficulty || '1'),
@@ -93,15 +136,19 @@ const QuizGame: React.FC = () => {
           ),
           quizProgressService.useHeart(currentUser.uid)
         ]);
+        newHearts = remainingHearts;
       } catch (error) {
         console.error('Failed to record timeout:', error);
+        newHearts = Math.max(0, hearts - 1);
       }
+    } else {
+      newHearts = Math.max(0, hearts - 1);
     }
     
-    setHearts(hearts - 1);
+    setHearts(newHearts);
     setAnsweredQuestions([...answeredQuestions, currentQuestion?.id || '']);
     
-    if (hearts <= 1) {
+    if (newHearts <= 0) {
       setGameStatus('finished');
     } else {
       // Move to next question after 2 seconds
@@ -109,7 +156,7 @@ const QuizGame: React.FC = () => {
         nextQuestion();
       }, 2000);
     }
-  }, [hearts, nextQuestion, currentQuestionIndex, questions, currentUser, answeredQuestions]);
+  }, [hearts, nextQuestion, currentQuestionIndex, questions, currentUser, answeredQuestions, difficulty]);
 
   useEffect(() => {
     if (gameStatus === 'playing' && timeLeft > 0) {
@@ -130,9 +177,24 @@ const QuizGame: React.FC = () => {
     const correct = answerIndex === currentQuestion.correctAnswer;
     setIsCorrect(correct);
     
+    // Play sound effect
+    try {
+      if (correct && correctSoundRef.current) {
+        correctSoundRef.current.currentTime = 0;
+        correctSoundRef.current.play().catch(e => console.log('Sound play failed:', e));
+      } else if (!correct && incorrectSoundRef.current) {
+        incorrectSoundRef.current.currentTime = 0;
+        incorrectSoundRef.current.play().catch(e => console.log('Sound play failed:', e));
+      }
+    } catch (error) {
+      console.log('Sound playback error:', error);
+    }
+    
     // Track answered questions
     const newAnsweredQuestions = [...answeredQuestions, currentQuestion.id];
     setAnsweredQuestions(newAnsweredQuestions);
+    
+    let newHearts = hearts;
     
     if (correct) {
       setScore(score + 1);
@@ -141,28 +203,33 @@ const QuizGame: React.FC = () => {
       // Use heart
       if (currentUser) {
         try {
-          await quizProgressService.useHeart(currentUser.uid);
+          const remainingHearts = await quizProgressService.useHeart(currentUser.uid);
+          newHearts = remainingHearts;
         } catch (error) {
           console.error('Failed to use heart:', error);
+          newHearts = Math.max(0, hearts - 1);
         }
+      } else {
+        newHearts = Math.max(0, hearts - 1);
       }
-      setHearts(hearts - 1);
+      setHearts(newHearts);
     }
 
-    // Update question status in advanced quiz service
+    // Show explanation immediately
+    setShowExplanation(true);
+    
+    // Update question status in background (non-blocking)
     if (currentUser) {
-      await advancedQuizService.updateQuestionStatus(
+      advancedQuizService.updateQuestionStatus(
         currentUser.uid,
         parseInt(difficulty || '1'),
         currentQuestion.id,
         correct
-      );
+      ).catch(error => console.error('Failed to update question status:', error));
     }
-    
-    setShowExplanation(true);
 
     // Check if game should end due to no hearts remaining
-    if (hearts <= 1 && !correct) {
+    if (newHearts <= 0 && !correct) {
       setTimeout(() => setGameStatus('finished'), 1000);
     }
   };
@@ -196,23 +263,17 @@ const QuizGame: React.FC = () => {
           const difficultyNum = parseInt(difficulty || '1');
           const isStreak = score === questions.length; // Perfect score
           
-          await Promise.all([
-            quizProgressService.updateProgress(
-              currentUser.uid,
-              difficultyNum,
-              answeredQuestions,
-              score,
-              questions.length
-            ),
-            quizProgressService.updateUserQuizStats(
-              currentUser.uid,
-              score,
-              questions.length,
-              isStreak
-            )
-          ]);
+          // Use completeQuizSession which includes gamification
+          await quizProgressService.completeQuizSession(
+            currentUser.uid,
+            difficultyNum,
+            answeredQuestions,
+            score,
+            questions.length,
+            !isStreak // streakBroken parameter
+          );
           
-          console.log('Progress saved successfully');
+          console.log('Progress and XP saved successfully');
         } catch (error) {
           console.error('Failed to save quiz progress:', error);
         }
@@ -225,6 +286,45 @@ const QuizGame: React.FC = () => {
   const goBack = () => {
     navigate('/quiz');
   };
+
+  if (gameStatus === 'error') {
+    return (
+      <div className="page-container">
+        <div className="quiz-result">
+          <h2>エラーが発生しました</h2>
+          <p className="error-message">{loadingError}</p>
+          <div className="result-actions">
+            <button className="btn-primary" onClick={() => window.location.reload()}>
+              再読み込み
+            </button>
+            <button className="btn-secondary" onClick={() => navigate('/quiz')}>
+              レベル選択に戻る
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (showNoHeartsMessage) {
+    return (
+      <div className="page-container">
+        <div className="quiz-result">
+          <h2>ハートがありません</h2>
+          <div className="no-hearts-icon">💔</div>
+          <p className="error-message">
+            ハートが回復するまでお待ちください。<br />
+            30分ごとに1つずつ回復します。
+          </p>
+          <div className="result-actions">
+            <button className="btn-secondary" onClick={() => navigate('/quiz')}>
+              レベル選択に戻る
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (questions.length === 0) {
     return (
