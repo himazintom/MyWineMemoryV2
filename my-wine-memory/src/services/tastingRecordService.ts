@@ -588,6 +588,64 @@ class TastingRecordService {
       return [];
     }
   }
+
+  // Get all public records from all users
+  async getAllPublicRecords(limit: number = 50): Promise<(PublicWineRecord & { userName?: string })[]> {
+    try {
+      const publicRecordsQuery = query(
+        collection(db, this.collection),
+        where('isPublic', '==', true),
+        orderBy('createdAt', 'desc'),
+        limitQuery(limit)
+      );
+      
+      const querySnapshot = await getDocs(publicRecordsQuery);
+      const publicRecords: (PublicWineRecord & { userName?: string })[] = [];
+      
+      for (const docSnapshot of querySnapshot.docs) {
+        const data = docSnapshot.data() as TastingRecord;
+        
+        // Get user name if available
+        let userName = 'Anonymous';
+        try {
+          const userRef = doc(db, 'users', data.userId);
+          const userDoc = await getDoc(userRef);
+          if (userDoc.exists()) {
+            userName = userDoc.data().displayName || 'Wine Lover';
+          }
+        } catch (error) {
+          console.warn('Could not fetch user name:', error);
+        }
+        
+        publicRecords.push({
+          id: docSnapshot.id,
+          wineName: data.wineName,
+          producer: data.producer,
+          country: data.country,
+          region: data.region,
+          vintage: data.vintage,
+          grapeVarieties: data.grapeVarieties,
+          wineType: data.wineType,
+          alcoholContent: data.alcoholContent,
+          overallRating: data.overallRating,
+          tastingDate: data.tastingDate instanceof Timestamp ? data.tastingDate.toDate() : new Date(data.tastingDate),
+          recordMode: data.recordMode,
+          notes: data.notes,
+          images: data.images,
+          detailedAnalysis: data.detailedAnalysis,
+          environment: data.environment,
+          createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(data.createdAt),
+          userName,
+          userId: data.userId
+        } as any);
+      }
+      
+      return publicRecords;
+    } catch (error) {
+      console.error('Error getting all public records:', error);
+      return [];
+    }
+  }
 }
 
 export const tastingRecordService = new TastingRecordService();

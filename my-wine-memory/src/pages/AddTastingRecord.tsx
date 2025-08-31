@@ -72,7 +72,10 @@ const AddTastingRecord: React.FC = () => {
     },
     foodPairings: '',
     personalNotes: '',
-    referenceUrls: [] as string[]
+    referenceUrls: [] as string[],
+    purchaseLocation: '',
+    price: undefined as number | undefined,
+    isPublic: false
   });
 
   // New wine data from location state (if creating new wine)
@@ -317,8 +320,10 @@ const AddTastingRecord: React.FC = () => {
           tastingDate: formData.tastingDate,
           recordMode,
           notes: formData.notes || undefined,
+          price: formData.price,
+          purchaseLocation: formData.purchaseLocation || undefined,
           images: imageUrls.length > 0 ? imageUrls : undefined,
-          isPublic: false, // Default to private
+          isPublic: formData.isPublic,
           
           // Detailed analysis for detailed mode
           detailedAnalysis: recordMode === 'detailed' ? {
@@ -1129,6 +1134,31 @@ const AddTastingRecord: React.FC = () => {
               </div>
             </>
           )}
+
+          {/* Privacy Settings */}
+          <div className="form-section privacy-settings">
+            <h3>公開設定</h3>
+            <div className="privacy-toggle-container">
+              <label className="toggle-switch">
+                <input
+                  type="checkbox"
+                  checked={formData.isPublic}
+                  onChange={(e) => setFormData(prev => ({ ...prev, isPublic: e.target.checked }))}
+                />
+                <span className="toggle-slider"></span>
+              </label>
+              <div className="privacy-label">
+                <span className="privacy-status">
+                  {formData.isPublic ? '🌐 公開' : '🔒 非公開'}
+                </span>
+                <p className="privacy-description">
+                  {formData.isPublic 
+                    ? 'この記録は他のユーザーに表示されます（価格・購入場所は非表示）'
+                    : 'この記録はあなただけが閲覧できます'}
+                </p>
+              </div>
+            </div>
+          </div>
 
           {/* Save Buttons */}
           <div className="form-action">

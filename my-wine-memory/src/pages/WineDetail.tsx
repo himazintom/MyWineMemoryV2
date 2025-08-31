@@ -78,6 +78,19 @@ const WineDetail: React.FC = () => {
     }
   };
 
+  const handleTogglePrivacy = async (record: TastingRecord) => {
+    try {
+      await tastingRecordService.updateTastingRecord(record.id, {
+        isPublic: !record.isPublic
+      });
+      await loadTastingRecords(); // Refresh the list
+      alert(record.isPublic ? '記録を非公開にしました' : '記録を公開しました');
+    } catch (error) {
+      console.error('Failed to toggle privacy:', error);
+      alert('公開設定の変更に失敗しました');
+    }
+  };
+
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('ja-JP', {
       year: 'numeric',
@@ -410,6 +423,16 @@ const WineDetail: React.FC = () => {
                               }}
                             >
                               🗑️ 削除
+                            </button>
+                            <button 
+                              className={`privacy-toggle-button ${record.isPublic ? 'public' : 'private'}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleTogglePrivacy(record);
+                              }}
+                              title={record.isPublic ? '非公開にする' : '公開する'}
+                            >
+                              {record.isPublic ? '🌐 公開中' : '🔒 非公開'}
                             </button>
                             {record.detailedAnalysis && (
                               <button 

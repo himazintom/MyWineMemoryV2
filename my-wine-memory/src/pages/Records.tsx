@@ -123,6 +123,20 @@ const Records: React.FC = () => {
     navigate(`/add-tasting-record/${wineId}`);
   };
 
+  const handleTogglePrivacy = async (record: TastingRecord, event: React.MouseEvent) => {
+    event.stopPropagation();
+    try {
+      await tastingRecordService.updateTastingRecord(record.id, {
+        isPublic: !record.isPublic
+      });
+      await loadRecords(); // Refresh the list
+      alert(record.isPublic ? '記録を非公開にしました' : '記録を公開しました');
+    } catch (error) {
+      console.error('Failed to toggle privacy:', error);
+      alert('公開設定の変更に失敗しました');
+    }
+  };
+
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('ja-JP', {
       year: 'numeric',
@@ -304,6 +318,13 @@ const Records: React.FC = () => {
                         <div className="tasting-mode">
                           {record.recordMode === 'quick' ? 'クイック' : '詳細'}
                         </div>
+                        <button
+                          className={`privacy-indicator ${record.isPublic ? 'public' : 'private'}`}
+                          onClick={(e) => handleTogglePrivacy(record, e)}
+                          title={record.isPublic ? '非公開にする' : '公開する'}
+                        >
+                          {record.isPublic ? '🌐' : '🔒'}
+                        </button>
                       </div>
                     ))}
                     {group.tastingRecords.length > 3 && (

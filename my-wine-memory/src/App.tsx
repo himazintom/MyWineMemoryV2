@@ -33,6 +33,8 @@ const WineDetail = React.lazy(() => import('./pages/WineDetail'));
 const QuizGame = React.lazy(() => import('./pages/QuizGame'));
 const QuizLevelSelect = React.lazy(() => import('./pages/QuizLevelSelect'));
 const PublicProfile = React.lazy(() => import('./pages/PublicProfile'));
+const PublicWines = React.lazy(() => import('./pages/PublicWines'));
+const UserPublicProfile = React.lazy(() => import('./pages/UserPublicProfile'));
 
 function App() {
   // Initialize monitoring services
@@ -84,6 +86,8 @@ function App() {
                   <Route path="/stats" element={<Stats />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/profile/:userId" element={<PublicProfile />} />
+                  <Route path="/public-wines" element={<PublicWines />} />
+                  <Route path="/public-wines/:userId" element={<UserPublicProfile />} />
                 </Routes>
               </Suspense>
             </main>
