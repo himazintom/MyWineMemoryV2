@@ -23,6 +23,7 @@ const QuizGame: React.FC = () => {
   const [correctAnswers, setCorrectAnswers] = useState<string[]>([]);
   const [loadingError, setLoadingError] = useState<string>('');
   const [showNoHeartsMessage, setShowNoHeartsMessage] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   
   // Sound effects refs
   const correctSoundRef = useRef<HTMLAudioElement | null>(null);
@@ -104,6 +105,9 @@ const QuizGame: React.FC = () => {
   }, [currentUser, difficulty, navigate]);
 
   const nextQuestion = useCallback(() => {
+    // 処理中の場合は何もしない
+    if (isProcessing) return;
+    
     if (currentQuestionIndex + 1 >= questions.length) {
       setGameStatus('finished');
     } else {
@@ -111,12 +115,13 @@ const QuizGame: React.FC = () => {
       setSelectedAnswer(null);
       setShowExplanation(false);
       setIsCorrect(null);
+      setIsProcessing(false);
       setTimeLeft(30);
       if (gameStatus === 'timeup') {
         setGameStatus('playing');
       }
     }
-  }, [currentQuestionIndex, questions.length, gameStatus]);
+  }, [currentQuestionIndex, questions.length, gameStatus, isProcessing]);
 
   const handleTimeUp = useCallback(async () => {
     setGameStatus('timeup');
@@ -170,7 +175,10 @@ const QuizGame: React.FC = () => {
   }, [timeLeft, gameStatus, handleTimeUp]);
 
   const handleAnswerSelect = async (answerIndex: number) => {
-    if (selectedAnswer !== null || showExplanation) return;
+    // 既に回答済み、説明表示中、または処理中の場合は何もしない
+    if (selectedAnswer !== null || showExplanation || isProcessing) return;
+    
+    setIsProcessing(true);
     
     setSelectedAnswer(answerIndex);
     const currentQuestion = questions[currentQuestionIndex];
@@ -232,6 +240,9 @@ const QuizGame: React.FC = () => {
     if (newHearts <= 0 && !correct) {
       setTimeout(() => setGameStatus('finished'), 1000);
     }
+    
+    // 処理完了
+    setIsProcessing(false);
   };
 
   const restartQuiz = async () => {
@@ -426,7 +437,7 @@ const QuizGame: React.FC = () => {
                       : ''
                 }`}
                 onClick={() => handleAnswerSelect(index)}
-                disabled={showExplanation}
+                disabled={showExplanation || selectedAnswer !== null || isProcessing}
               >
                 {option}
               </button>
@@ -442,6 +453,7 @@ const QuizGame: React.FC = () => {
               <button 
                 className="next-button"
                 onClick={nextQuestion}
+                disabled={isProcessing}
               >
                 {currentQuestionIndex + 1 >= questions.length ? '結果を見る' : '次の問題へ →'}
               </button>
