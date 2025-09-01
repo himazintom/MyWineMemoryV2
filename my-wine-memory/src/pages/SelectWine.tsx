@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthHooks';
 import { tastingRecordService } from '../services/tastingRecordService';
+import { wineMasterService } from '../services/wineMasterService';
 import type { TastingRecord } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
@@ -73,13 +74,9 @@ const SelectWine: React.FC = () => {
     }
   }, [searchTerm, searchWines]);
 
-  const handleSelectWine = (wineName: string, producer: string) => {
-    // Navigate with wine info as URL params
-    const params = new URLSearchParams({
-      wineName,
-      producer
-    });
-    navigate(`/add-tasting-record?${params.toString()}`);
+  const handleSelectWine = (wineId: string) => {
+    // Navigate to add tasting record page with wine ID
+    navigate(`/add-tasting-record/${wineId}`);
   };
 
   const handleCreateNewWine = () => {
@@ -140,28 +137,21 @@ const SelectWine: React.FC = () => {
         return;
       }
       
-      // Create tasting record with all wine info included
-      const recordData = {
-        ...newWineData,
-        ...initialRecordData,
-        isPublic: false
-      };
+      // First, create the wine in WineMaster
+      const wineId = await wineMasterService.createOrFindWineMaster(newWineData as any, currentUser.uid);
       
       if (initialRecordData) {
-        // Create record with initial data
+        // Create tasting record with the new wine
+        const recordData = {
+          ...initialRecordData,
+          wineId: wineId,
+          isPublic: false
+        };
         await tastingRecordService.createTastingRecord(currentUser.uid, recordData as any);
         navigate('/records');
       } else {
-        // Navigate to add tasting record page with wine data
-        const params = new URLSearchParams();
-        params.set('wineName', String(newWineData.wineName || ''));
-        params.set('producer', String(newWineData.producer || ''));
-        params.set('country', String(newWineData.country || ''));
-        params.set('region', String(newWineData.region || ''));
-        if (newWineData.vintage) params.set('vintage', newWineData.vintage.toString());
-        if (newWineData.wineType) params.set('wineType', String(newWineData.wineType));
-        if (newWineData.grapeVarieties) params.set('grapeVarieties', JSON.stringify(newWineData.grapeVarieties));
-        navigate(`/add-tasting-record?${params.toString()}`);
+        // Navigate to add tasting record page with the new wine ID
+        navigate(`/add-tasting-record/${wineId}`);
       }
     } catch (error) {
       console.error('Failed to create new wine:', error);
@@ -234,7 +224,7 @@ const SelectWine: React.FC = () => {
                   <div 
                     key={wine.id} 
                     className="wine-list-item"
-                    onClick={() => handleSelectWine(wine.wineName, wine.producer)}
+                    onClick={() => handleSelectWine(wine.id)}
                   >
                     <div className="wine-info">
                       <h3 className="wine-name">{wine.wineName}</h3>

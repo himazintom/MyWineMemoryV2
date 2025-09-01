@@ -6,6 +6,7 @@ import { tastingRecordService } from '../services/tastingRecordService';
 import { draftService } from '../services/wineService';
 import { gamificationService } from '../services/gamificationService';
 import { guestDataService } from '../services/guestDataService';
+import { userService } from '../services/userService';
 import type { WineRecord, WineDraft, DailyGoal } from '../types';
 import WineCard from '../components/WineCard';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -28,6 +29,8 @@ const Home: React.FC = () => {
   const [drafts, setDrafts] = useState<WineDraft[]>([]);
   const [dailyGoal, setDailyGoal] = useState<DailyGoal | null>(null);
   const [authError, setAuthError] = useState<string>('');
+  const [weeklyProgress, setWeeklyProgress] = useState<number[]>([]);
+  const [learningStreak, setLearningStreak] = useState<number>(0);
   const { loading, error, execute: executeLoadHome } = useAsyncOperation<void>();
   const { loading: authLoading, execute: executeAuth } = useAsyncOperation<void>();
 
@@ -54,7 +57,7 @@ const Home: React.FC = () => {
           }
           
           // Load authenticated user data
-          const [wines, userDrafts, goal] = await Promise.all([
+          const [wines, userDrafts, goal, weekProgress] = await Promise.all([
             tastingRecordService.getUserTastingRecordsWithWineInfo(currentUser.uid, 'date', 5).catch(error => {
               console.error('Failed to load wines:', error);
               return [];
@@ -74,12 +77,18 @@ const Home: React.FC = () => {
                 quizCompleted: 0,
                 xpEarned: 0
               };
+            }),
+            userService.getWeeklyProgress(currentUser.uid).catch(error => {
+              console.error('Failed to load weekly progress:', error);
+              return [0, 0, 0, 0, 0, 0, 0];
             })
           ]);
           
           setRecentWines(wines.slice(0, 3));
           setDrafts(userDrafts);
           setDailyGoal(goal);
+          setWeeklyProgress(weekProgress);
+          setLearningStreak(userProfile?.streak || 0);
         } else {
           console.log('No authenticated user, loading guest data');
           // Load guest data
@@ -248,6 +257,38 @@ const Home: React.FC = () => {
                   💎 今日獲得したXP: {dailyGoal.xpEarned} XP
                 </div>
               )}
+            </div>
+            
+            <div className="learning-progress">
+              <h3>今週の学習進捗</h3>
+              <div className="weekly-overview">
+                <div className="week-chart">
+                  {['月', '火', '水', '木', '金', '土', '日'].map((day, i) => {
+                    const isToday = i === new Date().getDay() - 1;
+                    return (
+                      <div key={day} className={`day-column ${isToday ? 'today' : ''}`}>
+                        <div 
+                          className="activity-bar" 
+                          style={{ height: `${Math.min(weeklyProgress[i] * 25, 100)}px` }}
+                          title={`${weeklyProgress[i]}件の記録`}
+                        >
+                          {weeklyProgress[i] > 0 && (
+                            <span className="activity-count">{weeklyProgress[i]}</span>
+                          )}
+                        </div>
+                        <span className="day-name">{day}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="learning-tip">
+                  <p className="tip-text">
+                    {learningStreak > 0 
+                      ? `${learningStreak}日連続で学習中！この調子で続けましょう！`
+                      : '毎日1本でも記録することで、知識が定着します'}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         )}

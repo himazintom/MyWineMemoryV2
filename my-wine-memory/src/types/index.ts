@@ -265,5 +265,6 @@ export interface UserStats {
   countryDistribution: { [country: string]: number };
   varietyDistribution: { [variety: string]: number };
   averageRating: number;
+  mostCommonType?: string;
   updatedAt: Date;
 }

@@ -278,6 +278,121 @@ export const userService = {
     }
     
     return slug;
+  },
+
+  // Get weekly progress (last 7 days)
+  async getWeeklyProgress(userId: string): Promise<number[]> {
+    try {
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(endDate.getDate() - 6);
+      
+      const q = query(
+        collection(db, 'tasting_records'),
+        where('userId', '==', userId),
+        where('tastingDate', '>=', Timestamp.fromDate(startDate)),
+        where('tastingDate', '<=', Timestamp.fromDate(endDate))
+      );
+      
+      const snapshot = await getDocs(q);
+      const dailyCounts = [0, 0, 0, 0, 0, 0, 0];
+      
+      snapshot.forEach(doc => {
+        const date = doc.data().tastingDate.toDate();
+        const dayIndex = Math.floor((date.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+        if (dayIndex >= 0 && dayIndex < 7) {
+          dailyCounts[dayIndex]++;
+        }
+      });
+      
+      return dailyCounts;
+    } catch (error) {
+      console.error('Error getting weekly progress:', error);
+      return [0, 0, 0, 0, 0, 0, 0];
+    }
+  },
+
+  // Get monthly growth metrics
+  async getMonthlyGrowth(userId: string): Promise<{ rating: number; knowledge: number }> {
+    try {
+      const currentMonth = new Date();
+      currentMonth.setDate(1);
+      const lastMonth = new Date(currentMonth);
+      lastMonth.setMonth(lastMonth.getMonth() - 1);
+      
+      // Get current month's average rating
+      const currentMonthQuery = query(
+        collection(db, 'tasting_records'),
+        where('userId', '==', userId),
+        where('tastingDate', '>=', Timestamp.fromDate(currentMonth))
+      );
+      
+      const currentSnapshot = await getDocs(currentMonthQuery);
+      let currentAvg = 0;
+      let currentCount = 0;
+      
+      currentSnapshot.forEach(doc => {
+        const rating = doc.data().overallRating;
+        if (rating) {
+          currentAvg += rating;
+          currentCount++;
+        }
+      });
+      
+      if (currentCount > 0) {
+        currentAvg = currentAvg / currentCount;
+      }
+      
+      // Get last month's average rating
+      const lastMonthQuery = query(
+        collection(db, 'tasting_records'),
+        where('userId', '==', userId),
+        where('tastingDate', '>=', Timestamp.fromDate(lastMonth)),
+        where('tastingDate', '<', Timestamp.fromDate(currentMonth))
+      );
+      
+      const lastSnapshot = await getDocs(lastMonthQuery);
+      let lastAvg = 0;
+      let lastCount = 0;
+      
+      lastSnapshot.forEach(doc => {
+        const rating = doc.data().overallRating;
+        if (rating) {
+          lastAvg += rating;
+          lastCount++;
+        }
+      });
+      
+      if (lastCount > 0) {
+        lastAvg = lastAvg / lastCount;
+      }
+      
+      // Calculate rating growth percentage
+      const ratingGrowth = lastAvg > 0 ? ((currentAvg - lastAvg) / lastAvg) * 100 : 0;
+      
+      // Get quiz knowledge score growth
+      const quizQuery = query(
+        collection(db, 'quiz_progress'),
+        where('userId', '==', userId)
+      );
+      
+      const quizSnapshot = await getDocs(quizQuery);
+      let knowledgeGrowth = 0;
+      
+      if (!quizSnapshot.empty) {
+        const quizData = quizSnapshot.docs[0].data();
+        // Simple calculation: XP gained this month
+        knowledgeGrowth = quizData.monthlyXP || 0;
+      }
+      
+      return {
+        rating: ratingGrowth,
+        knowledge: knowledgeGrowth
+      };
+    } catch (error) {
+      console.error('Error getting monthly growth:', error);
+      return { rating: 0, knowledge: 0 };
+    }
   }
 };
 
