@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthHooks';
 import { tastingRecordService } from '../services/tastingRecordService';
 import { wineMasterService } from '../services/wineMasterService';
-import type { TastingRecord } from '../types';
+import type { WineMaster } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import TagInput from '../components/TagInput';
@@ -15,14 +15,14 @@ const SelectWine: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<TastingRecord[]>([]);
-  const [popularWines, setPopularWines] = useState<{wineName: string; producer: string; count: number; lastRecord: TastingRecord}[]>([]);
+  const [searchResults, setSearchResults] = useState<WineMaster[]>([]);
+  const [popularWines, setPopularWines] = useState<WineMaster[]>([]);
   const [showNewWineForm, setShowNewWineForm] = useState(false);
   const [grapeVarieties, setGrapeVarieties] = useState<string[]>([]);
   const [, setIsUsingOfflineData] = useState(false);
   
-  const { loading: searchLoading, error: searchError, execute: executeSearch } = useAsyncOperation<TastingRecord[]>();
-  const { loading: popularLoading, error: popularError, execute: executeLoadPopular } = useAsyncOperation<{wineName: string; producer: string; count: number; lastRecord: TastingRecord}[]>();
+  const { loading: searchLoading, error: searchError, execute: executeSearch } = useAsyncOperation<WineMaster[]>();
+  const { loading: popularLoading, error: popularError, execute: executeLoadPopular } = useAsyncOperation<WineMaster[]>();
   // const { isOnline } = useNetworkStatus();
   // const { searchCachedWines, getCachedWines, cacheWines } = useOfflineSync(currentUser?.uid);
 
@@ -31,13 +31,14 @@ const SelectWine: React.FC = () => {
     if (!currentUser) return;
     
     try {
-      const wines = await executeLoadPopular(() => tastingRecordService.getUserPopularWines(currentUser.uid, 10));
+      const wines = await executeLoadPopular(() => wineMasterService.getPopularWineMasters(currentUser.uid, 10));
       if (wines) {
         setPopularWines(wines);
         setIsUsingOfflineData(false);
       }
     } catch (error) {
       console.error('Failed to load popular wines:', error);
+      setPopularWines([]);
     }
   }, [executeLoadPopular, currentUser]);
 
@@ -45,7 +46,7 @@ const SelectWine: React.FC = () => {
     if (!searchTerm.trim() || !currentUser) return;
 
     try {
-      const results = await executeSearch(() => tastingRecordService.searchUserWines(currentUser.uid, searchTerm, 20));
+      const results = await executeSearch(() => wineMasterService.searchWineMasters(searchTerm, currentUser.uid, 20));
       if (results) {
         setSearchResults(results);
         setIsUsingOfflineData(false);
@@ -159,7 +160,7 @@ const SelectWine: React.FC = () => {
     }
   };
 
-  const displayedWines = searchTerm.trim() ? searchResults : popularWines.map(w => w.lastRecord);
+  const displayedWines = searchTerm.trim() ? searchResults : popularWines;
   const isLoading = searchTerm.trim() ? searchLoading : popularLoading;
   const error = searchTerm.trim() ? searchError : popularError;
 
@@ -215,34 +216,45 @@ const SelectWine: React.FC = () => {
               <p>新しいワインを登録してください</p>
             </div>
           )}
+          
+          {!isLoading && !error && displayedWines.length === 0 && !searchTerm.trim() && (
+            <div className="empty-state">
+              <div className="empty-icon">🍷</div>
+              <h3>まだワインが登録されていません</h3>
+              <p>最初のワインを登録して、あなたのワイン学習を始めましょう！</p>
+              <button 
+                className="btn-primary"
+                onClick={handleCreateNewWine}
+              >
+                新しいワインを登録
+              </button>
+            </div>
+          )}
 
           {!isLoading && !error && displayedWines.length > 0 && (
             <div className="wine-list">
-              {displayedWines.map((wine, index) => {
-                const popularWine = searchTerm.trim() ? null : popularWines[index];
-                return (
-                  <div 
-                    key={wine.id} 
-                    className="wine-list-item"
-                    onClick={() => handleSelectWine(wine.id)}
-                  >
-                    <div className="wine-info">
-                      <h3 className="wine-name">{wine.wineName}</h3>
-                      <p className="wine-producer">{wine.producer}</p>
-                      <p className="wine-location">{wine.country} - {wine.region}</p>
-                      {wine.vintage && (
-                        <p className="wine-vintage">{wine.vintage}年</p>
-                      )}
-                    </div>
-                    <div className="wine-stats">
-                      <span className="reference-count">
-                        {popularWine ? `${popularWine.count}回記録` : '既に記録済み'}
-                      </span>
-                      <span className="select-arrow">→</span>
-                    </div>
+              {displayedWines.map((wine) => (
+                <div 
+                  key={wine.id} 
+                  className="wine-list-item"
+                  onClick={() => handleSelectWine(wine.id)}
+                >
+                  <div className="wine-info">
+                    <h3 className="wine-name">{wine.wineName}</h3>
+                    <p className="wine-producer">{wine.producer}</p>
+                    <p className="wine-location">{wine.country} - {wine.region}</p>
+                    {wine.vintage && (
+                      <p className="wine-vintage">{wine.vintage}年</p>
+                    )}
                   </div>
-                );
-              })}
+                  <div className="wine-stats">
+                    <span className="reference-count">
+                      {wine.referenceCount > 0 ? `${wine.referenceCount}回記録` : '新規ワイン'}
+                    </span>
+                    <span className="select-arrow">→</span>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
