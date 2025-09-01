@@ -22,13 +22,6 @@ service cloud.firestore {
       return mode == 'quick' || mode == 'detailed';
     }
     
-    function hasValidStringFields(data, requiredFields) {
-      return requiredFields.hasAll() &&
-        requiredFields.hasAll(function(field) {
-          return field in data && data[field] is string && data[field].size() > 0;
-        });
-    }
-    
     function isValidWineMasterData(data) {
       return 'wineName' in data && data.wineName is string && data.wineName.size() > 0 &&
         'producer' in data && data.producer is string && data.producer.size() > 0 &&
