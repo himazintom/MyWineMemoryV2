@@ -85,12 +85,12 @@ const AddTastingRecord: React.FC = () => {
     if (!wineId || wineId === 'new') return;
     
     try {
-      const wineData = await executeLoadWine(() => wineMasterService.getWineMaster(wineId));
+      const wineData = await executeLoadWine(() => wineMasterService.getWineMaster(wineId, currentUser!.uid));
       setWine(wineData);
     } catch (error) {
       console.error('Failed to load wine data:', error);
     }
-  }, [wineId, executeLoadWine]);
+  }, [wineId, currentUser, executeLoadWine]);
 
   useEffect(() => {
     if (wineId && wineId !== 'new') {

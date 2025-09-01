@@ -180,7 +180,13 @@ const Profile: React.FC = () => {
             </button>
           </div>
         ) : (
-          <div className="logout-section">
+          <div className="action-buttons">
+            <button 
+              className="public-profile-button" 
+              onClick={() => navigate(`/public-wines/${currentUser.uid}`)}
+            >
+              🌐 公開プロフィールを見る
+            </button>
             <button className="logout-button" onClick={handleLogout}>
               ログアウト
             </button>

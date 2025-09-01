@@ -35,35 +35,52 @@ service cloud.firestore {
         'country' in data && data.country is string && data.country.size() > 0 &&
         'region' in data && data.region is string && data.region.size() > 0;
     }
-    // Wine master data - public read, authenticated write with strict validation
-    match /wines_master/{wineId} {
-      allow read: if true; // Wine data is publicly readable
+    
+    // Users can only access their own user document with validation
+    match /users/{userId} {
+      allow read: if isAuthenticated() && isOwner(userId);
+      allow create: if isAuthenticated() && isValidEmail() && isOwner(userId) &&
+        'email' in request.resource.data && request.resource.data.email == request.auth.token.email &&
+        'displayName' in request.resource.data && request.resource.data.displayName is string &&
+        'level' in request.resource.data && request.resource.data.level is int && request.resource.data.level >= 1 &&
+        'xp' in request.resource.data && request.resource.data.xp is int && request.resource.data.xp >= 0;
+      allow update: if isAuthenticated() && isOwner(userId) &&
+        // Immutable fields
+        request.resource.data.id == resource.data.id &&
+        request.resource.data.email == resource.data.email &&
+        request.resource.data.createdAt == resource.data.createdAt;
       
-      allow create: if isAuthenticated() && isValidEmail() &&
-        // Required fields validation
-        isValidWineMasterData(request.resource.data) &&
-        request.resource.data.createdBy == request.auth.uid &&
-        request.resource.data.referenceCount == 1 &&
-        // Optional field validation
-        (!('vintage' in request.resource.data) || (request.resource.data.vintage is int && request.resource.data.vintage > 1800 && request.resource.data.vintage <= 2030)) &&
-        (!('wineType' in request.resource.data) || request.resource.data.wineType in ['red', 'white', 'rose', 'sparkling', 'dessert', 'fortified']) &&
-        (!('grapeVarieties' in request.resource.data) || (request.resource.data.grapeVarieties is list && request.resource.data.grapeVarieties.size() <= 10));
+      // User-scoped wine master data - PERSONAL wine database
+      // Each user has their own wine collection (not shared with other users)
+      match /wines_master/{wineId} {
+        allow read: if isAuthenticated() && isOwner(userId);
+        
+        allow create: if isAuthenticated() && isOwner(userId) &&
+          // Required fields validation
+          isValidWineMasterData(request.resource.data) &&
+          request.resource.data.createdBy == request.auth.uid &&
+          request.resource.data.referenceCount == 1 &&
+          // Optional field validation
+          (!('vintage' in request.resource.data) || (request.resource.data.vintage is int && request.resource.data.vintage > 1800 && request.resource.data.vintage <= 2030)) &&
+          (!('wineType' in request.resource.data) || request.resource.data.wineType in ['red', 'white', 'rose', 'sparkling', 'dessert', 'fortified']) &&
+          (!('grapeVarieties' in request.resource.data) || (request.resource.data.grapeVarieties is list && request.resource.data.grapeVarieties.size() <= 10));
 
-      allow update: if isAuthenticated() &&
-        resource.data.createdBy == request.auth.uid &&
-        // Immutable fields protection
-        request.resource.data.createdBy == resource.data.createdBy &&
-        request.resource.data.createdAt == resource.data.createdAt &&
-        request.resource.data.referenceCount == resource.data.referenceCount &&
-        // Field validation on update
-        isValidWineMasterData(request.resource.data);
+        allow update: if isAuthenticated() && isOwner(userId) &&
+          // Immutable fields protection
+          request.resource.data.createdBy == resource.data.createdBy &&
+          request.resource.data.createdAt == resource.data.createdAt &&
+          // Field validation on update
+          isValidWineMasterData(request.resource.data);
 
-      allow delete: if false; // Wine masters should never be deleted due to referential integrity
+        allow delete: if isAuthenticated() && isOwner(userId);
+      }
     }
 
     // Tasting records - strict owner-only access with comprehensive validation
     match /tasting_records/{recordId} {
-      allow read: if isAuthenticated() && isOwner(resource.data.userId);
+      // Public read for public records, owner read for all records
+      allow read: if (resource.data.isPublic == true) || 
+                     (isAuthenticated() && isOwner(resource.data.userId));
 
       allow create: if isAuthenticated() && isValidEmail() &&
         // Owner validation
@@ -92,20 +109,6 @@ service cloud.firestore {
         request.resource.data.isPublic is bool;
 
       allow delete: if isAuthenticated() && isOwner(resource.data.userId);
-    }
-    // Users can only access their own user document with validation
-    match /users/{userId} {
-      allow read: if isAuthenticated() && isOwner(userId);
-      allow create: if isAuthenticated() && isValidEmail() && isOwner(userId) &&
-        'email' in request.resource.data && request.resource.data.email == request.auth.token.email &&
-        'displayName' in request.resource.data && request.resource.data.displayName is string &&
-        'level' in request.resource.data && request.resource.data.level is int && request.resource.data.level >= 1 &&
-        'xp' in request.resource.data && request.resource.data.xp is int && request.resource.data.xp >= 0;
-      allow update: if isAuthenticated() && isOwner(userId) &&
-        // Immutable fields
-        request.resource.data.id == resource.data.id &&
-        request.resource.data.email == resource.data.email &&
-        request.resource.data.createdAt == resource.data.createdAt;
     }
     
     // User stats - strict owner-only access
@@ -171,6 +174,13 @@ service cloud.firestore {
         'originalCollection' in request.resource.data && request.resource.data.originalCollection is string &&
         'deletedAt' in request.resource.data && request.resource.data.deletedAt is timestamp;
       allow update, delete: if isAuthenticated() && isOwner(resource.data.userId);
+    }
+    
+    // DEPRECATED: Global wines_master collection (not aligned with app principles)
+    // This app is for personal wine learning, not a social platform
+    // Each user should have their own wine database (see users/{userId}/wines_master above)
+    match /wines_master/{wineId} {
+      allow read, write: if false; // Completely disabled - use user-scoped collection instead
     }
     
     // Deny all other operations by default

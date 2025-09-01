@@ -23,15 +23,15 @@ const WineDetail: React.FC = () => {
   const { loading: recordsLoading, error: recordsError, execute: executeLoadRecords } = useAsyncOperation<TastingRecord[]>();
 
   const loadWineData = useCallback(async () => {
-    if (!wineId) return;
+    if (!wineId || !currentUser) return;
     
     try {
-      const wineData = await executeLoadWine(() => wineMasterService.getWineMaster(wineId));
+      const wineData = await executeLoadWine(() => wineMasterService.getWineMaster(wineId, currentUser.uid));
       setWine(wineData);
     } catch (error) {
       console.error('Failed to load wine data:', error);
     }
-  }, [wineId, executeLoadWine]);
+  }, [wineId, currentUser, executeLoadWine]);
 
   const loadTastingRecords = useCallback(async () => {
     if (!wineId || !currentUser) return;

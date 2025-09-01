@@ -142,6 +142,19 @@ class TastingRecordService {
     data: Omit<TastingRecord, 'id' | 'userId' | 'createdAt' | 'updatedAt'>
   ): Promise<string> {
     try {
+      // Validate required fields
+      if (!data.wineId || typeof data.wineId !== 'string' || data.wineId.trim() === '') {
+        throw new Error('wineId is required and must be a non-empty string');
+      }
+      
+      if (!data.wineName || typeof data.wineName !== 'string' || data.wineName.trim() === '') {
+        throw new Error('wineName is required and must be a non-empty string');
+      }
+      
+      if (!data.producer || typeof data.producer !== 'string' || data.producer.trim() === '') {
+        throw new Error('producer is required and must be a non-empty string');
+      }
+
       const tastingData: Omit<TastingRecord, 'id'> = {
         userId,
         ...data,
@@ -163,6 +176,7 @@ class TastingRecordService {
       // Debug log for troubleshooting
       console.log('Creating tasting record with data:', {
         userId: firestoreData.userId,
+        wineId: firestoreData.wineId,
         wineName: firestoreData.wineName,
         producer: firestoreData.producer,
         overallRating: firestoreData.overallRating,
@@ -238,13 +252,28 @@ class TastingRecordService {
 
       const querySnapshot = await getDocs(q);
       
-      return querySnapshot.docs.map((doc) => ({
+      const records = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
         tastingDate: doc.data().tastingDate?.toDate() || new Date(),
         createdAt: doc.data().createdAt?.toDate() || new Date(),
         updatedAt: doc.data().updatedAt?.toDate() || new Date()
       } as TastingRecord));
+      
+      // Filter out records with invalid wineId (data integrity check)
+      const validRecords = records.filter(record => {
+        const hasValidWineId = record.wineId && typeof record.wineId === 'string' && record.wineId.trim() !== '';
+        if (!hasValidWineId) {
+          console.warn(`Found tasting record ${record.id} with invalid wineId:`, record.wineId);
+        }
+        return hasValidWineId;
+      });
+      
+      if (validRecords.length !== records.length) {
+        console.warn(`Filtered out ${records.length - validRecords.length} records with invalid wineId`);
+      }
+      
+      return validRecords;
     } catch (error) {
       console.error('Error getting user tasting records:', error);
       throw new Error('ユーザーのテイスティング記録取得に失敗しました');
@@ -589,7 +618,11 @@ class TastingRecordService {
     }
   }
 
-  // Get all public records from all users
+  // DEPRECATED: Not aligned with app principles (personal learning focus)
+  // This method fetches records from ALL users, which goes against the fundamental principle
+  // that this is a personal wine learning app, not a social platform
+  // Use getPublicRecords(userId) instead for individual user profiles
+  // @deprecated
   async getAllPublicRecords(limit: number = 50): Promise<(PublicWineRecord & { userName?: string })[]> {
     try {
       const publicRecordsQuery = query(

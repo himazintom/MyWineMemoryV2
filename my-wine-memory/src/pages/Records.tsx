@@ -35,28 +35,70 @@ const Records: React.FC = () => {
 
     try {
       const records = await executeLoadRecords(async () => {
-        // Get all user's tasting records
+        // Get all user's tasting records (already filtered in service)
         const tastingRecords = await tastingRecordService.getUserTastingRecords(currentUser.uid, 'date', 1000);
+        
+        // Additional safety check and logging for debugging
+        const validRecords = tastingRecords.filter(record => {
+          const hasValidWineId = record.wineId && typeof record.wineId === 'string' && record.wineId.trim() !== '';
+          if (!hasValidWineId) {
+            console.error('Found record with invalid wineId in Records.tsx:', {
+              recordId: record.id,
+              wineId: record.wineId,
+              wineName: record.wineName,
+              producer: record.producer
+            });
+          }
+          return hasValidWineId;
+        });
+        
+        if (validRecords.length !== tastingRecords.length) {
+          console.warn(`Records.tsx: Filtered out ${tastingRecords.length - validRecords.length} records with invalid wineId`);
+        }
         
         // Group by wine ID
         const wineGroups = new Map<string, TastingRecord[]>();
-        tastingRecords.forEach(record => {
-          if (!wineGroups.has(record.wineId)) {
-            wineGroups.set(record.wineId, []);
+        validRecords.forEach(record => {
+          // Additional safety check before grouping
+          if (record.wineId && typeof record.wineId === 'string') {
+            if (!wineGroups.has(record.wineId)) {
+              wineGroups.set(record.wineId, []);
+            }
+            wineGroups.get(record.wineId)!.push(record);
+          } else {
+            console.error('Skipping record with invalid wineId during grouping:', record.id);
           }
-          wineGroups.get(record.wineId)!.push(record);
         });
 
         // Batch fetch wine master data for each group to avoid N+1
         const wineIds = Array.from(wineGroups.keys());
-        const wines = await wineMasterService.getWineMastersByIds(wineIds);
+        
+        // Final validation before calling getWineMastersByIds
+        const safeWineIds = wineIds.filter(id => id && typeof id === 'string' && id.trim() !== '');
+        if (safeWineIds.length !== wineIds.length) {
+          console.error('Found invalid wineIds in group keys:', {
+            original: wineIds,
+            filtered: safeWineIds,
+            invalid: wineIds.filter(id => !id || typeof id !== 'string' || id.trim() === '')
+          });
+        }
+        
+        if (safeWineIds.length === 0) {
+          console.warn('No valid wine IDs found for fetching wine masters');
+          return [];
+        }
+        
+        const wines = await wineMasterService.getWineMastersByIds(safeWineIds, currentUser.uid);
         const wineMap = new Map<string, WineMaster>();
         wines.forEach((w) => wineMap.set(w.id, w));
 
         const wineWithTastings: WineWithTastings[] = [];
         for (const [wineId, records] of wineGroups.entries()) {
           const wine = wineMap.get(wineId);
-          if (!wine) continue;
+          if (!wine) {
+            console.warn(`Wine not found for wineId: ${wineId}`);
+            continue;
+          }
           const latestTasting = new Date(Math.max(...records.map(r => new Date(r.tastingDate).getTime())));
           const averageRating = records.reduce((sum, r) => sum + r.overallRating, 0) / records.length;
           wineWithTastings.push({

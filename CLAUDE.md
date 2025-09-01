@@ -8,6 +8,50 @@ MyWineMemory is a PWA (Progressive Web App) for wine enthusiasts to record tasti
 
 **Live URL**: my-wine-memory.himazi.com
 
+## 🎯 Fundamental Principles (基本理念)
+
+**This is a PERSONAL WINE LEARNING APP, not a social wine rating platform.**
+
+### Core Philosophy:
+1. **Personal Learning First (個人学習優先)**
+   - This app exists to help individuals study and learn about wine
+   - Users track their own wine journey and taste development
+   - Statistics and analytics are based solely on personal data
+   - No global wine rankings or community ratings
+
+2. **Educational Focus (教育重視)**
+   - Wine recording for learning purposes
+   - Quiz system to test and reinforce knowledge
+   - Notifications to maintain study habits
+   - Progress tracking for self-improvement
+
+3. **Selective Sharing (選択的共有)**
+   - Users CAN share their records publicly if they choose
+   - Shared records hide sensitive information (price, purchase location)
+   - Public profiles show individual journeys, not comparative ratings
+   - NO aggregate statistics across users
+   - NO "popular wines" or "community favorites"
+
+4. **Data Independence (データ独立性)**
+   - Each user has their own wine database
+   - WineMaster exists only to avoid duplicate entries within a user's records
+   - No need for global wine ID unification
+   - Users define wines based on their own understanding
+
+### What This App IS:
+- ✅ Personal wine study companion
+- ✅ Individual progress tracker
+- ✅ Private tasting note repository
+- ✅ Self-improvement tool through quizzes
+- ✅ Optional showcase of personal wine journey
+
+### What This App IS NOT:
+- ❌ Social wine rating platform
+- ❌ Community wine recommendation system
+- ❌ Global wine statistics aggregator
+- ❌ Wine marketplace or price comparison tool
+- ❌ Professional sommelier certification platform
+
 ## Technology Stack
 
 - **Frontend**: React 18 with TypeScript and Vite
