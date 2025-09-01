@@ -31,8 +31,8 @@ class WineMasterService {
         data.producer,
         data.country,
         data.region,
-        data.vintage,
-        userId  // Added userId to scope the search
+        userId,  // Added userId to scope the search
+        data.vintage
       );
 
       if (existingWine) {
@@ -74,8 +74,8 @@ class WineMasterService {
     producer: string,
     country: string,
     region: string,
-    vintage?: number,
-    userId: string
+    userId: string,
+    vintage?: number
   ): Promise<WineMaster | null> {
     try {
       let q = query(

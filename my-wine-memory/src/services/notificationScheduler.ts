@@ -295,7 +295,7 @@ class NotificationScheduler {
       const randomRecord = records[Math.floor(Math.random() * records.length)];
       // Get wine info from wines_master collection
       const { wineMasterService } = await import('./wineMasterService');
-      const wineInfo = await wineMasterService.getWineMaster(randomRecord.wineId);
+      const wineInfo = await wineMasterService.getWineMaster(randomRecord.wineId, userId);
       
       if (!wineInfo) return;
 

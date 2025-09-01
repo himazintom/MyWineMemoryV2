@@ -2,8 +2,7 @@ import {
   collection, 
   doc, 
   getDocs, 
-  updateDoc, 
-  deleteDoc,
+  updateDoc,
   query, 
   where,
   writeBatch

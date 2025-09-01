@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthHooks';
 import { badgeService } from '../services/badgeService';
 import { userService } from '../services/userService';
@@ -9,6 +10,7 @@ import BadgeDisplay, { EarnedBadges, LevelDisplay, StreakDisplay } from '../comp
 import type { Badge, UserStats, DailyGoal } from '../types';
 
 const Profile: React.FC = () => {
+  const navigate = useNavigate();
   const { currentUser, userProfile, signInWithGoogle, logout } = useAuth();
   const [badges, setBadges] = useState<(Badge & { earnedAt: Date })[]>([]);
   const [badgeProgress, setBadgeProgress] = useState<{
