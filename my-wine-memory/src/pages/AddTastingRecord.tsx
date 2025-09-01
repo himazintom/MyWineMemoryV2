@@ -82,10 +82,10 @@ const AddTastingRecord: React.FC = () => {
   const newWineData = location.state?.newWineData;
 
   const loadWineData = useCallback(async () => {
-    if (!wineId || wineId === 'new') return;
+    if (!wineId || wineId === 'new' || !currentUser) return;
     
     try {
-      const wineData = await executeLoadWine(() => wineMasterService.getWineMaster(wineId, currentUser!.uid));
+      const wineData = await executeLoadWine(() => wineMasterService.getWineMaster(wineId, currentUser.uid));
       setWine(wineData);
     } catch (error) {
       console.error('Failed to load wine data:', error);
@@ -93,22 +93,13 @@ const AddTastingRecord: React.FC = () => {
   }, [wineId, currentUser, executeLoadWine]);
 
   useEffect(() => {
-    if (wineId && wineId !== 'new') {
+    if (wineId) {
       loadWineData();
-    } else if (newWineData) {
-      // Creating new wine - set up temporary wine data
-      setWine({
-        id: 'new',
-        ...newWineData,
-        createdAt: new Date(),
-        createdBy: '',
-        referenceCount: 0,
-        updatedAt: new Date()
-      } as WineMaster);
-    } else {
+    } else if (!wineId) {
+      // No wine selected, navigate back to select wine
       navigate('/select-wine');
     }
-  }, [wineId, newWineData, loadWineData, navigate]);
+  }, [wineId, loadWineData, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
