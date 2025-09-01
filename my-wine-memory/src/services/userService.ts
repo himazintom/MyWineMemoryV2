@@ -56,8 +56,7 @@ export const userService = {
         badges: [],
         createdAt: new Date(),
         updatedAt: new Date(),
-        isPublic: false,
-        publicSlug: undefined
+        isPublic: false
       };
 
       await setDoc(userRef, {

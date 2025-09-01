@@ -146,6 +146,13 @@ const SelectWine: React.FC = () => {
         const recordData = {
           ...initialRecordData,
           wineId: wineId,
+          wineName: newWineData.wineName as string,
+          producer: newWineData.producer as string,
+          country: newWineData.country as string,
+          region: newWineData.region as string,
+          vintage: newWineData.vintage as number | undefined,
+          wineType: newWineData.wineType as any,
+          grapeVarieties: newWineData.grapeVarieties as string[] | undefined,
           isPublic: false
         };
         await tastingRecordService.createTastingRecord(currentUser.uid, recordData as any);

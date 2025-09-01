@@ -51,6 +51,49 @@
         { "fieldPath": "wineId", "order": "ASCENDING" },
         { "fieldPath": "tastingDate", "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "level_progress",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "level", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "wrong_answers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "isResolved", "order": "ASCENDING" },
+        { "fieldPath": "lastAttemptAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "wrong_answer_history",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "nextReviewAt", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "wrong_answer_history",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "level", "order": "ASCENDING" },
+        { "fieldPath": "difficultyScore", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "wrong_answer_history",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "level", "order": "ASCENDING" },
+        { "fieldPath": "nextReviewAt", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

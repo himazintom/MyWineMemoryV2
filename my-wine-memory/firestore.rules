@@ -133,7 +133,8 @@ service cloud.firestore {
     
     // Daily goals - owner-only with validation
     match /daily_goals/{goalId} {
-      allow read: if isAuthenticated() && isOwner(resource.data.userId);
+      allow read: if isAuthenticated() && 
+        (resource == null || isOwner(resource.data.userId));
       allow create: if isAuthenticated() && isOwner(request.resource.data.userId) &&
         request.resource.data.userId == request.auth.uid &&
         'date' in request.resource.data && request.resource.data.date is string &&
@@ -146,17 +147,96 @@ service cloud.firestore {
       allow delete: if isAuthenticated() && isOwner(resource.data.userId);
     }
     
+    // Notification settings - owner-only with validation
+    match /notification_settings/{userId} {
+      allow read: if isAuthenticated() && isOwner(userId);
+      allow create: if isAuthenticated() && isOwner(userId) &&
+        request.resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() && isOwner(userId) &&
+        request.resource.data.userId == resource.data.userId;
+      allow delete: if isAuthenticated() && isOwner(userId);
+    }
+    
     // Quiz progress - owner-only with validation
     match /quiz_progress/{progressId} {
-      allow read: if isAuthenticated() && isOwner(resource.data.userId);
+      allow read: if isAuthenticated() && 
+        (resource == null || isOwner(resource.data.userId));
       allow create: if isAuthenticated() && isOwner(request.resource.data.userId) &&
-        'questionId' in request.resource.data && request.resource.data.questionId is string &&
-        'correctCount' in request.resource.data && request.resource.data.correctCount is int && request.resource.data.correctCount >= 0 &&
-        'incorrectCount' in request.resource.data && request.resource.data.incorrectCount is int && request.resource.data.incorrectCount >= 0;
+        'userId' in request.resource.data && request.resource.data.userId == request.auth.uid &&
+        'difficulty' in request.resource.data && request.resource.data.difficulty is int;
       allow update: if isAuthenticated() && isOwner(resource.data.userId) &&
         // Immutable fields
-        request.resource.data.userId == resource.data.userId &&
-        request.resource.data.questionId == resource.data.questionId;
+        request.resource.data.userId == resource.data.userId;
+      allow delete: if isAuthenticated() && isOwner(resource.data.userId);
+    }
+    
+    // User quiz statistics - owner-only
+    match /user_quiz_stats/{userId} {
+      allow read: if isAuthenticated() && isOwner(userId);
+      allow create: if isAuthenticated() && isOwner(userId) &&
+        request.resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() && isOwner(userId) &&
+        request.resource.data.userId == resource.data.userId;
+      allow delete: if isAuthenticated() && isOwner(userId);
+    }
+    
+    // Wrong answers tracking - owner-only
+    match /wrong_answers/{answerId} {
+      allow read: if isAuthenticated() && 
+        (resource == null || isOwner(resource.data.userId));
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userId) &&
+        'userId' in request.resource.data && request.resource.data.userId == request.auth.uid &&
+        'questionId' in request.resource.data && request.resource.data.questionId is string;
+      allow update: if isAuthenticated() && isOwner(resource.data.userId) &&
+        request.resource.data.userId == resource.data.userId;
+      allow delete: if isAuthenticated() && isOwner(resource.data.userId);
+    }
+    
+    // Quiz level progress - owner-only
+    match /quiz_level_progress/{progressId} {
+      allow read: if isAuthenticated() && 
+        (resource == null || isOwner(resource.data.userId));
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userId) &&
+        'userId' in request.resource.data && request.resource.data.userId == request.auth.uid &&
+        'difficulty' in request.resource.data && request.resource.data.difficulty is int;
+      allow update: if isAuthenticated() && isOwner(resource.data.userId) &&
+        request.resource.data.userId == resource.data.userId;
+      allow delete: if isAuthenticated() && isOwner(resource.data.userId);
+    }
+    
+    // Level progress (advanced quiz) - owner-only
+    match /level_progress/{progressId} {
+      allow read: if isAuthenticated() && 
+        (resource == null || isOwner(resource.data.userId));
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userId) &&
+        'userId' in request.resource.data && request.resource.data.userId == request.auth.uid &&
+        'level' in request.resource.data && request.resource.data.level is int;
+      allow update: if isAuthenticated() && isOwner(resource.data.userId) &&
+        request.resource.data.userId == resource.data.userId;
+      allow delete: if isAuthenticated() && isOwner(resource.data.userId);
+    }
+    
+    // Wrong answer history (advanced quiz) - owner-only
+    match /wrong_answer_history/{historyId} {
+      allow read: if isAuthenticated() && 
+        (resource == null || isOwner(resource.data.userId));
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userId) &&
+        'userId' in request.resource.data && request.resource.data.userId == request.auth.uid &&
+        'questionId' in request.resource.data && request.resource.data.questionId is string;
+      allow update: if isAuthenticated() && isOwner(resource.data.userId) &&
+        request.resource.data.userId == resource.data.userId;
+      allow delete: if isAuthenticated() && isOwner(resource.data.userId);
+    }
+    
+    // Level statistics (advanced quiz) - owner-only
+    match /level_statistics/{statId} {
+      allow read: if isAuthenticated() && 
+        (resource == null || isOwner(resource.data.userId));
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userId) &&
+        'userId' in request.resource.data && request.resource.data.userId == request.auth.uid &&
+        'level' in request.resource.data && request.resource.data.level is int;
+      allow update: if isAuthenticated() && isOwner(resource.data.userId) &&
+        request.resource.data.userId == resource.data.userId;
       allow delete: if isAuthenticated() && isOwner(resource.data.userId);
     }
     
