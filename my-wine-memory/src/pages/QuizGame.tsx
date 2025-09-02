@@ -14,7 +14,7 @@ const QuizGame: React.FC = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(30);
+  // const [timeLeft, setTimeLeft] = useState(30); // Time limit removed
   const [gameStatus, setGameStatus] = useState<'playing' | 'finished' | 'timeup' | 'error'>('playing');
   const [hearts, setHearts] = useState(5);
   const [showExplanation, setShowExplanation] = useState(false);
@@ -116,63 +116,18 @@ const QuizGame: React.FC = () => {
       setShowExplanation(false);
       setIsCorrect(null);
       setIsProcessing(false);
-      setTimeLeft(30);
+      // setTimeLeft(30); // Time limit removed
       if (gameStatus === 'timeup') {
         setGameStatus('playing');
       }
     }
   }, [currentQuestionIndex, questions.length, gameStatus, isProcessing]);
 
-  const handleTimeUp = useCallback(async () => {
-    setGameStatus('timeup');
-    
-    // Record time up as wrong answer
-    const currentQuestion = questions[currentQuestionIndex];
-    let newHearts = hearts;
-    
-    if (currentUser && currentQuestion) {
-      try {
-        const [, remainingHearts] = await Promise.all([
-          advancedQuizService.updateQuestionStatus(
-            currentUser.uid,
-            parseInt(difficulty || '1'),
-            currentQuestion.id,
-            false
-          ),
-          quizProgressService.useHeart(currentUser.uid)
-        ]);
-        newHearts = remainingHearts;
-      } catch (error) {
-        console.error('Failed to record timeout:', error);
-        newHearts = Math.max(0, hearts - 1);
-      }
-    } else {
-      newHearts = Math.max(0, hearts - 1);
-    }
-    
-    setHearts(newHearts);
-    setAnsweredQuestions([...answeredQuestions, currentQuestion?.id || '']);
-    
-    if (newHearts <= 0) {
-      setGameStatus('finished');
-    } else {
-      // Move to next question after 2 seconds
-      setTimeout(() => {
-        nextQuestion();
-      }, 2000);
-    }
-  }, [hearts, nextQuestion, currentQuestionIndex, questions, currentUser, answeredQuestions, difficulty]);
+  // Time limit functionality removed
+  // const handleTimeUp = useCallback(async () => { ... }, [...]);
 
-  useEffect(() => {
-    if (gameStatus === 'playing' && timeLeft > 0) {
-      const timer = setTimeout(() => {
-        setTimeLeft(timeLeft - 1);
-      }, 1000);
-      return () => clearTimeout(timer);
-    } else if (timeLeft === 0 && gameStatus === 'playing') {
-      handleTimeUp();
-    }
-  }, [timeLeft, gameStatus, handleTimeUp]);
+  // Timer functionality removed
+  // useEffect(() => { ... }, [timeLeft, gameStatus, handleTimeUp]);
 
   const handleAnswerSelect = async (answerIndex: number) => {
     // 既に回答済み、説明表示中、または処理中の場合は何もしない
@@ -257,7 +212,7 @@ const QuizGame: React.FC = () => {
     setCurrentQuestionIndex(0);
     setSelectedAnswer(null);
     setScore(0);
-    setTimeLeft(30);
+    // setTimeLeft(30); // Time limit removed
     setHearts(5);
     setGameStatus('playing');
     setShowExplanation(false);
@@ -325,7 +280,7 @@ const QuizGame: React.FC = () => {
           <div className="no-hearts-icon">💔</div>
           <p className="error-message">
             ハートが回復するまでお待ちください。<br />
-            30分ごとに1つずつ回復します。
+            3分ごとに1つずつ回復します。
           </p>
           <div className="result-actions">
             <button className="btn-secondary" onClick={() => navigate('/quiz')}>
@@ -408,7 +363,7 @@ const QuizGame: React.FC = () => {
               style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
             ></div>
           </div>
-          <div className="timer">{timeLeft}秒</div>
+          {/* Timer removed */}
         </div>
       </header>
 

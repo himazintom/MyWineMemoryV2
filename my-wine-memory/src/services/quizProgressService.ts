@@ -352,8 +352,8 @@ class QuizProgressService {
           const newHearts = Math.max(0, currentStats.heartsRemaining - 1);
           const now = new Date();
           
-          // Set recovery time for next heart (30 minutes)
-          const recoveryTime = new Date(now.getTime() + 30 * 60 * 1000);
+          // Set recovery time for next heart (3 minutes)
+          const recoveryTime = new Date(now.getTime() + 3 * 60 * 1000);
           
           transaction.update(statsRef, {
             heartsRemaining: newHearts,
@@ -366,7 +366,7 @@ class QuizProgressService {
         } else {
           // Initialize with 4 hearts (used 1)
           const now = new Date();
-          const recoveryTime = new Date(now.getTime() + 30 * 60 * 1000);
+          const recoveryTime = new Date(now.getTime() + 3 * 60 * 1000);
           
           const newStats: Partial<UserQuizStats> = {
             userId,
@@ -426,17 +426,17 @@ class QuizProgressService {
           return currentStats.heartsRemaining;
         }
         
-        // Calculate how many hearts to recover (1 every 30 minutes)
+        // Calculate how many hearts to recover (1 every 3 minutes)
         const timeSinceLastUsed = currentStats.heartsLastUsedAt 
           ? now.getTime() - currentStats.heartsLastUsedAt.toDate().getTime()
           : 0;
         
-        const heartsToRecover = Math.floor(timeSinceLastUsed / (30 * 60 * 1000));
+        const heartsToRecover = Math.floor(timeSinceLastUsed / (3 * 60 * 1000));
         const newHearts = Math.min(5, currentStats.heartsRemaining + heartsToRecover);
         
         // Update hearts and recovery time
         const nextRecoveryTime = newHearts < 5 
-          ? new Date(now.getTime() + 30 * 60 * 1000)
+          ? new Date(now.getTime() + 3 * 60 * 1000)
           : null;
         
         transaction.update(statsRef, {
