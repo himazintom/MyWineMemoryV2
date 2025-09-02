@@ -77,6 +77,7 @@ function App() {
                   <Route path="/records" element={<Records />} />
                   <Route path="/select-wine" element={<SelectWine />} />
                   <Route path="/add-tasting-record" element={<AddTastingRecord />} />
+                  <Route path="/add-tasting-record/:wineId" element={<AddTastingRecord />} />
                   <Route path="/edit-tasting-record/:recordId" element={<AddTastingRecord />} />
                   <Route path="/wine-detail/:wineId" element={<WineDetail />} />
                   <Route path="/quiz" element={<Quiz />} />

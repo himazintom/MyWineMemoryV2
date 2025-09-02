@@ -240,6 +240,18 @@ service cloud.firestore {
       allow delete: if isAuthenticated() && isOwner(resource.data.userId);
     }
     
+    // XP transactions for gamification - owner-only
+    match /xp_transactions/{transactionId} {
+      allow read: if isAuthenticated() && 
+        (resource == null || isOwner(resource.data.userId));
+      allow create: if isAuthenticated() && 
+        'userId' in request.resource.data && request.resource.data.userId == request.auth.uid &&
+        'amount' in request.resource.data && request.resource.data.amount is number &&
+        'reason' in request.resource.data && request.resource.data.reason is string;
+      allow update: if false; // Transactions should be immutable
+      allow delete: if false; // Transactions should not be deleted
+    }
+    
     // Deleted items - owner-only, auto-cleanup after TTL
     match /deleted_items/{itemId} {
       allow read: if isAuthenticated() && isOwner(resource.data.userId);
