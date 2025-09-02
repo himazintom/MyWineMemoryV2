@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthHooks';
 import { tastingRecordService } from '../services/tastingRecordService';
 import { wineMasterService } from '../services/wineMasterService';
 import { userService, goalService } from '../services/userService';
+import { learningInsightService, type LearningInsight } from '../services/learningInsightService';
 import type { WineMaster } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
@@ -26,6 +27,9 @@ const AddTastingRecord: React.FC = () => {
   const [recordMode, setRecordMode] = useState<'quick' | 'detailed'>('quick');
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [pendingSave, setPendingSave] = useState(false);
+  const [showInsightModal, setShowInsightModal] = useState(false);
+  const [learningInsight, setLearningInsight] = useState<LearningInsight | null>(null);
+  const [isLoadingInsight, setIsLoadingInsight] = useState(false);
   // const [currentDraftId, setCurrentDraftId] = useState<string | null>(null);
   
   const { loading: wineLoading, error: wineError, execute: executeLoadWine } = useAsyncOperation<WineMaster | null>();
@@ -404,10 +408,32 @@ const AddTastingRecord: React.FC = () => {
         
         // Update daily goal progress
         await goalService.updateGoalProgress(currentUser.uid, 'wine');
+        
+        // Generate learning insight
+        setIsLoadingInsight(true);
+        setShowInsightModal(true);
+        try {
+          const insight = await learningInsightService.generateWineInsight({
+            wineName: wine.wineName,
+            wineType: wine.wineType,
+            country: wine.country,
+            region: wine.region,
+            rating: formData.overallRating,
+            notes: formData.notes,
+            grapeVarieties: wine.grapeVarieties
+          });
+          setLearningInsight(insight);
+        } catch (error) {
+          console.error('Failed to generate insight:', error);
+        } finally {
+          setIsLoadingInsight(false);
+        }
       });
 
-      alert('テイスティング記録が保存されました！');
-      navigate('/records');
+      // Show success message with insight modal
+      setTimeout(() => {
+        navigate('/records');
+      }, 5000); // Navigate after 5 seconds
     } catch (error) {
       console.error('Failed to save tasting record:', error);
     }
@@ -445,6 +471,39 @@ const AddTastingRecord: React.FC = () => {
 
   return (
     <div className="page-container">
+      {/* Learning Insight Modal */}
+      {showInsightModal && (
+        <div className="insight-modal-overlay" onClick={() => setShowInsightModal(false)}>
+          <div className="insight-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="insight-modal-header">
+              <h2>✅ 記録が保存されました！</h2>
+              <button className="close-button" onClick={() => setShowInsightModal(false)}>×</button>
+            </div>
+            <div className="insight-modal-body">
+              {(learningInsight || isLoadingInsight) && (
+                <div className="learning-insight">
+                  <div className="insight-header">💡 学習インサイト</div>
+                  {isLoadingInsight ? (
+                    <div className="insight-loading">分析中...</div>
+                  ) : (
+                    <div className="insight-message">{learningInsight?.message}</div>
+                  )}
+                </div>
+              )}
+              <button 
+                className="btn-primary" 
+                onClick={() => {
+                  setShowInsightModal(false);
+                  navigate('/records');
+                }}
+              >
+                記録一覧へ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <header className="page-header">
         <button className="back-button" onClick={() => navigate(-1)}>
           ← 戻る

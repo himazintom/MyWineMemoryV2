@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthHooks';
 import type { QuizQuestion } from '../types';
 import { advancedQuizService } from '../services/advancedQuizService';
 import { quizProgressService } from '../services/quizProgressService';
+import { learningInsightService, type LearningInsight } from '../services/learningInsightService';
 
 const QuizGame: React.FC = () => {
   const navigate = useNavigate();
@@ -24,6 +25,8 @@ const QuizGame: React.FC = () => {
   const [loadingError, setLoadingError] = useState<string>('');
   const [showNoHeartsMessage, setShowNoHeartsMessage] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [learningInsight, setLearningInsight] = useState<LearningInsight | null>(null);
+  const [isLoadingInsight, setIsLoadingInsight] = useState(false);
   
   // Sound effects refs
   const correctSoundRef = useRef<HTMLAudioElement | null>(null);
@@ -221,10 +224,10 @@ const QuizGame: React.FC = () => {
     setCorrectAnswers([]);
   };
   
-  // Save progress when game ends
+  // Save progress and generate insight when game ends
   useEffect(() => {
     if (gameStatus === 'finished' && currentUser && answeredQuestions.length > 0) {
-      const saveProgress = async () => {
+      const saveProgressAndGenerateInsight = async () => {
         try {
           const difficultyNum = parseInt(difficulty || '1');
           const isStreak = score === questions.length; // Perfect score
@@ -240,12 +243,27 @@ const QuizGame: React.FC = () => {
           );
           
           console.log('Progress and XP saved successfully');
+          
+          // Generate learning insight
+          setIsLoadingInsight(true);
+          try {
+            const insight = await learningInsightService.generateQuizInsight({
+              correctAnswers: score,
+              totalQuestions: questions.length,
+              difficulty: difficultyNum
+            });
+            setLearningInsight(insight);
+          } catch (error) {
+            console.error('Failed to generate insight:', error);
+          } finally {
+            setIsLoadingInsight(false);
+          }
         } catch (error) {
           console.error('Failed to save quiz progress:', error);
         }
       };
       
-      saveProgress();
+      saveProgressAndGenerateInsight();
     }
   }, [gameStatus, currentUser, answeredQuestions, score, questions.length, difficulty]);
 
@@ -327,6 +345,18 @@ const QuizGame: React.FC = () => {
             {percentage >= 40 && percentage < 60 && <p>📚 まずまずです。もう少し勉強してみましょう！</p>}
             {percentage < 40 && <p>💪 まだまだこれから！頑張って学習を続けましょう！</p>}
           </div>
+          
+          {/* Learning Insight */}
+          {(learningInsight || isLoadingInsight) && (
+            <div className="learning-insight">
+              <div className="insight-header">💡 学習インサイト</div>
+              {isLoadingInsight ? (
+                <div className="insight-loading">分析中...</div>
+              ) : (
+                <div className="insight-message">{learningInsight?.message}</div>
+              )}
+            </div>
+          )}
 
           <div className="result-actions">
             <button className="btn-primary" onClick={restartQuiz}>
