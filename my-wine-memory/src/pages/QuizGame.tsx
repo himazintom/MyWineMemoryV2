@@ -15,6 +15,7 @@ const QuizGame: React.FC = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [score, setScore] = useState(0);
+  const [shuffledOptions, setShuffledOptions] = useState<{ text: string; originalIndex: number }[]>([]);
   // const [timeLeft, setTimeLeft] = useState(30); // Time limit removed
   const [gameStatus, setGameStatus] = useState<'playing' | 'finished' | 'timeup' | 'error'>('playing');
   const [hearts, setHearts] = useState(5);
@@ -107,6 +108,28 @@ const QuizGame: React.FC = () => {
     initializeQuiz();
   }, [currentUser, difficulty, navigate]);
 
+  // Shuffle array helper
+  const shuffleArray = <T,>(array: T[]): T[] => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
+  // Shuffle options when question changes
+  useEffect(() => {
+    if (questions[currentQuestionIndex]) {
+      const currentQuestion = questions[currentQuestionIndex];
+      const optionsWithIndex = currentQuestion.options.map((text, index) => ({
+        text,
+        originalIndex: index
+      }));
+      setShuffledOptions(shuffleArray(optionsWithIndex));
+    }
+  }, [currentQuestionIndex, questions]);
+
   const nextQuestion = useCallback(() => {
     // 処理中の場合は何もしない
     if (isProcessing) return;
@@ -132,28 +155,25 @@ const QuizGame: React.FC = () => {
   // Timer functionality removed
   // useEffect(() => { ... }, [timeLeft, gameStatus, handleTimeUp]);
 
-  const handleAnswerSelect = async (answerIndex: number) => {
+  const handleAnswerSelect = async (shuffledIndex: number, originalIndex: number) => {
     // 既に回答済み、説明表示中、または処理中の場合は何もしない
     if (selectedAnswer !== null || showExplanation || isProcessing) return;
     
+    // Immediately set processing and selected state for faster response
     setIsProcessing(true);
+    setSelectedAnswer(shuffledIndex);
     
-    setSelectedAnswer(answerIndex);
     const currentQuestion = questions[currentQuestionIndex];
-    const correct = answerIndex === currentQuestion.correctAnswer;
+    const correct = originalIndex === currentQuestion.correctAnswer;
     setIsCorrect(correct);
     
-    // Play sound effect
-    try {
-      if (correct && correctSoundRef.current) {
-        correctSoundRef.current.currentTime = 0;
-        correctSoundRef.current.play().catch(e => console.log('Sound play failed:', e));
-      } else if (!correct && incorrectSoundRef.current) {
-        incorrectSoundRef.current.currentTime = 0;
-        incorrectSoundRef.current.play().catch(e => console.log('Sound play failed:', e));
-      }
-    } catch (error) {
-      console.log('Sound playback error:', error);
+    // Play sound effect immediately
+    if (correct && correctSoundRef.current) {
+      correctSoundRef.current.currentTime = 0;
+      correctSoundRef.current.play().catch(() => {});
+    } else if (!correct && incorrectSoundRef.current) {
+      incorrectSoundRef.current.currentTime = 0;
+      incorrectSoundRef.current.play().catch(() => {});
     }
     
     // Track answered questions
@@ -199,8 +219,7 @@ const QuizGame: React.FC = () => {
       setTimeout(() => setGameStatus('finished'), 1000);
     }
     
-    // 処理完了
-    setIsProcessing(false);
+    // Don't reset processing here - keep it until next question
   };
 
   const restartQuiz = async () => {
@@ -376,9 +395,6 @@ const QuizGame: React.FC = () => {
   return (
     <div className="page-container">
       <header className="quiz-header">
-        <button className="back-button" onClick={goBack}>
-          ← 戻る
-        </button>
         <div className="quiz-progress">
           <div className="hearts">
             {Array.from({ length: 5 }).map((_, i) => (
@@ -393,8 +409,10 @@ const QuizGame: React.FC = () => {
               style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
             ></div>
           </div>
-          {/* Timer removed */}
         </div>
+        <button className="quiz-back-button" onClick={goBack}>
+          ← 戻る
+        </button>
       </header>
 
       <main className="quiz-content">
@@ -409,24 +427,32 @@ const QuizGame: React.FC = () => {
           <h2 className="question-text">{currentQuestion.question}</h2>
           
           <div className="answer-options">
-            {currentQuestion.options.map((option, index) => (
-              <button
-                key={index}
-                className={`answer-option ${
-                  selectedAnswer === index 
-                    ? isCorrect === true 
-                      ? 'correct' 
-                      : 'incorrect'
-                    : showExplanation && index === currentQuestion.correctAnswer
-                      ? 'correct-answer'
-                      : ''
-                }`}
-                onClick={() => handleAnswerSelect(index)}
-                disabled={showExplanation || selectedAnswer !== null || isProcessing}
-              >
-                {option}
-              </button>
-            ))}
+            {shuffledOptions.map((option, index) => {
+              const isSelected = selectedAnswer === index;
+              const isCorrectAnswer = showExplanation && option.originalIndex === currentQuestion.correctAnswer;
+              
+              return (
+                <button
+                  key={index}
+                  className={`answer-option ${
+                    isSelected
+                      ? isCorrect === true 
+                        ? 'correct' 
+                        : 'incorrect'
+                      : isCorrectAnswer
+                        ? 'correct-answer'
+                        : ''
+                  } ${isProcessing && !showExplanation ? 'processing' : ''}`}
+                  onClick={() => handleAnswerSelect(index, option.originalIndex)}
+                  disabled={showExplanation || selectedAnswer !== null}
+                >
+                  {isProcessing && isSelected && !showExplanation && (
+                    <span className="answer-loading"></span>
+                  )}
+                  {option.text}
+                </button>
+              );
+            })}
           </div>
 
           {showExplanation && (
@@ -435,13 +461,15 @@ const QuizGame: React.FC = () => {
                 {isCorrect ? '✅ 正解！' : '❌ 不正解'}
               </div>
               <p className="explanation-text">{currentQuestion.explanation}</p>
-              <button 
-                className="next-button"
-                onClick={nextQuestion}
-                disabled={isProcessing}
-              >
-                {currentQuestionIndex + 1 >= questions.length ? '結果を見る' : '次の問題へ →'}
-              </button>
+              <div className="next-button-container">
+                <button 
+                  className="next-button"
+                  onClick={nextQuestion}
+                  disabled={isProcessing}
+                >
+                  {currentQuestionIndex + 1 >= questions.length ? '結果を見る' : '次の問題へ →'}
+                </button>
+              </div>
             </div>
           )}
         </div>

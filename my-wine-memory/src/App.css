@@ -3351,14 +3351,33 @@ body {
   border-bottom: 1px solid var(--border-color);
 }
 
-.quiz-header .back-button {
-  background: none;
+.quiz-back-button {
+  background: var(--primary-color);
+  color: white;
   border: none;
-  color: var(--primary-color);
   font-size: 1rem;
   cursor: pointer;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
+  padding: 0.75rem 1.5rem;
+  margin-top: 1rem;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+  width: fit-content;
+}
+
+.quiz-back-button:hover {
+  background: var(--primary-hover);
+}
+
+/* Dark mode specific */
+.dark-mode .quiz-back-button {
+  background: var(--secondary-color);
+  color: white;
+  border: 2px solid var(--border-color);
+}
+
+.dark-mode .quiz-back-button:hover {
+  background: var(--secondary-hover);
+  border-color: var(--primary-color);
 }
 
 .quiz-progress {
@@ -3499,6 +3518,54 @@ body {
   color: var(--text-secondary);
   line-height: 1.6;
   margin-bottom: 1rem;
+}
+
+.next-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.next-button {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.next-button:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.next-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.answer-option.processing {
+  position: relative;
+  opacity: 0.8;
+}
+
+.answer-loading {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-top: 2px solid var(--primary-color);
+  border-radius: 50%;
+  margin-right: 8px;
+  animation: spin 1s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .next-button {
@@ -7417,4 +7484,58 @@ input[type="number"] {
 
 .setting-toggle:checked + .toggle-slider:before {
   transform: translateX(20px);
+}
+
+/* Wine List Item Styles for Profile/Stats */
+.wine-list-item {
+  padding: 1rem;
+  background: var(--card-bg);
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.wine-list-item .wine-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.wine-list-item .wine-info {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.wine-list-item .wine-rating {
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.wine-list-item .wine-date {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 480px) {
+  .wine-list-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .wine-list-item .wine-name {
+    width: 100%;
+  }
+  
+  .wine-list-item .wine-info {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
