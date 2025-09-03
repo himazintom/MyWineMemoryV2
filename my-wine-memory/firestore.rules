@@ -152,8 +152,7 @@ service cloud.firestore {
       allow read: if isAuthenticated() && isOwner(userId);
       allow create: if isAuthenticated() && isOwner(userId) &&
         request.resource.data.userId == request.auth.uid;
-      allow update: if isAuthenticated() && isOwner(userId) &&
-        request.resource.data.userId == resource.data.userId;
+      allow update: if isAuthenticated() && isOwner(userId);
       allow delete: if isAuthenticated() && isOwner(userId);
     }
     
