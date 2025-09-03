@@ -119,23 +119,33 @@ export const LevelDisplay: React.FC<LevelDisplayProps> = ({ level, xp, xpForNext
 
   return (
     <div className="level-display">
-      <div className="level-info">
-        <div className="level-number">レベル {level}</div>
-        <div className="xp-info">{xp.toLocaleString()} XP</div>
-      </div>
-      <div className="level-progress">
-        <div className="progress-bar">
-          <div 
-            className="progress-fill level-progress-fill" 
-            style={{ width: `${Math.min(100, progressPercentage)}%` }}
-          />
-        </div>
-        <div className="progress-text">
-          {currentLevelXp} / {xpForNextLevel} XP
+      <div className="level-header">
+        <div className="level-badge">
+          <span className="level-icon">⭐</span>
+          <span className="level-number">レベル {level}</span>
         </div>
       </div>
-      <div className="next-level">
-        次のレベルまで {xpForNextLevel - currentLevelXp} XP
+      <div className="xp-section">
+        <div className="xp-total">
+          <span className="xp-label">累計経験値</span>
+          <span className="xp-value">{xp.toLocaleString()} XP</span>
+        </div>
+        <div className="level-progress">
+          <div className="progress-bar">
+            <div 
+              className="progress-fill level-progress-fill" 
+              style={{ width: `${Math.min(100, progressPercentage)}%` }}
+            />
+          </div>
+          <div className="progress-details">
+            <span className="progress-current">{currentLevelXp.toLocaleString()}</span>
+            <span className="progress-separator">/</span>
+            <span className="progress-needed">{xpForNextLevel.toLocaleString()} XP</span>
+          </div>
+        </div>
+        <div className="next-level-info">
+          次のレベルまで <strong>{(xpForNextLevel - currentLevelXp).toLocaleString()}</strong> XP
+        </div>
       </div>
     </div>
   );
@@ -295,37 +305,103 @@ const styles = `
 .level-display {
   background: var(--card-bg);
   border: 2px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 1.5rem;
   margin-bottom: 1rem;
 }
 
-.level-info {
-  display: flex;
-  justify-content: space-between;
+.level-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.level-badge {
+  display: inline-flex;
   align-items: center;
-  margin-bottom: 1rem;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: white;
+  border-radius: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.level-icon {
+  font-size: 1.5rem;
 }
 
 .level-number {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.xp-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.xp-total {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+}
+
+.xp-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.xp-value {
   font-size: 1.5rem;
   font-weight: bold;
   color: var(--primary-color);
 }
 
-.xp-info {
-  font-size: 1.1rem;
+.level-progress {
+  margin: 0.5rem 0;
+}
+
+.progress-details {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.progress-current {
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.progress-separator {
   color: var(--text-secondary);
 }
 
-.level-progress {
-  margin-bottom: 0.5rem;
+.progress-needed {
+  color: var(--text-secondary);
 }
 
-.next-level {
+.next-level-info {
   text-align: center;
   font-size: 0.9rem;
   color: var(--text-secondary);
+  padding: 0.5rem;
+  background: var(--bg-primary);
+  border-radius: 6px;
+}
+
+.next-level-info strong {
+  color: var(--primary-color);
+  font-size: 1rem;
 }
 
 .streak-display {

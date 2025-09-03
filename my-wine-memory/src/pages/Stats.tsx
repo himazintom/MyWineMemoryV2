@@ -165,18 +165,31 @@ const Stats: React.FC = () => {
         <div className="level-info">
           <h3>学習進捗</h3>
           <div className="level-card">
-            <div className="level-display">
+            <div className="level-badge-container">
+              <span className="level-icon">⭐</span>
               <span className="level-number">レベル {userProfile?.level || 1}</span>
-              <span className="xp-amount">{userProfile?.xp || 0} XP</span>
             </div>
-            <div className="xp-progress">
-              <div className="xp-bar">
-                <div 
-                  className="xp-bar-fill" 
-                  style={{ width: `${((userProfile?.xp || 0) % 1000) / 10}%` }}
-                ></div>
+            <div className="xp-display-section">
+              <div className="xp-total-display">
+                <span className="xp-label">累計経験値</span>
+                <span className="xp-amount">{(userProfile?.xp || 0).toLocaleString()} XP</span>
               </div>
-              <span className="xp-text">次のレベルまで {1000 - ((userProfile?.xp || 0) % 1000)} XP</span>
+              <div className="xp-progress">
+                <div className="xp-bar">
+                  <div 
+                    className="xp-bar-fill" 
+                    style={{ width: `${((userProfile?.xp || 0) % 1000) / 10}%` }}
+                  ></div>
+                </div>
+                <div className="xp-progress-text">
+                  <span className="xp-current">{(userProfile?.xp || 0) % 1000}</span>
+                  <span className="xp-divider"> / </span>
+                  <span className="xp-needed">1000 XP</span>
+                </div>
+              </div>
+              <div className="next-level-text">
+                次のレベルまで <strong>{1000 - ((userProfile?.xp || 0) % 1000)}</strong> XP
+              </div>
             </div>
           </div>
         </div>
