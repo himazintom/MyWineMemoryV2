@@ -260,6 +260,7 @@ class NotificationService {
       const updatedSettings = {
         ...currentSettings,
         ...settings,
+        userId: userId, // Add userId field for Firestore rules
         types: {
           ...currentSettings.types,
           ...settings.types
@@ -267,7 +268,8 @@ class NotificationService {
         quietHours: {
           ...currentSettings.quietHours,
           ...settings.quietHours
-        }
+        },
+        updatedAt: new Date()
       };
 
       await setDoc(settingsRef, updatedSettings);
