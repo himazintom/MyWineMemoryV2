@@ -7656,3 +7656,294 @@ input[type="number"] {
     justify-content: space-between;
   }
 }
+
+/* Grape Variety Input with Percentage Styles */
+.grape-variety-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.grape-variety-add-section {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.grape-variety-text-input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+}
+
+.auto-balance-btn {
+  padding: 0.5rem 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.auto-balance-btn:hover {
+  background: var(--bg-tertiary);
+}
+
+.grape-varieties-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.grape-variety-item {
+  padding: 0.75rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.variety-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.variety-name {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.variety-remove {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: var(--error-bg);
+  color: var(--error-text);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  transition: all 0.2s;
+}
+
+.variety-remove:hover {
+  background: var(--error-text);
+  color: white;
+}
+
+.variety-percentage {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.percentage-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border-color);
+  outline: none;
+}
+
+.percentage-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  cursor: pointer;
+}
+
+.percentage-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  cursor: pointer;
+  border: none;
+}
+
+.percentage-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.percentage-number {
+  width: 60px;
+  padding: 0.25rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.percentage-symbol {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.percentage-total {
+  padding: 0.75rem;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.percentage-total.valid {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.percentage-total.warning {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+}
+
+.warning-text {
+  font-size: 0.85rem;
+  margin-left: 0.5rem;
+}
+
+.variety-mode-toggle {
+  margin-bottom: 0.5rem;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.toggle-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* Loading spinner for save button */
+.spinner-small {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Wine Selection Page Mobile Layout Fix */
+.select-wine-content .wine-list-item {
+  display: flex;
+  padding: 1rem;
+  background: var(--card-bg);
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border-color);
+}
+
+.select-wine-content .wine-list-item:hover {
+  background: var(--bg-secondary);
+  transform: translateX(4px);
+}
+
+.select-wine-content .wine-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.select-wine-content .wine-info h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.select-wine-content .wine-info .wine-producer {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.select-wine-content .wine-details-mobile {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.select-wine-content .wine-location,
+.select-wine-content .wine-vintage {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.select-wine-content .wine-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.select-wine-content .reference-count {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  padding: 0.25rem 0.5rem;
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+.select-wine-content .select-arrow {
+  font-size: 1.2rem;
+  color: var(--primary-color);
+}
+
+/* Mobile responsive layout for wine selection */
+@media (max-width: 480px) {
+  .select-wine-content .wine-list-item {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .select-wine-content .wine-info {
+    width: 100%;
+  }
+  
+  .select-wine-content .wine-details-mobile {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .select-wine-content .wine-stats {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .select-wine-content .wine-location,
+  .select-wine-content .wine-vintage {
+    display: block;
+  }
+}

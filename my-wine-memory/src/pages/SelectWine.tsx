@@ -7,6 +7,7 @@ import type { WineMaster } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import TagInput from '../components/TagInput';
+import GrapeVarietyInput from '../components/GrapeVarietyInput';
 import { useAsyncOperation } from '../hooks/useAsyncOperation';
 // import { useOfflineSync } from '../hooks/useOfflineSync';
 // import { useNetworkStatus } from '../hooks/useNetworkStatus';
@@ -19,6 +20,9 @@ const SelectWine: React.FC = () => {
   const [popularWines, setPopularWines] = useState<WineMaster[]>([]);
   const [showNewWineForm, setShowNewWineForm] = useState(false);
   const [grapeVarieties, setGrapeVarieties] = useState<string[]>([]);
+  const [grapeVarietiesWithPercentage, setGrapeVarietiesWithPercentage] = useState<{name: string; percentage: number}[]>([]);
+  const [usePercentageMode, setUsePercentageMode] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [, setIsUsingOfflineData] = useState(false);
   
   const { loading: searchLoading, error: searchError, execute: executeSearch } = useAsyncOperation<WineMaster[]>();
@@ -83,16 +87,31 @@ const SelectWine: React.FC = () => {
   const handleCreateNewWine = () => {
     setShowNewWineForm(true);
     setGrapeVarieties([]); // Reset grape varieties when opening form
+    setGrapeVarietiesWithPercentage([]);
+    setUsePercentageMode(false);
   };
 
   const handleCancelNewWine = () => {
     setShowNewWineForm(false);
     setGrapeVarieties([]);
+    setGrapeVarietiesWithPercentage([]);
+    setUsePercentageMode(false);
+    setIsSaving(false);
   };
 
   const handleNewWineSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    
+    // Prevent double submission
+    if (isSaving) return;
+    
+    setIsSaving(true);
     const formData = new FormData(event.currentTarget);
+    
+    // Format grape varieties based on mode
+    const formattedGrapeVarieties = usePercentageMode && grapeVarietiesWithPercentage.length > 0
+      ? grapeVarietiesWithPercentage.map(v => `${v.name} (${v.percentage}%)`)
+      : grapeVarieties;
     
     const newWineDataRaw = {
       wineName: formData.get('wineName') as string,
@@ -101,7 +120,7 @@ const SelectWine: React.FC = () => {
       region: formData.get('region') as string,
       vintage: formData.get('vintage') ? parseInt(formData.get('vintage') as string) : undefined,
       wineType: formData.get('wineType') as 'red' | 'white' | 'rose' | 'sparkling' | 'dessert' | 'fortified' | undefined,
-      grapeVarieties: grapeVarieties.length > 0 ? grapeVarieties : undefined
+      grapeVarieties: formattedGrapeVarieties.length > 0 ? formattedGrapeVarieties : undefined
     };
 
     // Remove undefined values
@@ -135,6 +154,7 @@ const SelectWine: React.FC = () => {
       // Need currentUser for wine creation, show login prompt if not available
       if (!currentUser) {
         alert('ワインの登録にはログインが必要です。');
+        setIsSaving(false);
         return;
       }
       
@@ -164,6 +184,8 @@ const SelectWine: React.FC = () => {
     } catch (error) {
       console.error('Failed to create new wine:', error);
       alert('ワインの登録に失敗しました。再度お試しください。');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -249,10 +271,12 @@ const SelectWine: React.FC = () => {
                   <div className="wine-info">
                     <h3 className="wine-name">{wine.wineName}</h3>
                     <p className="wine-producer">{wine.producer}</p>
-                    <p className="wine-location">{wine.country} - {wine.region}</p>
-                    {wine.vintage && (
-                      <p className="wine-vintage">{wine.vintage}年</p>
-                    )}
+                    <div className="wine-details-mobile">
+                      <p className="wine-location">{wine.country} - {wine.region}</p>
+                      {wine.vintage && (
+                        <p className="wine-vintage">{wine.vintage}年</p>
+                      )}
+                    </div>
                   </div>
                   <div className="wine-stats">
                     <span className="reference-count">
@@ -363,11 +387,42 @@ const SelectWine: React.FC = () => {
 
                 <div className="form-group">
                   <label>ブドウ品種</label>
-                  <TagInput
-                    value={grapeVarieties}
-                    onChange={setGrapeVarieties}
-                    placeholder="例: カベルネ・ソーヴィニヨン（Enterで追加）"
-                  />
+                  <div className="variety-mode-toggle">
+                    <label className="toggle-label">
+                      <input
+                        type="checkbox"
+                        checked={usePercentageMode}
+                        onChange={(e) => {
+                          setUsePercentageMode(e.target.checked);
+                          if (e.target.checked) {
+                            // Convert simple varieties to percentage mode
+                            const converted = grapeVarieties.map((name, index) => ({
+                              name,
+                              percentage: Math.floor(100 / grapeVarieties.length) + (index === 0 ? 100 % grapeVarieties.length : 0)
+                            }));
+                            setGrapeVarietiesWithPercentage(converted);
+                          } else {
+                            // Convert percentage varieties back to simple list
+                            setGrapeVarieties(grapeVarietiesWithPercentage.map(v => v.name));
+                          }
+                        }}
+                      />
+                      <span>配合パーセンテージを設定</span>
+                    </label>
+                  </div>
+                  {usePercentageMode ? (
+                    <GrapeVarietyInput
+                      value={grapeVarietiesWithPercentage}
+                      onChange={setGrapeVarietiesWithPercentage}
+                      placeholder="例: カベルネ・ソーヴィニヨン（Enterで追加）"
+                    />
+                  ) : (
+                    <TagInput
+                      value={grapeVarieties}
+                      onChange={setGrapeVarieties}
+                      placeholder="例: カベルネ・ソーヴィニヨン（Enterで追加）"
+                    />
+                  )}
                   <small className="field-help">Enterまたはカンマで区切って複数入力できます</small>
                 </div>
 
@@ -413,11 +468,18 @@ const SelectWine: React.FC = () => {
                 </div>
 
                 <div className="modal-actions">
-                  <button type="button" className="btn-secondary" onClick={handleCancelNewWine}>
+                  <button type="button" className="btn-secondary" onClick={handleCancelNewWine} disabled={isSaving}>
                     キャンセル
                   </button>
-                  <button type="submit" className="btn-primary">
-                    次へ（記録入力）
+                  <button type="submit" className="btn-primary" disabled={isSaving}>
+                    {isSaving ? (
+                      <>
+                        <span className="spinner-small"></span>
+                        保存中...
+                      </>
+                    ) : (
+                      '次へ（記録入力）'
+                    )}
                   </button>
                 </div>
               </form>
