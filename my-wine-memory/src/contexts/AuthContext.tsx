@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from 'react';
-import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut } from 'firebase/auth';
 import type { User as FirebaseUser } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import type { User } from '../types';
@@ -25,21 +25,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     
     try {
-      console.log('Starting Google sign-in with popup...');
-      const result = await signInWithPopup(auth, provider);
+      // Check if we're on iOS Safari or in PWA mode
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+      const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+                    (window.navigator as any).standalone === true;
       
-      // Create or update user profile in Firestore
-      const userProfile = await userService.createOrUpdateUser(result.user);
-      setUserProfile(userProfile);
-      
-      return result;
+      if (isIOS || isPWA) {
+        // Use redirect method for iOS/PWA
+        console.log('Using redirect method for iOS/PWA...');
+        await signInWithRedirect(auth, provider);
+        // The redirect will happen, and result will be handled on page reload
+        return null;
+      } else {
+        // Use popup method for desktop and Android
+        console.log('Starting Google sign-in with popup...');
+        const result = await signInWithPopup(auth, provider);
+        
+        // Create or update user profile in Firestore
+        const userProfile = await userService.createOrUpdateUser(result.user);
+        setUserProfile(userProfile);
+        
+        return result;
+      }
     } catch (error: unknown) {
-      console.error('Google sign-in popup error:', error);
+      console.error('Google sign-in error:', error);
       
       if (error && typeof error === 'object' && 'code' in error) {
         const authError = error as { code: string; message?: string };
         if (authError.code === 'auth/popup-closed-by-user') {
           throw new Error('サインインがキャンセルされました');
+        } else if (authError.code === 'auth/popup-blocked') {
+          // If popup is blocked, fallback to redirect
+          console.log('Popup blocked, using redirect method...');
+          await signInWithRedirect(auth, provider);
+          return null;
         } else if (authError.code === 'auth/unauthorized-domain') {
           throw new Error('このドメインは認証が許可されていません');
         } else {
@@ -127,6 +146,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
+    // Check for redirect result when component mounts
+    const handleRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result && result.user) {
+          console.log('Redirect sign-in successful');
+          // Create or update user profile in Firestore
+          const userProfile = await userService.createOrUpdateUser(result.user);
+          setUserProfile(userProfile);
+          
+          // Migrate guest data if available
+          if (guestDataService.hasGuestData()) {
+            const guestWineRecords = guestDataService.getGuestWineRecords();
+            for (const guestRecord of guestWineRecords) {
+              const wineRecord = {
+                ...guestRecord,
+                createdAt: new Date(guestRecord.createdAt)
+              };
+              delete (wineRecord as { [key: string]: unknown }).tempId;
+              await wineService.createWineRecord(result.user.uid, wineRecord);
+            }
+            
+            const guestQuizResults = guestDataService.getGuestQuizResults();
+            if (guestQuizResults.length > 0) {
+              const totalGuestXP = guestQuizResults.reduce((sum, result) => sum + result.xpEarned, 0);
+              await userService.addXP(result.user.uid, totalGuestXP);
+            }
+            
+            guestDataService.clearAllGuestData();
+            console.log('Guest data migration completed after redirect');
+          }
+        }
+      } catch (error) {
+        console.error('Error handling redirect result:', error);
+      }
+    };
+    
+    handleRedirectResult();
+    
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       setCurrentUser(user);
       
