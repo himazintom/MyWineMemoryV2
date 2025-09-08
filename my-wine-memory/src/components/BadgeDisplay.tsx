@@ -114,8 +114,24 @@ interface LevelDisplayProps {
 }
 
 export const LevelDisplay: React.FC<LevelDisplayProps> = ({ level, xp, xpForNextLevel }) => {
-  const currentLevelXp = xp - (level > 1 ? calculateTotalXpForLevel(level - 1) : 0);
-  const progressPercentage = (currentLevelXp / xpForNextLevel) * 100;
+  // Calculate total XP required to reach current level
+  const totalXpForCurrentLevel = calculateTotalXpForLevel(level);
+  // Calculate current level progress (XP in current level only)
+  const currentLevelXp = xp - totalXpForCurrentLevel;
+  // Ensure currentLevelXp is not negative
+  const validCurrentLevelXp = Math.max(0, currentLevelXp);
+  const progressPercentage = (validCurrentLevelXp / xpForNextLevel) * 100;
+  
+  // Debug log
+  console.log('Level display debug:', {
+    level,
+    totalXP: xp,
+    totalXpForCurrentLevel,
+    currentLevelXp,
+    validCurrentLevelXp,
+    xpForNextLevel,
+    progressPercentage
+  });
 
   return (
     <div className="level-display">
@@ -138,13 +154,13 @@ export const LevelDisplay: React.FC<LevelDisplayProps> = ({ level, xp, xpForNext
             />
           </div>
           <div className="progress-details">
-            <span className="progress-current">{currentLevelXp.toLocaleString()}</span>
+            <span className="progress-current">{validCurrentLevelXp.toLocaleString()}</span>
             <span className="progress-separator">/</span>
             <span className="progress-needed">{xpForNextLevel.toLocaleString()} XP</span>
           </div>
         </div>
         <div className="next-level-info">
-          次のレベルまで <strong>{(xpForNextLevel - currentLevelXp).toLocaleString()}</strong> XP
+          次のレベルまで <strong>{Math.max(0, xpForNextLevel - validCurrentLevelXp).toLocaleString()}</strong> XP
         </div>
       </div>
     </div>
