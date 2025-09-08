@@ -35,6 +35,18 @@ const QuizLevelSelect = React.lazy(() => import('./pages/QuizLevelSelect'));
 const PublicProfile = React.lazy(() => import('./pages/PublicProfile'));
 const UserPublicProfile = React.lazy(() => import('./pages/UserPublicProfile'));
 
+// Component to conditionally show BottomNavigation
+function ConditionalBottomNav() {
+  const location = useLocation();
+  const isQuizGame = location.pathname.includes('/quiz/play/');
+  
+  if (isQuizGame) {
+    return null;
+  }
+  
+  return <BottomNavigation />;
+}
+
 function App() {
   // Initialize monitoring services
   useEffect(() => {
@@ -90,7 +102,7 @@ function App() {
                 </Routes>
               </Suspense>
             </main>
-            <BottomNavigation />
+            <ConditionalBottomNav />
           </div>
           </Router>
         </AuthProvider>

@@ -286,8 +286,34 @@ const QuizGame: React.FC = () => {
   }, [gameStatus, currentUser, answeredQuestions, score, questions.length, difficulty]);
 
   const goBack = () => {
-    navigate('/quiz');
+    const confirmExit = window.confirm('クイズを中断しますか？進捗は保存されません。');
+    if (confirmExit) {
+      navigate('/quiz');
+    }
   };
+  
+  // Handle browser back button
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      e.preventDefault();
+      const confirmExit = window.confirm('クイズを中断しますか？進捗は保存されません。');
+      if (confirmExit) {
+        navigate('/quiz');
+      } else {
+        // Push state again to prevent navigation
+        window.history.pushState(null, '', window.location.pathname);
+      }
+    };
+    
+    // Push initial state
+    window.history.pushState(null, '', window.location.pathname);
+    
+    window.addEventListener('popstate', handlePopState);
+    
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [navigate]);
 
   if (gameStatus === 'error') {
     return (
@@ -393,25 +419,32 @@ const QuizGame: React.FC = () => {
 
   return (
     <div className="page-container">
-      <header className="quiz-header">
-        <div className="quiz-progress">
-          <div className="hearts">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <span key={i} className={`heart ${i < hearts ? 'active' : ''}`}>
-                ❤️
-              </span>
-            ))}
+      <header className="quiz-header-compact">
+        <div className="quiz-header-content">
+          <div className="quiz-hearts-section">
+            <span className="hearts-label">体力:</span>
+            <div className="hearts-compact">
+              {Array.from({ length: hearts }).map((_, i) => (
+                <span key={i} className="heart-icon">❤️</span>
+              ))}
+              {hearts < 5 && Array.from({ length: 5 - hearts }).map((_, i) => (
+                <span key={`empty-${i}`} className="heart-icon empty">🤍</span>
+              ))}
+            </div>
           </div>
-          <div className="progress-bar">
-            <div 
-              className="progress-fill" 
-              style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
-            ></div>
+          <div className="quiz-progress-section">
+            <span className="progress-label">進捗:</span>
+            <div className="quiz-progress-text">
+              {currentQuestionIndex + 1}/{questions.length}
+            </div>
           </div>
         </div>
-        <button className="quiz-back-button" onClick={goBack}>
-          ← 戻る
-        </button>
+        <div className="progress-bar-thin">
+          <div 
+            className="progress-fill" 
+            style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
+          />
+        </div>
       </header>
 
       <main className="quiz-content">
@@ -460,19 +493,22 @@ const QuizGame: React.FC = () => {
                 {isCorrect ? '✅ 正解！' : '❌ 不正解'}
               </div>
               <p className="explanation-text">{currentQuestion.explanation}</p>
-              <div className="next-button-container">
-                <button 
-                  className="next-button"
-                  onClick={nextQuestion}
-                  disabled={false}
-                >
-                  {currentQuestionIndex + 1 >= questions.length ? '結果を見る' : '次の問題へ →'}
-                </button>
-              </div>
             </div>
           )}
         </div>
       </main>
+      
+      {showExplanation && (
+        <div className="quiz-fixed-footer">
+          <button 
+            className="next-button-fixed"
+            onClick={nextQuestion}
+            disabled={false}
+          >
+            {currentQuestionIndex + 1 >= questions.length ? '結果を見る' : '次の問題へ →'}
+          </button>
+        </div>
+      )}
     </div>
   );
 };
