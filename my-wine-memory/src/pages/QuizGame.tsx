@@ -131,8 +131,8 @@ const QuizGame: React.FC = () => {
   }, [currentQuestionIndex, questions]);
 
   const nextQuestion = useCallback(() => {
-    // 処理中の場合は何もしない
-    if (isProcessing) return;
+    // 処理中フラグを即座にリセット
+    setIsProcessing(false);
     
     if (currentQuestionIndex + 1 >= questions.length) {
       setGameStatus('finished');
@@ -141,13 +141,12 @@ const QuizGame: React.FC = () => {
       setSelectedAnswer(null);
       setShowExplanation(false);
       setIsCorrect(null);
-      setIsProcessing(false);
       // setTimeLeft(30); // Time limit removed
       if (gameStatus === 'timeup') {
         setGameStatus('playing');
       }
     }
-  }, [currentQuestionIndex, questions.length, gameStatus, isProcessing]);
+  }, [currentQuestionIndex, questions.length, gameStatus]);
 
   // Time limit functionality removed
   // const handleTimeUp = useCallback(async () => { ... }, [...]);
@@ -465,7 +464,7 @@ const QuizGame: React.FC = () => {
                 <button 
                   className="next-button"
                   onClick={nextQuestion}
-                  disabled={isProcessing}
+                  disabled={false}
                 >
                   {currentQuestionIndex + 1 >= questions.length ? '結果を見る' : '次の問題へ →'}
                 </button>
