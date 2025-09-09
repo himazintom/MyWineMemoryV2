@@ -121,17 +121,6 @@ export const LevelDisplay: React.FC<LevelDisplayProps> = ({ level, xp, xpForNext
   // Ensure currentLevelXp is not negative
   const validCurrentLevelXp = Math.max(0, currentLevelXp);
   const progressPercentage = (validCurrentLevelXp / xpForNextLevel) * 100;
-  
-  // Debug log
-  console.log('Level display debug:', {
-    level,
-    totalXP: xp,
-    totalXpForCurrentLevel,
-    currentLevelXp,
-    validCurrentLevelXp,
-    xpForNextLevel,
-    progressPercentage
-  });
 
   return (
     <div className="level-display">
