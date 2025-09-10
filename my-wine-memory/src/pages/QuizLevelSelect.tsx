@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthHooks';
-import { QUIZ_LEVELS } from '../data/quiz';
+import { QUIZ_LEVELS, loadQuestionsByLevel } from '../data/quiz';
 import { 
   advancedQuizService, 
   type LevelProgress, 
@@ -24,6 +24,7 @@ const QuizLevelSelect: React.FC = () => {
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
   const [showWrongAnswers, setShowWrongAnswers] = useState(false);
   const [showMessage, setShowMessage] = useState<{type: 'error' | 'success' | 'info', text: string} | null>(null);
+  const [levelQuestionCounts, setLevelQuestionCounts] = useState<Map<number, number>>(new Map());
   const isMountedRef = useRef(true);
 
   useEffect(() => {
@@ -63,6 +64,14 @@ const QuizLevelSelect: React.FC = () => {
       
       setLevelProgress(progress);
       setWrongAnswers(wrongs);
+
+      // Check question counts for each level
+      const questionCounts = new Map<number, number>();
+      for (const level of QUIZ_LEVELS) {
+        const questions = await loadQuestionsByLevel(level.level);
+        questionCounts.set(level.level, questions.length);
+      }
+      setLevelQuestionCounts(questionCounts);
 
       // Load statistics for visible levels only (defer others)
       const visibleLevels = progress.slice(0, 6); // Load first 6 levels initially
@@ -244,7 +253,11 @@ const QuizLevelSelect: React.FC = () => {
 
       {/* Level Grid */}
       <div className="level-grid">
-        {QUIZ_LEVELS.map((levelInfo) => {
+        {QUIZ_LEVELS.filter((levelInfo) => {
+          // Filter out levels with 0 questions
+          const questionCount = levelQuestionCounts.get(levelInfo.level) || 0;
+          return questionCount > 0;
+        }).map((levelInfo) => {
           const progress = levelProgress.find(p => p.level === levelInfo.level) || {
             userId: currentUser?.uid || '',
             level: levelInfo.level,

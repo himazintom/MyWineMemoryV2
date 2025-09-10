@@ -93,8 +93,12 @@ const QuizGame: React.FC = () => {
           10
         );
         if (quizQuestions.length === 0) {
-          setLoadingError('クイズの問題を読み込めませんでした。');
+          setLoadingError('このレベルにはまだ問題が準備されていません。');
           setGameStatus('error');
+          // Redirect to quiz selection after 2 seconds
+          setTimeout(() => {
+            navigate('/quiz');
+          }, 2000);
         } else {
           setQuestions(quizQuestions);
         }
