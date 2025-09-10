@@ -22,6 +22,13 @@ export const QUIZ_LEVELS = [
   { level: 18, name: 'ワイン投資・ビジネス理論', description: '投資と経営' },
   { level: 19, name: '総合酒類知識', description: '日本酒・ウイスキー等' },
   { level: 20, name: 'ワイン哲学・心理学・文化論', description: '文化と心理' },
+  // 学習資料ベースのレベル
+  { level: 21, name: 'ワイン入門講座', description: 'ワイン概論から各産地まで' },
+  { level: 22, name: 'テイスティング入門基礎', description: '基礎的なテイスティング技法' },
+  { level: 23, name: 'テイスティング入門発展', description: '上級テイスティング技法' },
+  { level: 24, name: 'ワインペアリング入門', description: 'ペアリングの基本と応用' },
+  { level: 25, name: 'スパークリングワイン入門', description: 'スパークリングの基本と楽しみ方' },
+  { level: 26, name: 'TSGトレーニング', description: '品種解説と実践トレーニング' },
 ] as const;
 
 // 動的インポート用のマップ
@@ -29,8 +36,7 @@ const levelImportMap: Record<number, () => Promise<{ default: QuizQuestion[] }>>
   1: async () => {
     const { level01Questions } = await import('./levels/level01-basic');
     return { default: level01Questions };
-  },
-  2: async () => {
+  },  2: async () => {
     const { level02Questions } = await import('./levels/level02-grapes');
     return { default: level02Questions };
   },
@@ -106,6 +112,136 @@ const levelImportMap: Record<number, () => Promise<{ default: QuizQuestion[] }>>
     const { level20Questions } = await import('./levels/level20-philosophy');
     return { default: level20Questions };
   },
+  // 学習資料ベースのレベル
+  21: async () => {
+    // ワイン入門講座シリーズを統合
+    const [
+      m01, m02, m03, m04, m05, m06, m07, m08,
+      m09, m10, m11, m12, m13, m14, m15
+    ] = await Promise.all([
+      import('./study/data/study-wine-intro-01'),
+      import('./study/data/study-wine-intro-02'),
+      import('./study/data/study-wine-intro-03'),
+      import('./study/data/study-wine-intro-04'),
+      import('./study/data/study-wine-intro-05'),
+      import('./study/data/study-wine-intro-06'),
+      import('./study/data/study-wine-intro-07'),
+      import('./study/data/study-wine-intro-08'),
+      import('./study/data/study-wine-intro-09'),
+      import('./study/data/study-wine-intro-10'),
+      import('./study/data/study-wine-intro-11'),
+      import('./study/data/study-wine-intro-12'),
+      import('./study/data/study-wine-intro-13'),
+      import('./study/data/study-wine-intro-14'),
+      import('./study/data/study-wine-intro-15'),
+    ]);
+    const questions = [
+      ...m01.studyWineIntro01Questions,
+      ...m02.studyWineIntro02Questions,
+      ...m03.studyWineIntro03Questions,
+      ...m04.studyWineIntro04Questions,
+      ...m05.studyWineIntro05Questions,
+      ...m06.studyWineIntro06Questions,
+      ...m07.studyWineIntro07Questions,
+      ...m08.studyWineIntro08Questions,
+      ...m09.studyWineIntro09Questions,
+      ...m10.studyWineIntro10Questions,
+      ...m11.studyWineIntro11Questions,
+      ...m12.studyWineIntro12Questions,
+      ...m13.studyWineIntro13Questions,
+      ...m14.studyWineIntro14Questions,
+      ...m15.studyWineIntro15Questions,
+    ];
+    return { default: questions };
+  },
+  22: async () => {
+    // テイスティング入門基礎シリーズ
+    const [m01, m02, m03, m04, m05] = await Promise.all([
+      import('./study/data/study-tasting-basic-01'),
+      import('./study/data/study-tasting-basic-02'),
+      import('./study/data/study-tasting-basic-03'),
+      import('./study/data/study-tasting-basic-04'),
+      import('./study/data/study-tasting-basic-05'),
+    ]);
+    const questions = [
+      ...m01.studyTastingBasic01Questions,
+      ...m02.studyTastingBasic02Questions,
+      ...m03.studyTastingBasic03Questions,
+      ...m04.studyTastingBasic04Questions,
+      ...m05.studyTastingBasic05Questions,
+    ];
+    return { default: questions };
+  },
+  23: async () => {
+    // テイスティング入門発展シリーズ
+    const [m01, m02, m03, m04, m05, m06] = await Promise.all([
+      import('./study/data/study-tasting-advanced-01'),
+      import('./study/data/study-tasting-advanced-02'),
+      import('./study/data/study-tasting-advanced-03'),
+      import('./study/data/study-tasting-advanced-04'),
+      import('./study/data/study-tasting-advanced-05'),
+      import('./study/data/study-tasting-advanced-06'),
+    ]);
+    const questions = [
+      ...m01.studyTastingAdvanced01Questions,
+      ...m02.studyTastingAdvanced02Questions,
+      ...m03.studyTastingAdvanced03Questions,
+      ...m04.studyTastingAdvanced04Questions,
+      ...m05.studyTastingAdvanced05Questions,
+      ...m06.studyTastingAdvanced06Questions,
+    ];
+    return { default: questions };
+  },
+  24: async () => {
+    // ペアリング入門シリーズ
+    const [m01, m02, m03] = await Promise.all([
+      import('./study/data/study-pairing-01'),
+      import('./study/data/study-pairing-02'),
+      import('./study/data/study-pairing-03'),
+    ]);
+    const questions = [
+      ...m01.studyPairing01Questions,
+      ...m02.studyPairing02Questions,
+      ...m03.studyPairing03Questions,
+    ];
+    return { default: questions };
+  },
+  25: async () => {
+    // スパークリングワイン入門シリーズ
+    const [m01, m02, m03] = await Promise.all([
+      import('./study/data/study-sparkling-01'),
+      import('./study/data/study-sparkling-02'),
+      import('./study/data/study-sparkling-03'),
+    ]);
+    const questions = [
+      ...m01.studySparkling01Questions,
+      ...m02.studySparkling02Questions,
+      ...m03.studySparkling03Questions,
+    ];
+    return { default: questions };
+  },
+  26: async () => {
+    // TSGトレーニングシリーズ
+    const [m01, m02, m03, m04, m05, m06, m07] = await Promise.all([
+      import('./study/data/study-tsg-01'),
+      import('./study/data/study-tsg-02'),
+      import('./study/data/study-tsg-03'),
+      import('./study/data/study-tsg-04'),
+      import('./study/data/study-tsg-05'),
+      import('./study/data/study-tsg-06'),
+      import('./study/data/study-tsg-07'),
+    ]);
+    const questions = [
+      ...m01.studyTsg01Questions,
+      ...m02.studyTsg02Questions,
+      ...m03.studyTsg03Questions,
+      ...m04.studyTsg04Questions,
+      ...m05.studyTsg05Questions,
+      ...m06.studyTsg06Questions,
+      ...m07.studyTsg07Questions,
+    ];
+    return { default: questions };
+  },
 };
 
 // キャッシュ用
@@ -113,7 +249,7 @@ const questionCache: Map<number, QuizQuestion[]> = new Map();
 
 /**
  * 指定レベルの問題を動的に読み込む
- * @param level レベル番号 (1-20)
+ * @param level レベル番号 (1-26)
  * @returns 問題配列
  */
 export async function loadQuestionsByLevel(level: number): Promise<QuizQuestion[]> {
