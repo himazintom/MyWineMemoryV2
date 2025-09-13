@@ -290,6 +290,12 @@ const QuizGame: React.FC = () => {
   }, [gameStatus, currentUser, answeredQuestions, score, questions.length, difficulty]);
 
   const goBack = () => {
+    // If game is finished, no need to confirm
+    if (gameStatus === 'finished') {
+      navigate('/quiz');
+      return;
+    }
+    
     const confirmExit = window.confirm('クイズを中断しますか？進捗は保存されません。');
     if (confirmExit) {
       navigate('/quiz');
@@ -300,6 +306,13 @@ const QuizGame: React.FC = () => {
   useEffect(() => {
     const handlePopState = (e: PopStateEvent) => {
       e.preventDefault();
+      
+      // If game is finished, allow navigation without confirmation
+      if (gameStatus === 'finished') {
+        navigate('/quiz');
+        return;
+      }
+      
       const confirmExit = window.confirm('クイズを中断しますか？進捗は保存されません。');
       if (confirmExit) {
         navigate('/quiz');
@@ -317,7 +330,7 @@ const QuizGame: React.FC = () => {
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [navigate]);
+  }, [navigate, gameStatus]);
 
   if (gameStatus === 'error') {
     return (
@@ -392,6 +405,18 @@ const QuizGame: React.FC = () => {
             {percentage >= 60 && percentage < 80 && <p>👍 よくできました！もう少しで完璧です！</p>}
             {percentage >= 40 && percentage < 60 && <p>📚 まずまずです。もう少し勉強してみましょう！</p>}
             {percentage < 40 && <p>💪 まだまだこれから！頑張って学習を続けましょう！</p>}
+          </div>
+          
+          {/* XP Earned Display */}
+          <div className="xp-earned" style={{ 
+            textAlign: 'center', 
+            fontSize: '1.2rem', 
+            color: '#4CAF50',
+            fontWeight: 'bold',
+            margin: '1rem 0'
+          }}>
+            ✨ {score * 5 + (percentage === 100 ? 10 : 0)}XP 獲得しました！
+            {percentage === 100 && <span style={{ color: '#FFD700', marginLeft: '0.5rem' }}>🏆 パーフェクトボーナス!</span>}
           </div>
           
           {/* Learning Insight */}

@@ -335,9 +335,17 @@ class GamificationService {
   
   // Process quiz completion
   async processQuizCompletion(userId: string, correctAnswers: number, totalQuestions: number): Promise<void> {
-    // Award XP for correct answers
-    const xpAmount = correctAnswers * XP_REWARDS.QUIZ_CORRECT;
-    await this.awardXP(userId, xpAmount, `クイズ正解 ${correctAnswers}/${totalQuestions}問`);
+    // Award XP for correct answers + perfect bonus
+    let xpAmount = correctAnswers * XP_REWARDS.QUIZ_CORRECT;
+    let xpDescription = `クイズ正解 ${correctAnswers}/${totalQuestions}問`;
+    
+    // Add perfect score bonus
+    if (correctAnswers === totalQuestions && totalQuestions > 0) {
+      xpAmount += 10; // Perfect score bonus
+      xpDescription += ' 🏆パーフェクト!';
+    }
+    
+    await this.awardXP(userId, xpAmount, xpDescription);
     
     // Update daily goal
     await this.updateDailyGoalProgress(userId, 'quiz', correctAnswers);
