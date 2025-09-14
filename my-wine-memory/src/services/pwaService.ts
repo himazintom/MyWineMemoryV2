@@ -175,17 +175,7 @@ export class PWAService {
     });
   }
 
-  // Notify user about app update
-  private notifyUpdateAvailable() {
-    // You can show a toast or modal here
-    const shouldUpdate = window.confirm(
-      'アプリの新しいバージョンが利用可能です。更新しますか？'
-    );
-
-    if (shouldUpdate) {
-      window.location.reload();
-    }
-  }
+  // (Update prompt removed in Plan A/B; SW auto-updates via VitePWA)
 
   // Get install instructions for iOS
   getIOSInstallInstructions(): string {

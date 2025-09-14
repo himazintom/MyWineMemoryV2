@@ -89,13 +89,8 @@ try {
         badge: '/android/mipmap-mdpi/ic_launcher.png',
         tag: (payload.data && (payload.data as any).type) || 'general',
         data: payload.data,
-        actions: [
-          { action: 'open', title: 'アプリを開く' },
-          { action: 'dismiss', title: '後で' }
-        ],
         requireInteraction: false,
-        silent: false,
-        vibrate: [200, 100, 200]
+        silent: false
       };
       self.registration.showNotification(title, options);
     });
@@ -118,20 +113,21 @@ self.addEventListener('notificationclick', (event: NotificationEvent) => {
   else if (data?.type === 'wine_memory') url = data.wineUrl || '/records';
   else if (data?.url) url = data.url;
 
-  event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      for (const client of clientList) {
-        if ('focus' in client) {
-          (client as WindowClient).navigate(url);
-          return (client as WindowClient).focus();
-        }
-      }
-      if (self.clients.openWindow) {
-        return self.clients.openWindow(url);
-      }
-      return Promise.resolve();
-    })
-  );
+  event.waitUntil((async () => {
+    const clientList = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of clientList) {
+      try {
+        await (client as WindowClient).navigate(url);
+      } catch {}
+      try {
+        await (client as WindowClient).focus();
+      } catch {}
+      return;
+    }
+    if (self.clients.openWindow) {
+      await self.clients.openWindow(url);
+    }
+  })());
 });
 
 // Local notification scheduling support (message channel)
@@ -189,8 +185,7 @@ class NotificationScheduler {
       tag: type,
       data: { type, url },
       requireInteraction: false,
-      silent: false,
-      vibrate: [200, 100, 200]
+      silent: false
     });
   }
 
@@ -244,4 +239,3 @@ self.addEventListener('periodicsync', (event: any) => {
     })());
   }
 });
-

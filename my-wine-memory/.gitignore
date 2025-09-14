@@ -48,3 +48,5 @@ deployment-config.json
 *.njsproj
 *.sln
 *.sw?
+
+/src/data/quiz/study/res
