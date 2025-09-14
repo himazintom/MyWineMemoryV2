@@ -45,7 +45,8 @@ export class PWAService {
     });
   }
 
-  // Register service worker
+  // Register service worker (minimal plan A): rely on VitePWA auto registration
+  // and just await the ready registration instead of manually registering here.
   async registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
     if (!('serviceWorker' in navigator)) {
       console.warn('Service Worker not supported');
@@ -53,30 +54,12 @@ export class PWAService {
     }
 
     try {
-      // Register main service worker
-      const registration = await navigator.serviceWorker.register('/sw.js', {
-        scope: '/'
-      });
-      
+      const registration = await navigator.serviceWorker.ready;
       this.swRegistration = registration;
-      console.log('Service Worker registered:', registration);
-
-      // Update service worker if needed
-      registration.addEventListener('updatefound', () => {
-        const newWorker = registration.installing;
-        if (newWorker) {
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              // New service worker available
-              this.notifyUpdateAvailable();
-            }
-          });
-        }
-      });
-
+      console.log('Service Worker ready:', registration);
       return registration;
     } catch (error) {
-      console.error('Service Worker registration failed:', error);
+      console.error('Service Worker readiness check failed:', error);
       return null;
     }
   }

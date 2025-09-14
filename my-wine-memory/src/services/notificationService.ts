@@ -123,11 +123,12 @@ class NotificationService {
     }
 
     try {
-      // Register service worker first
-      await this.registerServiceWorker();
+      // Use existing service worker registration managed by VitePWA
+      const registration = await navigator.serviceWorker.ready;
 
       const token = await getToken(this.messaging, {
-        vapidKey: this.vapidKey
+        vapidKey: this.vapidKey,
+        serviceWorkerRegistration: registration
       });
 
       if (token) {
@@ -144,22 +145,7 @@ class NotificationService {
     }
   }
 
-  // Register service worker for FCM
-  private async registerServiceWorker(): Promise<void> {
-    if (!('serviceWorker' in navigator)) {
-      throw new Error('Service Worker not supported');
-    }
-
-    try {
-      const registration = await navigator.serviceWorker.register(
-        '/firebase-messaging-sw.js'
-      );
-      console.log('Service Worker registered:', registration);
-    } catch (error) {
-      console.error('Service Worker registration failed:', error);
-      throw error;
-    }
-  }
+  // Note: No separate registration for FCM; we rely on the main SW.
 
   // Save FCM token to Firestore
   private async saveFCMToken(userId: string, token: string): Promise<void> {
