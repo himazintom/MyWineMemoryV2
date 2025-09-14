@@ -8,7 +8,10 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
+      injectRegister: 'auto',
       includeAssets: ['logo-icon.svg', 'playstore-icon.png'],
       manifest: {
         name: 'MyWineMemory',
@@ -64,82 +67,6 @@ export default defineConfig({
             type: 'image/svg+xml'
           }
         ]
-      },
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,woff,ttf}'],
-        navigateFallbackDenylist: [
-          /^\/__\/.*$/, 
-          /^\/google\.firestore\.v1\.Firestore/,
-          /^\/v1\/projects\/.*\/databases\/.*\/documents\/.*/, // Firestore REST API
-          /^\/google\.firestore\.v1beta1\.Firestore/, // Firestore WebChannel
-          /^.*\.firebasestorage\.app\/_.*/, // Firebase Storage internal
-          /^.*\.googleapis\.com\/.*/, // All Google APIs
-          /^\/assets\/.*/, // Prevent fallback for asset files
-          /\.(?:png|jpg|jpeg|svg|webp|gif|ico|js|css|woff|woff2|ttf|json)$/ // File extensions
-        ],
-        // Enhanced offline functionality
-        navigateFallback: '/index.html',
-        runtimeCaching: [
-          // Firebase Storage images
-          {
-            urlPattern: /^https:\/\/firebasestorage\.googleapis\.com\/.*/i,
-            handler: 'StaleWhileRevalidate',
-            options: {
-              cacheName: 'firebase-storage',
-              expiration: {
-                maxEntries: 200,
-                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
-              }
-            }
-          },
-          // Static images
-          {
-            urlPattern: /\.(?:png|jpg|jpeg|svg|webp|gif|ico)$/,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'static-images',
-              expiration: {
-                maxEntries: 300,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
-              }
-            }
-          },
-          // Fonts
-          {
-            urlPattern: /\.(?:woff|woff2|ttf|otf)$/,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'fonts',
-              expiration: {
-                maxEntries: 30,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
-              }
-            }
-          },
-          // Firebase APIs - NetworkOnly to prevent interference
-          {
-            urlPattern: /^https:\/\/.*\.googleapis\.com\/.*/i,
-            handler: 'NetworkOnly' // Never cache Firebase API calls
-          },
-          // App shell
-          {
-            urlPattern: /^https:\/\/my-wine-memory\.himazi\.com\/.*/,
-            handler: 'StaleWhileRevalidate',
-            options: {
-              cacheName: 'app-shell',
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24 * 7 // 1 week
-              }
-            }
-          }
-        ],
-        // オフライン機能の拡張
-        skipWaiting: true,
-        clientsClaim: true,
-        cleanupOutdatedCaches: true,
-        // Add fallback routing for SPA
-        navigateFallbackAllowlist: [/^(?!\/__).*/]
       }
     }),
     visualizer({
