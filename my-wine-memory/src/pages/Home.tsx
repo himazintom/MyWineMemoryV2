@@ -1,19 +1,15 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthHooks';
 import { useTheme } from '../contexts/ThemeHooks';
-import { tastingRecordService } from '../services/tastingRecordService';
-import { draftService } from '../services/wineService';
-import { gamificationService } from '../services/gamificationService';
-import { guestDataService } from '../services/guestDataService';
-import { userService } from '../services/userService';
-import type { WineRecord, WineDraft, DailyGoal } from '../types';
+import type { WineDraft } from '../types';
 import WineCard from '../components/WineCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import { StreakDisplay } from '../components/BadgeDisplay';
 import NotificationPrompt from '../components/NotificationPrompt';
 import { useAsyncOperation } from '../hooks/useAsyncOperation';
+import { useHomeData } from '../hooks/useHomeData';
 import heroDark from '../assets/images/hero/home-hero-desktop-dark.webp';
 import heroLight from '../assets/images/hero/home-hero-desktop-light.webp';
 import brandLogo from '../assets/images/logo-icon/logo-icon.svg';
@@ -25,87 +21,20 @@ const Home: React.FC = () => {
   const [isMobile, setIsMobile] = useState<boolean>(() =>
     typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(max-width: 767px)').matches : false
   );
-  const [recentWines, setRecentWines] = useState<WineRecord[]>([]);
-  const [drafts, setDrafts] = useState<WineDraft[]>([]);
-  const [dailyGoal, setDailyGoal] = useState<DailyGoal | null>(null);
   const [authError, setAuthError] = useState<string>('');
-  const [weeklyProgress, setWeeklyProgress] = useState<number[]>([]);
-  const [learningStreak, setLearningStreak] = useState<number>(0);
-  const { loading, error, execute: executeLoadHome } = useAsyncOperation<void>();
   const { loading: authLoading, execute: executeAuth } = useAsyncOperation<void>();
 
-  const loadHomeData = useCallback(async () => {
-    // Don't load data while auth is initializing
-    if (authInitializing) {
-      console.log('Auth still initializing, waiting...');
-      return;
-    }
-
-    try {
-      await executeLoadHome(async () => {
-        if (currentUser && !currentUser.isAnonymous) {
-          // Ensure user is fully authenticated
-          try {
-            const token = await currentUser.getIdToken(false);
-            if (!token) {
-              console.warn('User token not available, skipping data load');
-              return;
-            }
-          } catch (tokenError) {
-            console.error('Token retrieval failed:', tokenError);
-            return;
-          }
-          
-          // Load authenticated user data
-          const [wines, userDrafts, goal, weekProgress] = await Promise.all([
-            tastingRecordService.getUserTastingRecordsWithWineInfo(currentUser.uid, 'date', 5).catch(error => {
-              console.error('Failed to load wines:', error);
-              return [];
-            }),
-            draftService.getUserDrafts(currentUser.uid).catch(error => {
-              console.error('Failed to load drafts:', error);
-              return [];
-            }),
-            gamificationService.getDailyGoal(currentUser.uid).catch(error => {
-              console.error('Failed to load daily goal:', error);
-              return {
-                userId: currentUser.uid,
-                date: new Date().toISOString().substring(0, 10),
-                wineRecordingGoal: 1,
-                quizGoal: 5,
-                wineRecordingCompleted: 0,
-                quizCompleted: 0,
-                xpEarned: 0
-              };
-            }),
-            userService.getWeeklyProgress(currentUser.uid).catch(error => {
-              console.error('Failed to load weekly progress:', error);
-              return [0, 0, 0, 0, 0, 0, 0];
-            })
-          ]);
-          
-          setRecentWines(wines.slice(0, 3));
-          setDrafts(userDrafts);
-          setDailyGoal(goal);
-          setWeeklyProgress(weekProgress);
-          setLearningStreak(userProfile?.streak || 0);
-        } else {
-          console.log('No authenticated user, loading guest data');
-          // Load guest data
-          const guestWines = guestDataService.getGuestWineRecordsAsWineRecords();
-          setRecentWines(guestWines.slice(0, 3));
-          setDrafts([]);
-          setDailyGoal(null);
-        }
-      });
-    } catch (error) {
-      console.error('Failed to load home data:', error);
-    }
-  }, [currentUser, authInitializing, executeLoadHome]);
-
-  useEffect(() => {
-    loadHomeData();
-  }, [loadHomeData]);
+  // Use custom hook for home data management (replaces 6 useState + useCallback + useEffect)
+  const {
+    recentWines,
+    drafts,
+    dailyGoal,
+    weeklyProgress,
+    learningStreak,
+    loading,
+    error,
+    loadData: loadHomeData,
+  } = useHomeData(currentUser?.uid, userProfile, authInitializing);
 
   // モバイル判定（リサイズ対応）
   useEffect(() => {

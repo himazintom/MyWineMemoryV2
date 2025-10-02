@@ -1,160 +1,27 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthHooks';
+import type { TastingRecord } from '../types';
 import { tastingRecordService } from '../services/tastingRecordService';
-import { wineMasterService } from '../services/wineMasterService';
-import type { WineMaster, TastingRecord } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
-import { useAsyncOperation } from '../hooks/useAsyncOperation';
-// import { useOfflineSync } from '../hooks/useOfflineSync';
-// import { useNetworkStatus } from '../hooks/useNetworkStatus';
-
-interface WineWithTastings {
-  wine: WineMaster;
-  tastingRecords: TastingRecord[];
-  latestTasting: Date;
-  averageRating: number;
-}
+import { useRecordsData } from '../hooks/useRecordsData';
 
 const Records: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
-  const [wineGroups, setWineGroups] = useState<WineWithTastings[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<'date' | 'rating' | 'count'>('date');
-  const [filteredWineGroups, setFilteredWineGroups] = useState<WineWithTastings[]>([]);
-  // const [isUsingOfflineData, setIsUsingOfflineData] = useState(false);
 
-  const { loading, error, execute: executeLoadRecords } = useAsyncOperation<WineWithTastings[]>();
-  // const { isOnline } = useNetworkStatus();
-  // const { getCachedTastingRecords, getCachedWines, cacheTastingRecords, cacheWines } = useOfflineSync(currentUser?.uid);
-
-  const loadRecords = useCallback(async () => {
-    if (!currentUser) return;
-
-    try {
-      const records = await executeLoadRecords(async () => {
-        // Get all user's tasting records (already filtered in service)
-        const tastingRecords = await tastingRecordService.getUserTastingRecords(currentUser.uid, 'date', 1000);
-        
-        // Additional safety check and logging for debugging
-        const validRecords = tastingRecords.filter(record => {
-          const hasValidWineId = record.wineId && typeof record.wineId === 'string' && record.wineId.trim() !== '';
-          if (!hasValidWineId) {
-            console.error('Found record with invalid wineId in Records.tsx:', {
-              recordId: record.id,
-              wineId: record.wineId,
-              wineName: record.wineName,
-              producer: record.producer
-            });
-          }
-          return hasValidWineId;
-        });
-        
-        if (validRecords.length !== tastingRecords.length) {
-          console.warn(`Records.tsx: Filtered out ${tastingRecords.length - validRecords.length} records with invalid wineId`);
-        }
-        
-        // Group by wine ID
-        const wineGroups = new Map<string, TastingRecord[]>();
-        validRecords.forEach(record => {
-          // Additional safety check before grouping
-          if (record.wineId && typeof record.wineId === 'string') {
-            if (!wineGroups.has(record.wineId)) {
-              wineGroups.set(record.wineId, []);
-            }
-            wineGroups.get(record.wineId)!.push(record);
-          } else {
-            console.error('Skipping record with invalid wineId during grouping:', record.id);
-          }
-        });
-
-        // Batch fetch wine master data for each group to avoid N+1
-        const wineIds = Array.from(wineGroups.keys());
-        
-        // Final validation before calling getWineMastersByIds
-        const safeWineIds = wineIds.filter(id => id && typeof id === 'string' && id.trim() !== '');
-        if (safeWineIds.length !== wineIds.length) {
-          console.error('Found invalid wineIds in group keys:', {
-            original: wineIds,
-            filtered: safeWineIds,
-            invalid: wineIds.filter(id => !id || typeof id !== 'string' || id.trim() === '')
-          });
-        }
-        
-        if (safeWineIds.length === 0) {
-          console.warn('No valid wine IDs found for fetching wine masters');
-          return [];
-        }
-        
-        const wines = await wineMasterService.getWineMastersByIds(safeWineIds, currentUser.uid);
-        const wineMap = new Map<string, WineMaster>();
-        wines.forEach((w) => wineMap.set(w.id, w));
-
-        const wineWithTastings: WineWithTastings[] = [];
-        for (const [wineId, records] of wineGroups.entries()) {
-          const wine = wineMap.get(wineId);
-          if (!wine) {
-            console.warn(`Wine not found for wineId: ${wineId}`);
-            continue;
-          }
-          const latestTasting = new Date(Math.max(...records.map(r => new Date(r.tastingDate).getTime())));
-          const averageRating = records.reduce((sum, r) => sum + r.overallRating, 0) / records.length;
-          wineWithTastings.push({
-            wine,
-            tastingRecords: records.sort((a, b) => new Date(b.tastingDate).getTime() - new Date(a.tastingDate).getTime()),
-            latestTasting,
-            averageRating
-          });
-        }
-
-        return wineWithTastings;
-      });
-
-      setWineGroups(records || []);
-    } catch (error) {
-      console.error('Failed to load records:', error);
-    }
-  }, [currentUser, executeLoadRecords]);
-
-  const filterAndSortRecords = useCallback(() => {
-    let filtered = wineGroups;
-
-    // Apply search filter
-    if (searchTerm.trim()) {
-      filtered = filtered.filter(wineGroup => 
-        wineGroup.wine.wineName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        wineGroup.wine.producer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        wineGroup.wine.country.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Apply sorting
-    switch (sortBy) {
-      case 'date':
-        filtered.sort((a, b) => b.latestTasting.getTime() - a.latestTasting.getTime());
-        break;
-      case 'rating':
-        filtered.sort((a, b) => b.averageRating - a.averageRating);
-        break;
-      case 'count':
-        filtered.sort((a, b) => b.tastingRecords.length - a.tastingRecords.length);
-        break;
-    }
-
-    setFilteredWineGroups(filtered);
-  }, [wineGroups, searchTerm, sortBy]);
-
-  useEffect(() => {
-    if (currentUser) {
-      loadRecords();
-    }
-  }, [currentUser, loadRecords]);
-
-  useEffect(() => {
-    filterAndSortRecords();
-  }, [filterAndSortRecords]);
+  // Use custom hook for records data management (replaces 5 useState + 2 useCallback + 2 useEffect)
+  const {
+    filteredWineGroups,
+    searchTerm,
+    sortBy,
+    loading,
+    error,
+    loadRecords,
+    setSearchTerm,
+    setSortBy,
+  } = useRecordsData(currentUser?.uid);
 
   const handleWineClick = (wineId: string) => {
     navigate(`/wine-detail/${wineId}`);
