@@ -83,11 +83,8 @@ export default defineConfig({
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
             // More granular vendor chunks for better caching
-            if (id.includes('react') || id.includes('react-dom')) {
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router') || id.includes('scheduler')) {
               return 'vendor-react';
-            }
-            if (id.includes('react-router-dom')) {
-              return 'vendor-router';
             }
             if (id.includes('firebase')) {
               return 'vendor-firebase';

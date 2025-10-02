@@ -8,6 +8,7 @@ import type { NotificationType } from './notificationService';
 import { userService } from './userService';
 import { tastingRecordService } from './tastingRecordService';
 import { pwaService } from './pwaService';
+import { wineMasterService } from './wineMasterService';
 
 export interface NotificationTrigger {
   id: string;
@@ -294,7 +295,6 @@ class NotificationScheduler {
       // Pick a random record from the past
       const randomRecord = records[Math.floor(Math.random() * records.length)];
       // Get wine info from wines_master collection
-      const { wineMasterService } = await import('./wineMasterService');
       const wineInfo = await wineMasterService.getWineMaster(randomRecord.wineId, userId);
       
       if (!wineInfo) return;
