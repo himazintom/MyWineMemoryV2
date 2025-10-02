@@ -8329,3 +8329,109 @@ input[type="number"] {
     gap: 1rem;
   }
 }
+
+
+/* ========================================
+   ACCESSIBILITY ENHANCEMENTS
+   ======================================== */
+
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Skip to content link */
+.skip-to-content {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--color-primary-main);
+  color: var(--color-primary-contrast);
+  padding: var(--padding-sm) var(--padding-md);
+  text-decoration: none;
+  z-index: var(--z-index-tooltip);
+  border-radius: 0 0 var(--radius-md) 0;
+  font-weight: var(--font-weight-semibold);
+}
+
+.skip-to-content:focus {
+  top: 0;
+}
+
+/* Enhanced focus indicators */
+*:focus-visible {
+  outline: 2px solid var(--color-primary-main);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Button focus states */
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--color-primary-main);
+  outline-offset: 2px;
+}
+
+/* Keyboard navigation helpers */
+[data-keyboard-focused='true'] {
+  outline: 2px solid var(--color-primary-main);
+  outline-offset: 2px;
+  background-color: var(--bg-tertiary);
+}
+
+/* High contrast mode improvements */
+@media (prefers-contrast: high) {
+  *:focus-visible {
+    outline-width: 3px;
+    outline-offset: 3px;
+  }
+  
+  .wine-card,
+  .button,
+  .action-button {
+    border: 2px solid var(--border-color);
+  }
+}
+
+/* Touch target size (minimum 44x44px) */
+button,
+a,
+input[type='checkbox'],
+input[type='radio'] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Exception for inline elements */
+.inline-link,
+.text-link {
+  min-height: auto;
+  min-width: auto;
+}
+
+/* ARIA live region styling */
+[role='status'],
+[role='alert'] {
+  position: relative;
+  padding: var(--padding-sm) var(--padding-md);
+  border-radius: var(--radius-md);
+}
+
+[role='alert'] {
+  background-color: var(--color-error);
+  color: var(--color-primary-contrast);
+}
+
+[role='status'] {
+  background-color: var(--color-info);
+  color: var(--color-primary-contrast);
+}
+
