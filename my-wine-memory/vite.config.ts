@@ -80,15 +80,11 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        // Ensure React loads before other chunks by naming it with prefix that sorts first
+        // CRITICAL: Bundle React + ALL React-dependent libraries in ONE chunk
+        // This prevents "Cannot read properties of undefined (reading 'createContext')" errors
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
-            // Firebase (largest, most stable, no React dependency)
-            if (id.includes('firebase')) {
-              return 'vendor-firebase';
-            }
-            // React and ALL React-dependent libraries in ONE chunk
-            // This ensures React is available when any dependent library needs it
+            // React + ALL dependent libraries MUST be in the same chunk
             if (id.includes('react') ||
                 id.includes('react-dom') ||
                 id.includes('react-router') ||
@@ -96,12 +92,16 @@ export default defineConfig({
                 id.includes('framer-motion') ||
                 id.includes('motion-dom') ||
                 id.includes('motion-utils') ||
-                id.includes('@sentry') ||
                 id.includes('chart.js') ||
-                id.includes('react-chartjs-2')) {
+                id.includes('react-chartjs-2') ||
+                id.includes('@sentry')) {
               return 'vendor-react';
             }
-            // Minimal vendor-other for truly independent libraries
+            // Firebase has no dependencies on React
+            if (id.includes('firebase')) {
+              return 'vendor-firebase';
+            }
+            // Other truly independent libraries (idb, @kurkle/color, etc.)
             return 'vendor-other';
           }
 
