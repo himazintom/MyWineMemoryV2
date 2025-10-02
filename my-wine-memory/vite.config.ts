@@ -80,22 +80,31 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
+        // Ensure React loads before other chunks by naming it with prefix that sorts first
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
-            // More granular vendor chunks for better caching
-            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router') || id.includes('scheduler')) {
-              return 'vendor-react';
-            }
+            // Firebase (largest, most stable, no React dependency)
             if (id.includes('firebase')) {
               return 'vendor-firebase';
             }
-            if (id.includes('chart.js') || id.includes('react-chartjs-2')) {
-              return 'vendor-charts';
+            // React and ALL React-dependent libraries in ONE chunk
+            // This ensures React is available when any dependent library needs it
+            if (id.includes('react') ||
+                id.includes('react-dom') ||
+                id.includes('react-router') ||
+                id.includes('scheduler') ||
+                id.includes('framer-motion') ||
+                id.includes('motion-dom') ||
+                id.includes('motion-utils') ||
+                id.includes('@sentry') ||
+                id.includes('chart.js') ||
+                id.includes('react-chartjs-2')) {
+              return 'vendor-react';
             }
-            // Other third party libraries
+            // Minimal vendor-other for truly independent libraries
             return 'vendor-other';
           }
-          
+
           // Split app code by feature for better lazy loading
           if (id.includes('/pages/')) {
             // Individual page chunks for optimal lazy loading
