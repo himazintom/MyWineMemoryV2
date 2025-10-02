@@ -1,12 +1,14 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import type { WineRecord } from '../types';
 
 interface WineCardProps {
   wine: WineRecord;
   onClick?: () => void;
+  index?: number; // For staggered animations
 }
 
-const WineCard: React.FC<WineCardProps> = ({ wine, onClick }) => {
+const WineCard: React.FC<WineCardProps> = ({ wine, onClick, index = 0 }) => {
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('ja-JP', {
       year: 'numeric',
@@ -18,7 +20,24 @@ const WineCard: React.FC<WineCardProps> = ({ wine, onClick }) => {
   const cover = wine.images && wine.images.length > 0 ? wine.images[0] : undefined;
 
   return (
-    <div className="wine-card wine-card--photo" onClick={onClick}>
+    <motion.div
+      className="wine-card wine-card--photo"
+      onClick={onClick}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{
+        duration: 0.3,
+        delay: index * 0.05, // Stagger effect
+        ease: [0.4, 0.0, 0.2, 1], // Custom easing
+      }}
+      whileHover={{
+        y: -4,
+        transition: { duration: 0.2 },
+      }}
+      whileTap={{ scale: 0.98 }}
+      layout
+    >
       {cover && <div className="wine-card-bg" style={{ backgroundImage: `url(${cover})` }} />}
       <div className="wine-card-body">
         <div className="wine-card-header">
@@ -55,7 +74,7 @@ const WineCard: React.FC<WineCardProps> = ({ wine, onClick }) => {
           </span>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

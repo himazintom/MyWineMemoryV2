@@ -245,10 +245,11 @@ const Home: React.FC = () => {
           ) : recentWines.length > 0 ? (
             <>
               <div className="wine-grid">
-                {recentWines.map(wine => (
-                  <WineCard 
-                    key={wine.id} 
-                    wine={wine} 
+                {recentWines.map((wine, index) => (
+                  <WineCard
+                    key={wine.id}
+                    wine={wine}
+                    index={index}
                     onClick={() => navigate(`/wine-detail/${wine.id}`)}
                   />
                 ))}
