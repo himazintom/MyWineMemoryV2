@@ -42,19 +42,26 @@ const NotificationPrompt: React.FC<NotificationPromptProps> = ({ onClose }) => {
 
     // Check permission status
     const permission = notificationService.getPermissionStatus();
-    
-    // If already granted, don't show the prompt
+
+    // If already granted, check if notifications are enabled in settings
     if (permission === 'granted') {
-      // Check if notifications are enabled in settings
       const settings = await notificationService.getUserNotificationSettings(currentUser.uid);
-      
-      // Only show PWA prompt if notifications are enabled
-      if (settings.enabled && pwaService.canInstall()) {
+
+      // If notifications are already enabled, don't show any prompts
+      if (settings.enabled) {
+        setShow(false);
+        setShowPWAPrompt(false);
+        return;
+      }
+
+      // If permission granted but not enabled in settings, show PWA prompt
+      if (pwaService.canInstall()) {
+        setShow(false);
         setShowPWAPrompt(true);
       }
       return;
     }
-    
+
     // Only show notification prompt if permission is 'default' (never asked)
     if (permission === 'default') {
       // Delay showing to avoid being too aggressive
@@ -67,22 +74,27 @@ const NotificationPrompt: React.FC<NotificationPromptProps> = ({ onClose }) => {
 
     try {
       setIsEnabling(true);
-      
+
       // Request permission and enable notifications
       const success = await notificationService.enableNotifications(currentUser.uid);
-      
+
       if (success) {
         // Setup daily schedules
         await notificationScheduler.initializeUserNotifications(currentUser.uid);
-        
+
         // Test notification
         await notificationService.testNotification();
-        
+
+        // Close notification prompt
         setShow(false);
-        
+
         // Check if PWA can be installed
         if (pwaService.canInstall()) {
+          // Show PWA prompt briefly
           setShowPWAPrompt(true);
+        } else {
+          // No PWA install available, close completely
+          if (onClose) onClose();
         }
       } else {
         // Permission denied
@@ -90,6 +102,7 @@ const NotificationPrompt: React.FC<NotificationPromptProps> = ({ onClose }) => {
       }
     } catch (error) {
       console.error('Failed to enable notifications:', error);
+      handleDismiss();
     } finally {
       setIsEnabling(false);
     }
@@ -120,10 +133,18 @@ const NotificationPrompt: React.FC<NotificationPromptProps> = ({ onClose }) => {
     const installed = await pwaService.promptInstall();
     if (installed) {
       setShowPWAPrompt(false);
-      
+
       // Enable periodic sync for installed PWA
       await pwaService.enablePeriodicSync();
+
+      // Close completely after PWA install
+      if (onClose) onClose();
     }
+  };
+
+  const handlePWADismiss = () => {
+    setShowPWAPrompt(false);
+    if (onClose) onClose();
   };
 
   if (!show && !showPWAPrompt) return null;
@@ -207,9 +228,9 @@ const NotificationPrompt: React.FC<NotificationPromptProps> = ({ onClose }) => {
               >
                 インストール
               </button>
-              <button 
+              <button
                 className="btn-text btn-small"
-                onClick={() => setShowPWAPrompt(false)}
+                onClick={handlePWADismiss}
               >
                 ✕
               </button>
@@ -228,9 +249,9 @@ const NotificationPrompt: React.FC<NotificationPromptProps> = ({ onClose }) => {
               <h4>iOSでインストール</h4>
               <p>{pwaService.getIOSInstallInstructions()}</p>
             </div>
-            <button 
+            <button
               className="btn-text"
-              onClick={() => setShowPWAPrompt(false)}
+              onClick={handlePWADismiss}
             >
               閉じる
             </button>
