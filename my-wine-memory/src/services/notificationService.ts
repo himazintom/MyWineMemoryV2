@@ -66,10 +66,19 @@ class NotificationService {
 
   private async initializeMessaging() {
     if (typeof window === 'undefined') return;
-    
+
     try {
-      const { messaging } = await import('../services/firebase');
-      this.messaging = messaging;
+      // Import getMessaging directly instead of the messaging instance
+      const { getMessaging, isSupported } = await import('firebase/messaging');
+      const { default: app } = await import('../services/firebase');
+
+      // Check if messaging is supported before initializing
+      const supported = await isSupported();
+      if (supported) {
+        this.messaging = getMessaging(app);
+      } else {
+        console.warn('Firebase Messaging is not supported in this browser');
+      }
     } catch (error) {
       console.warn('Failed to initialize messaging:', error);
     }
