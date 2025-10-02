@@ -1,0 +1,276 @@
+/**
+ * CSS Custom Properties - Design Tokens
+ * Single source of truth for all CSS variables
+ * Based on design tokens from src/styles/tokens/
+ */
+
+:root {
+  /* ========================================
+     COLORS - Light Theme (Default)
+     ======================================== */
+
+  /* Primary - Wine theme */
+  --color-primary-main: #722F37;
+  --color-primary-light: #d4636f;
+  --color-primary-dark: #5a2429;
+  --color-primary-contrast: #ffffff;
+
+  /* Semantic colors */
+  --color-success: #28a745;
+  --color-success-light: #34ce57;
+  --color-success-dark: #1e7e34;
+
+  --color-error: #dc3545;
+  --color-error-light: #e4606d;
+  --color-error-dark: #bd2130;
+
+  --color-warning: #ffc107;
+  --color-warning-light: #ffd54f;
+  --color-warning-dark: #c79100;
+
+  --color-info: #17a2b8;
+  --color-info-light: #58c4d4;
+  --color-info-dark: #117a8b;
+
+  /* Background colors */
+  --bg-primary: #FFF8E1;
+  --bg-secondary: #FFFBF0;
+  --bg-tertiary: #F5F0E8;
+  --bg-card: #FFFFFF;
+
+  /* Text colors */
+  --text-primary: #1a1a1a;
+  --text-secondary: #4a4a4a;
+  --text-tertiary: #757575;
+  --text-muted: #9e9e9e;
+  --text-inverse: #ffffff;
+
+  /* Border & Divider */
+  --border-color: #e0e0e0;
+  --divider-color: #f0f0f0;
+
+  /* Special colors */
+  --color-gold: #FFD700;
+  --color-bronze: #CD7F32;
+  --color-silver: #C0C0C0;
+
+  /* ========================================
+     SPACING - 8px baseline grid
+     ======================================== */
+
+  --space-xs: 0.25rem;   /* 4px */
+  --space-sm: 0.5rem;    /* 8px */
+  --space-md: 1rem;      /* 16px */
+  --space-lg: 1.5rem;    /* 24px */
+  --space-xl: 2rem;      /* 32px */
+  --space-xxl: 3rem;     /* 48px */
+  --space-xxxl: 4rem;    /* 64px */
+
+  /* Component padding */
+  --padding-xs: 0.5rem;
+  --padding-sm: 0.75rem;
+  --padding-md: 1rem;
+  --padding-lg: 1.5rem;
+  --padding-xl: 2rem;
+
+  /* Component margin */
+  --margin-xs: 0.5rem;
+  --margin-sm: 1rem;
+  --margin-md: 1.5rem;
+  --margin-lg: 2rem;
+  --margin-xl: 3rem;
+
+  /* Gap */
+  --gap-xs: 0.5rem;
+  --gap-sm: 0.75rem;
+  --gap-md: 1rem;
+  --gap-lg: 1.5rem;
+  --gap-xl: 2rem;
+
+  /* ========================================
+     SHADOWS - Elevation system
+     ======================================== */
+
+  --shadow-none: none;
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.18);
+  --shadow-xxl: 0 16px 32px rgba(0, 0, 0, 0.2);
+
+  /* Hover shadows */
+  --shadow-hover-sm: 0 4px 8px rgba(0, 0, 0, 0.15);
+  --shadow-hover-md: 0 6px 12px rgba(0, 0, 0, 0.18);
+  --shadow-hover-lg: 0 12px 20px rgba(0, 0, 0, 0.2);
+
+  /* Inner shadows */
+  --shadow-inner-sm: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-inner-md: inset 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  /* ========================================
+     TYPOGRAPHY
+     ======================================== */
+
+  /* Font families */
+  --font-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-heading: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "SF Mono", "Monaco", "Inconsolata", "Fira Mono", monospace;
+
+  /* Font sizes */
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-base: 1rem;     /* 16px */
+  --font-size-lg: 1.125rem;   /* 18px */
+  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 1.875rem;  /* 30px */
+  --font-size-4xl: 2.25rem;   /* 36px */
+  --font-size-5xl: 3rem;      /* 48px */
+
+  /* Font weights */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Line heights */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  --line-height-loose: 2;
+
+  /* ========================================
+     BORDER RADIUS
+     ======================================== */
+
+  --radius-none: 0;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-xxl: 20px;
+  --radius-full: 9999px;
+
+  /* Component-specific */
+  --radius-button: 8px;
+  --radius-card: 12px;
+  --radius-input: 8px;
+  --radius-badge: 4px;
+
+  /* ========================================
+     TRANSITIONS
+     ======================================== */
+
+  /* Duration */
+  --duration-instant: 0ms;
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 300ms;
+  --duration-slower: 400ms;
+
+  /* Timing functions */
+  --ease-linear: linear;
+  --ease-in: ease-in;
+  --ease-out: ease-out;
+  --ease-in-out: ease-in-out;
+  --ease-smooth: cubic-bezier(0.4, 0.0, 0.2, 1);
+
+  /* Common transitions */
+  --transition-base: all 200ms ease;
+  --transition-fast: all 150ms ease;
+  --transition-slow: all 300ms ease;
+  --transition-transform: transform 200ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  --transition-opacity: opacity 200ms ease;
+  --transition-color: color 200ms ease;
+
+  /* ========================================
+     Z-INDEX
+     ======================================== */
+
+  --z-index-dropdown: 1000;
+  --z-index-sticky: 1020;
+  --z-index-fixed: 1030;
+  --z-index-modal-backdrop: 1040;
+  --z-index-modal: 1050;
+  --z-index-popover: 1060;
+  --z-index-tooltip: 1070;
+}
+
+/* ========================================
+   DARK THEME
+   ======================================== */
+
+[data-theme="dark"] {
+  /* Primary colors remain same, but use light variant for contrast */
+  --color-primary-main: #d4636f;
+  --color-primary-light: #e88d96;
+  --color-primary-dark: #722F37;
+
+  /* Background colors */
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2a2a2a;
+  --bg-tertiary: #3a3a3a;
+  --bg-card: #242424;
+
+  /* Text colors */
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
+  --text-tertiary: #b0b0b0;
+  --text-muted: #808080;
+  --text-inverse: #1a1a1a;
+
+  /* Border & Divider */
+  --border-color: #404040;
+  --divider-color: #333333;
+
+  /* Shadows - stronger for dark theme */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.45);
+  --shadow-xxl: 0 16px 32px rgba(0, 0, 0, 0.5);
+
+  --shadow-hover-sm: 0 4px 8px rgba(0, 0, 0, 0.4);
+  --shadow-hover-md: 0 6px 12px rgba(0, 0, 0, 0.45);
+  --shadow-hover-lg: 0 12px 20px rgba(0, 0, 0, 0.5);
+
+  --shadow-inner-sm: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-inner-md: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* ========================================
+   HIGH CONTRAST MODE
+   ======================================== */
+
+@media (prefers-contrast: high) {
+  :root {
+    --color-primary-main: #5a2429;
+    --border-color: #000000;
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.5);
+  }
+
+  [data-theme="dark"] {
+    --color-primary-main: #ffffff;
+    --border-color: #ffffff;
+  }
+}
+
+/* ========================================
+   REDUCED MOTION
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+    --duration-slow: 0ms;
+    --transition-base: none;
+    --transition-fast: none;
+    --transition-slow: none;
+    --transition-transform: none;
+  }
+}

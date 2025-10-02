@@ -1,62 +1,48 @@
+/**
+ * MyWineMemory - Main Stylesheet
+ *
+ * Import design tokens (CSS variables) first
+ * These provide a single source of truth for colors, spacing, etc.
+ */
+@import './styles/variables.css';
 
-/* CSS Custom Properties - Typography System */
+/* Legacy CSS variables - DEPRECATED, use variables.css tokens instead */
+/* These are kept temporarily for backward compatibility during migration */
 :root {
-  /* Light theme typography */
-  --text-primary: #2c2c2c;           /* Main headings, important text */
-  --text-secondary: #666666;         /* Subtitles, descriptions */
-  --text-tertiary: #888888;          /* Labels, metadata */
-  --text-muted: #aaaaaa;            /* Placeholder, disabled text */
-  
-  /* Button text */
-  --btn-primary-text: #ffffff;       /* Primary button text */
-  --btn-secondary-text: #666666;     /* Secondary button text */
-  --btn-tertiary-text: #722F37;      /* Link-style buttons */
-  
-  /* Interactive text */
-  --link-text: #722F37;             /* Links, clickable text */
-  --link-hover-text: #8B4513;       /* Link hover state */
-  --error-text: #dc2626;            /* Error messages */
-  --success-text: #16a34a;          /* Success messages */
-  --warning-text: #ca8a04;          /* Warning messages */
-  
-  /* Background colors */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8f8f8;
-  --card-bg: #ffffff;
-  --border-color: #e0e0e0;
-  --primary-color: #722F37;
-  --secondary-bg: #f5f5f5;
-  --tag-bg: #f8f8f8;
-  --tag-text: #666666;
+  /* Legacy typography - use --text-* from variables.css */
+  --btn-primary-text: var(--color-primary-contrast);
+  --btn-secondary-text: var(--text-secondary);
+  --btn-tertiary-text: var(--color-primary-main);
+
+  /* Legacy interactive text */
+  --link-text: var(--color-primary-main);
+  --link-hover-text: var(--color-primary-dark);
+  --error-text: var(--color-error);
+  --success-text: var(--color-success);
+  --warning-text: var(--color-warning);
+
+  /* Legacy background colors - use --bg-* from variables.css */
+  --card-bg: var(--bg-card);
+  --primary-color: var(--color-primary-main);
+  --secondary-bg: var(--bg-secondary);
+  --tag-bg: var(--bg-tertiary);
+  --tag-text: var(--text-tertiary);
 }
 
-/* Dark theme typography */
 [data-theme="dark"] {
-  --text-primary: #ffffff;           /* Main headings, important text */
-  --text-secondary: #cccccc;         /* Subtitles, descriptions */
-  --text-tertiary: #aaaaaa;          /* Labels, metadata */
-  --text-muted: #888888;            /* Placeholder, disabled text */
-  
-  /* Button text */
-  --btn-primary-text: #ffffff;       /* Primary button text */
-  --btn-secondary-text: #cccccc;     /* Secondary button text */
-  --btn-tertiary-text: #ffffff;      /* Link-style buttons */
-  
-  /* Interactive text */
-  --link-text: #ffffff;             /* Links, clickable text */
-  --link-hover-text: #cccccc;       /* Link hover state */
-  --error-text: #ef4444;            /* Error messages */
-  --success-text: #22c55e;          /* Success messages */
-  --warning-text: #eab308;          /* Warning messages */
-  
-  /* Background colors */
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #2a2a2a;
-  --card-bg: #2a2a2a;
-  --border-color: #444444;
-  --secondary-bg: #3a3a3a;
-  --tag-bg: #3a3a3a;
-  --tag-text: #cccccc;
+  /* Dark theme legacy mappings */
+  --btn-primary-text: var(--color-primary-contrast);
+  --btn-secondary-text: var(--text-secondary);
+  --btn-tertiary-text: var(--text-primary);
+
+  --link-text: var(--text-primary);
+  --link-hover-text: var(--text-secondary);
+  --error-text: var(--color-error);
+  --success-text: var(--color-success);
+  --warning-text: var(--color-warning);
+
+  --tag-bg: var(--bg-tertiary);
+  --tag-text: var(--text-secondary);
 }
 
 /* Typography Classes */
