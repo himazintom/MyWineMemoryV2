@@ -4,7 +4,6 @@ import {
   addDoc,
   deleteDoc,
   getDocs,
-  getDoc,
   query,
   where,
   orderBy,
@@ -66,15 +65,5 @@ export const draftService = {
   // Delete draft
   async deleteDraft(id: string): Promise<void> {
     await deleteDoc(doc(db, 'drafts', id));
-  },
-
-  // Convert draft to wine record (legacy - not used in new architecture)
-  // This is deprecated and should be replaced with TastingRecord creation
-  async publishDraft(draftId: string): Promise<string> {
-    const draftDoc = await getDoc(doc(db, 'drafts', draftId));
-    if (draftDoc.exists()) {
-      throw new Error('publishDraft is deprecated. Use TastingRecord creation instead.');
-    }
-    throw new Error('Draft not found');
   }
 };
