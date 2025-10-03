@@ -11,6 +11,30 @@ export class PWAService {
   constructor() {
     this.checkIfInstalled();
     this.setupInstallPrompt();
+    this.setupServiceWorkerMessages();
+  }
+
+  // Setup Service Worker message listener for cache updates
+  private setupServiceWorkerMessages() {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data?.type === 'CACHE_UPDATED') {
+          console.log('Cache updated to version:', event.data.version);
+          // Reload page once to get fresh content
+          if (!sessionStorage.getItem('cache-reload-done')) {
+            sessionStorage.setItem('cache-reload-done', 'true');
+            window.location.reload();
+          }
+        }
+      });
+
+      // Clear the reload flag when page loads successfully
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          sessionStorage.removeItem('cache-reload-done');
+        }, 1000);
+      });
+    }
   }
 
   // Check if app is already installed

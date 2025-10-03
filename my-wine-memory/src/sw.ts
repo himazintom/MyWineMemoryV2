@@ -18,6 +18,40 @@ import { onBackgroundMessage } from 'firebase/messaging/sw';
 self.skipWaiting();
 clientsClaim();
 
+// Clear ALL caches on SW activation (force fresh content)
+const CACHE_VERSION = 'v1'; // Increment this when you want to force cache clear
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    (async () => {
+      // Delete ALL old caches except current version marker
+      const cacheNames = await caches.keys();
+      const currentCacheMarker = `cache-version-${CACHE_VERSION}`;
+
+      // Check if this is a new version activation
+      const hasOldCache = cacheNames.some(name => !name.includes(CACHE_VERSION));
+
+      // Delete all old caches
+      await Promise.all(
+        cacheNames
+          .filter(cacheName => cacheName !== currentCacheMarker)
+          .map(cacheName => caches.delete(cacheName))
+      );
+
+      // Create version marker cache
+      await caches.open(currentCacheMarker);
+
+      // Only reload clients if we actually cleared old caches (prevents infinite reload)
+      if (hasOldCache) {
+        const clients = await self.clients.matchAll({ type: 'window' });
+        for (const client of clients) {
+          // Post message instead of navigate to avoid infinite reload
+          client.postMessage({ type: 'CACHE_UPDATED', version: CACHE_VERSION });
+        }
+      }
+    })()
+  );
+});
+
 // Precache manifest (injected by VitePWA)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 precacheAndRoute(self.__WB_MANIFEST as any);
