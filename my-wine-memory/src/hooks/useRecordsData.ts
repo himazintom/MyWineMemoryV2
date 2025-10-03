@@ -1,19 +1,41 @@
 /**
  * Custom hook for Records page data management
  * Handles loading, filtering, and sorting of wine records
+ *
+ * Data flow: TastingRecord (wineId) -> WineMaster (wine info)
  */
 
 import { useReducer, useCallback, useEffect } from 'react';
 import { tastingRecordService } from '../services/tastingRecordService';
 import { wineMasterService } from '../services/wineMasterService';
-import type { WineMaster, TastingRecord } from '../types';
+import type { WineMaster, TastingRecord, WineRecord } from '../types';
 
-// Wine with tastings interface
+// Wine with tastings interface - combines WineMaster with grouped TastingRecords
 export interface WineWithTastings {
   wine: WineMaster;
   tastingRecords: TastingRecord[];
   latestTasting: Date;
   averageRating: number;
+}
+
+// Helper to combine WineMaster + TastingRecord into WineRecord (for future use)
+export function combineWineAndRecord(wine: WineMaster, record: TastingRecord): WineRecord {
+  return {
+    ...wine,
+    recordId: record.id,
+    overallRating: record.overallRating,
+    tastingDate: record.tastingDate,
+    recordMode: record.recordMode,
+    price: record.price,
+    purchaseLocation: record.purchaseLocation,
+    notes: record.notes,
+    detailedAnalysis: record.detailedAnalysis,
+    environment: record.environment,
+    images: record.images,
+    referenceUrls: record.referenceUrls,
+    isPublic: record.isPublic,
+    userId: record.userId
+  };
 }
 
 // State interface

@@ -139,27 +139,45 @@ const Records: React.FC = () => {
 
         {!loading && !error && filteredWineGroups.length > 0 && (
           <div className="wine-groups-list">
-            {filteredWineGroups.map((group, index) => (
-              <WineCard
-                key={group.wine.id}
-                wine={{ ...group.wine, ...group.tastingRecords[0] }}
-                variant="group"
-                index={index}
-                showStats={true}
-                showPrice={true}
-                showPurchaseLocation={true}
-                showPrivacyToggle={true}
-                onClick={() => handleWineClick(group.wine.id)}
-                onAddTasting={handleAddTasting}
-                onTogglePrivacy={handleTogglePrivacy}
-                groupStats={{
-                  averageRating: group.averageRating,
-                  recordCount: group.tastingRecords.length,
-                  latestDate: group.latestTasting,
-                  recentRecords: group.tastingRecords.slice(0, 3)
-                }}
-              />
-            ))}
+            {filteredWineGroups.map((group, index) => {
+              // Combine wine master data with first tasting record for display
+              const latestRecord = group.tastingRecords[0];
+              const combinedWineData = {
+                ...group.wine,
+                recordId: latestRecord.id,
+                overallRating: latestRecord.overallRating,
+                tastingDate: latestRecord.tastingDate,
+                recordMode: latestRecord.recordMode,
+                price: latestRecord.price,
+                purchaseLocation: latestRecord.purchaseLocation,
+                notes: latestRecord.notes,
+                images: latestRecord.images,
+                isPublic: latestRecord.isPublic,
+                userId: latestRecord.userId
+              };
+
+              return (
+                <WineCard
+                  key={group.wine.id}
+                  wine={combinedWineData}
+                  variant="group"
+                  index={index}
+                  showStats={true}
+                  showPrice={true}
+                  showPurchaseLocation={true}
+                  showPrivacyToggle={true}
+                  onClick={() => handleWineClick(group.wine.id)}
+                  onAddTasting={handleAddTasting}
+                  onTogglePrivacy={handleTogglePrivacy}
+                  groupStats={{
+                    averageRating: group.averageRating,
+                    recordCount: group.tastingRecords.length,
+                    latestDate: group.latestTasting,
+                    recentRecords: group.tastingRecords.slice(0, 3)
+                  }}
+                />
+              );
+            })}
           </div>
         )}
       </main>

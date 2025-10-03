@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { publicSharingService } from '../services/userService';
 import { tastingRecordService } from '../services/tastingRecordService';
-import type { User, UserStats, PublicWineRecord } from '../types';
+import { wineMasterService } from '../services/wineMasterService';
+import type { User, UserStats, WineRecord } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import WineCard from '../components/WineCard';
@@ -12,7 +13,7 @@ const PublicProfile: React.FC = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [stats, setStats] = useState<UserStats | null>(null);
-  const [records, setRecords] = useState<PublicWineRecord[]>([]);
+  const [records, setRecords] = useState<WineRecord[]>([]); // Combined WineMaster + TastingRecord
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,7 +31,7 @@ const PublicProfile: React.FC = () => {
 
         // Get public user profile by userId
         const profileData = await publicSharingService.getPublicUserProfileByUserId(userId);
-        
+
         if (!profileData) {
           setError('このユーザーは見つかりませんでした、またはプロフィールが非公開です');
           setLoading(false);
@@ -40,9 +41,33 @@ const PublicProfile: React.FC = () => {
         setUser(profileData.user);
         setStats(profileData.stats);
 
-        // Get public records
-        const publicRecords = await tastingRecordService.getPublicRecords(profileData.user.id);
-        setRecords(publicRecords);
+        // Get public tasting records
+        const publicTastingRecords = await tastingRecordService.getPublicRecords(profileData.user.id);
+
+        // Fetch WineMaster data for each record and combine
+        const wineIds = publicTastingRecords.map(r => r.wineId).filter(id => id);
+        const wines = await wineMasterService.getWineMastersByIds(wineIds, profileData.user.id);
+        const wineMap = new Map(wines.map(w => [w.id, w]));
+
+        const wineRecords: WineRecord[] = [];
+        for (const record of publicTastingRecords) {
+          const wine = wineMap.get(record.wineId);
+          if (wine) {
+            wineRecords.push({
+              ...wine,
+              recordId: record.id,
+              overallRating: record.overallRating,
+              tastingDate: record.tastingDate,
+              recordMode: record.recordMode,
+              notes: record.notes,
+              images: record.images,
+              isPublic: record.isPublic,
+              userId: record.userId
+            });
+          }
+        }
+
+        setRecords(wineRecords);
 
       } catch (err) {
         console.error('Error loading public profile:', err);

@@ -3,9 +3,8 @@ import WineCard from '../WineCard';
 import type { WineRecord } from '../../types';
 
 const mockWineRecord: WineRecord = {
-  id: '123',
-  userId: 'user123',
-  wineId: 'wine123',
+  // WineMaster fields
+  id: 'wine123',
   wineName: 'Test Wine',
   producer: 'Test Producer',
   country: 'France',
@@ -13,13 +12,19 @@ const mockWineRecord: WineRecord = {
   vintage: 2020,
   grapeVarieties: ['Cabernet Sauvignon', 'Merlot'],
   wineType: 'red',
+  createdAt: new Date('2023-01-15'),
+  createdBy: 'user123',
+  referenceCount: 1,
+  updatedAt: new Date('2023-01-15'),
+
+  // TastingRecord fields
+  recordId: 'record123',
+  userId: 'user123',
   overallRating: 8.5,
   tastingDate: new Date('2023-01-15'),
   recordMode: 'quick',
   notes: 'Great wine with excellent balance',
   isPublic: false,
-  createdAt: new Date('2023-01-15'),
-  updatedAt: new Date('2023-01-15'),
 };
 
 describe('WineCard', () => {

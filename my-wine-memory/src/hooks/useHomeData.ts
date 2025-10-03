@@ -5,15 +5,15 @@
 
 import { useReducer, useCallback, useEffect } from 'react';
 import { tastingRecordService } from '../services/tastingRecordService';
-import { draftService } from '../services/wineService';
+import { wineMasterService } from '../services/wineMasterService';
+import { draftService } from '../services/draftService';
 import { gamificationService } from '../services/gamificationService';
-import { guestDataService } from '../services/guestDataService';
 import { userService } from '../services/userService';
 import type { WineRecord, WineDraft, DailyGoal } from '../types';
 
 // State interface
 interface HomeDataState {
-  recentWines: WineRecord[];
+  recentWines: WineRecord[]; // Combined WineMaster + TastingRecord for display
   drafts: WineDraft[];
   dailyGoal: DailyGoal | null;
   weeklyProgress: number[];
@@ -98,8 +98,8 @@ export function useHomeData(
     try {
       if (userId) {
         // Load authenticated user data
-        const [wines, userDrafts, goal, weekProgress] = await Promise.all([
-          tastingRecordService.getUserTastingRecordsWithWineInfo(userId, 'date', 5).catch(error => {
+        const [tastingRecords, userDrafts, goal, weekProgress] = await Promise.all([
+          tastingRecordService.getUserTastingRecords(userId, 'date', 5).catch((error: Error) => {
             console.error('Failed to load wines:', error);
             return [];
           }),
@@ -125,10 +125,39 @@ export function useHomeData(
           })
         ]);
 
+        // Fetch WineMaster data for each tasting record
+        const wineIds = tastingRecords.map(r => r.wineId).filter(id => id);
+        const wines = await wineMasterService.getWineMastersByIds(wineIds, userId);
+        const wineMap = new Map(wines.map(w => [w.id, w]));
+
+        // Combine TastingRecord + WineMaster into WineRecord
+        const wineRecords: WineRecord[] = [];
+        for (const record of tastingRecords) {
+          const wine = wineMap.get(record.wineId);
+          if (wine) {
+            wineRecords.push({
+              ...wine,
+              recordId: record.id,
+              overallRating: record.overallRating,
+              tastingDate: record.tastingDate,
+              recordMode: record.recordMode,
+              price: record.price,
+              purchaseLocation: record.purchaseLocation,
+              notes: record.notes,
+              detailedAnalysis: record.detailedAnalysis,
+              environment: record.environment,
+              images: record.images,
+              referenceUrls: record.referenceUrls,
+              isPublic: record.isPublic,
+              userId: record.userId
+            });
+          }
+        }
+
         dispatch({
           type: 'LOAD_SUCCESS',
           payload: {
-            recentWines: wines.slice(0, 3),
+            recentWines: wineRecords.slice(0, 3),
             drafts: userDrafts,
             dailyGoal: goal,
             weeklyProgress: weekProgress,
@@ -138,12 +167,12 @@ export function useHomeData(
       } else {
         // Load guest data
         console.log('No authenticated user, loading guest data');
-        const guestWines = guestDataService.getGuestWineRecordsAsWineRecords();
-
+        // Note: Guest data is not yet implemented for new architecture
+        // Will need to convert guestDataService to work with TastingRecord
         dispatch({
           type: 'LOAD_SUCCESS',
           payload: {
-            recentWines: guestWines.slice(0, 3),
+            recentWines: [], // TODO: Implement guest mode with new data structure
             drafts: [],
             dailyGoal: null,
             weeklyProgress: [0, 0, 0, 0, 0, 0, 0],

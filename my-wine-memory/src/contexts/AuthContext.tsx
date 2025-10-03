@@ -5,7 +5,8 @@ import { auth } from '../services/firebase';
 import type { User } from '../types';
 import { userService } from '../services/userService';
 import { guestDataService } from '../services/guestDataService';
-import { wineService } from '../services/wineService';
+import { wineMasterService } from '../services/wineMasterService';
+import { tastingRecordService } from '../services/tastingRecordService';
 import { notificationScheduler } from '../services/notificationScheduler';
 import type { AuthContextType } from './AuthTypes';
 
@@ -88,15 +89,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!currentUser) return;
 
     try {
-      // Migrate guest wine records
-      const guestWineRecords = guestDataService.getGuestWineRecords();
-      for (const guestRecord of guestWineRecords) {
-        const wineRecord = {
-          ...guestRecord,
-          createdAt: new Date(guestRecord.createdAt)
-        };
-        delete (wineRecord as { [key: string]: unknown }).tempId;
-        await wineService.createWineRecord(currentUser.uid, wineRecord);
+      // Migrate guest tasting records (new architecture: WineMaster + TastingRecord)
+      const guestTastingRecords = guestDataService.getGuestTastingRecords();
+      for (const guestRecord of guestTastingRecords) {
+        // Step 1: Create or find WineMaster
+        const wineId = await wineMasterService.createOrFindWineMaster(
+          guestRecord.wineData,
+          currentUser.uid
+        );
+
+        // Step 2: Create TastingRecord linked to WineMaster
+        await tastingRecordService.createTastingRecord(currentUser.uid, {
+          wineId,
+          ...guestRecord.tastingData
+        });
       }
 
       // Migrate guest quiz results (add XP to user profile)
@@ -104,7 +110,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (guestQuizResults.length > 0 && userProfile) {
         const totalGuestXP = guestQuizResults.reduce((sum, result) => sum + result.xpEarned, 0);
         await userService.addXP(currentUser.uid, totalGuestXP);
-        
+
         // Update local user profile
         setUserProfile(prev => prev ? {
           ...prev,
@@ -115,7 +121,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Clear guest data after successful migration
       guestDataService.clearAllGuestData();
-      
+
       console.log('Guest data migration completed successfully');
     } catch (error) {
       console.error('Guest data migration failed:', error);
@@ -156,24 +162,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const userProfile = await userService.createOrUpdateUser(result.user);
           setUserProfile(userProfile);
           
-          // Migrate guest data if available
+          // Migrate guest data if available (new architecture)
           if (guestDataService.hasGuestData()) {
-            const guestWineRecords = guestDataService.getGuestWineRecords();
-            for (const guestRecord of guestWineRecords) {
-              const wineRecord = {
-                ...guestRecord,
-                createdAt: new Date(guestRecord.createdAt)
-              };
-              delete (wineRecord as { [key: string]: unknown }).tempId;
-              await wineService.createWineRecord(result.user.uid, wineRecord);
+            const guestTastingRecords = guestDataService.getGuestTastingRecords();
+            for (const guestRecord of guestTastingRecords) {
+              // Step 1: Create or find WineMaster
+              const wineId = await wineMasterService.createOrFindWineMaster(
+                guestRecord.wineData,
+                result.user.uid
+              );
+
+              // Step 2: Create TastingRecord
+              await tastingRecordService.createTastingRecord(result.user.uid, {
+                wineId,
+                ...guestRecord.tastingData
+              });
             }
-            
+
             const guestQuizResults = guestDataService.getGuestQuizResults();
             if (guestQuizResults.length > 0) {
               const totalGuestXP = guestQuizResults.reduce((sum, result) => sum + result.xpEarned, 0);
               await userService.addXP(result.user.uid, totalGuestXP);
             }
-            
+
             guestDataService.clearAllGuestData();
             console.log('Guest data migration completed after redirect');
           }

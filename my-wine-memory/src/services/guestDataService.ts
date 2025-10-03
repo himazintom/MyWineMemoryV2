@@ -1,10 +1,15 @@
-import type { WineRecord } from '../types';
+import type { WineMaster, TastingRecord } from '../types';
 
-const GUEST_WINE_RECORDS_KEY = 'guestWineRecords';
+const GUEST_TASTING_RECORDS_KEY = 'guestTastingRecords';
 const GUEST_QUIZ_RESULTS_KEY = 'guestQuizResults';
 
-export interface GuestWineRecord extends Omit<WineRecord, 'id' | 'userId' | 'createdAt'> {
+// Guest data structure combining wine info + tasting data for easy migration
+export interface GuestTastingRecord {
   tempId: string;
+  // WineMaster data
+  wineData: Omit<WineMaster, 'id' | 'createdAt' | 'createdBy' | 'referenceCount' | 'updatedAt'>;
+  // TastingRecord data
+  tastingData: Omit<TastingRecord, 'id' | 'userId' | 'wineId' | 'createdAt' | 'updatedAt'>;
   createdAt: string; // ISO string for localStorage
 }
 
@@ -18,42 +23,37 @@ export interface GuestQuizResult {
 }
 
 class GuestDataService {
-  // Wine Records
-  saveGuestWineRecord(record: Omit<WineRecord, 'id' | 'userId'>): string {
-    const guestRecord: GuestWineRecord = {
-      ...record,
+  // Tasting Records (new architecture)
+  saveGuestTastingRecord(
+    wineData: Omit<WineMaster, 'id' | 'createdAt' | 'createdBy' | 'referenceCount' | 'updatedAt'>,
+    tastingData: Omit<TastingRecord, 'id' | 'userId' | 'wineId' | 'createdAt' | 'updatedAt'>
+  ): string {
+    const guestRecord: GuestTastingRecord = {
       tempId: `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      createdAt: record.createdAt.toISOString()
+      wineData,
+      tastingData,
+      createdAt: new Date().toISOString()
     };
 
-    const existingRecords = this.getGuestWineRecords();
+    const existingRecords = this.getGuestTastingRecords();
     existingRecords.push(guestRecord);
-    
-    localStorage.setItem(GUEST_WINE_RECORDS_KEY, JSON.stringify(existingRecords));
+
+    localStorage.setItem(GUEST_TASTING_RECORDS_KEY, JSON.stringify(existingRecords));
     return guestRecord.tempId;
   }
 
-  getGuestWineRecords(): GuestWineRecord[] {
+  getGuestTastingRecords(): GuestTastingRecord[] {
     try {
-      const stored = localStorage.getItem(GUEST_WINE_RECORDS_KEY);
+      const stored = localStorage.getItem(GUEST_TASTING_RECORDS_KEY);
       return stored ? JSON.parse(stored) : [];
     } catch (error) {
-      console.error('Failed to load guest wine records:', error);
+      console.error('Failed to load guest tasting records:', error);
       return [];
     }
   }
 
-  getGuestWineRecordsAsWineRecords(): WineRecord[] {
-    return this.getGuestWineRecords().map(guestRecord => ({
-      ...guestRecord,
-      id: guestRecord.tempId,
-      userId: 'guest',
-      createdAt: new Date(guestRecord.createdAt)
-    }));
-  }
-
-  clearGuestWineRecords(): void {
-    localStorage.removeItem(GUEST_WINE_RECORDS_KEY);
+  clearGuestTastingRecords(): void {
+    localStorage.removeItem(GUEST_TASTING_RECORDS_KEY);
   }
 
   // Quiz Results
@@ -90,17 +90,17 @@ class GuestDataService {
 
   // Check if there's any guest data
   hasGuestData(): boolean {
-    return this.getGuestWineRecords().length > 0 || this.getGuestQuizResults().length > 0;
+    return this.getGuestTastingRecords().length > 0 || this.getGuestQuizResults().length > 0;
   }
 
   // Get guest data summary for migration prompt
-  getGuestDataSummary(): { wineRecords: number; quizResults: number; totalXP: number } {
-    const wineRecords = this.getGuestWineRecords();
+  getGuestDataSummary(): { tastingRecords: number; quizResults: number; totalXP: number } {
+    const tastingRecords = this.getGuestTastingRecords();
     const quizResults = this.getGuestQuizResults();
     const totalXP = quizResults.reduce((sum, result) => sum + result.xpEarned, 0);
-    
+
     return {
-      wineRecords: wineRecords.length,
+      tastingRecords: tastingRecords.length,
       quizResults: quizResults.length,
       totalXP
     };
@@ -108,7 +108,7 @@ class GuestDataService {
 
   // Clear all guest data
   clearAllGuestData(): void {
-    this.clearGuestWineRecords();
+    this.clearGuestTastingRecords();
     this.clearGuestQuizResults();
   }
 }

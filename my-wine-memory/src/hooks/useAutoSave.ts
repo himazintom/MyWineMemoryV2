@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { draftService } from '../services/wineService';
+import { draftService } from '../services/draftService';
 import { indexedDBService } from '../services/indexedDBService';
 import type { WineRecord, TastingRecord } from '../types';
 import { useNetworkStatus } from './useNetworkStatus';

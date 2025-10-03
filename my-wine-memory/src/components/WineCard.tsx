@@ -2,7 +2,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import type { WineRecord, WineMaster, TastingRecord, PublicWineRecord } from '../types';
 
-type WineData = WineRecord | WineMaster | TastingRecord | PublicWineRecord;
+// WineCard accepts only types that have wine information (not pure TastingRecord)
+type WineData = WineRecord | WineMaster | PublicWineRecord;
 
 export interface WineCardProps {
   // 基本データ
@@ -347,8 +348,9 @@ const WineCard: React.FC<WineCardProps> = ({
   }
 
   // Variant: detail (WineDetail用のテイスティング記録)
+  // This variant requires a WineRecord (combined wine + tasting data)
   if (variant === 'detail' && hasTastingDate) {
-    const record = wine as TastingRecord;
+    const record = wine as WineRecord;
     return (
       <motion.div
         className="tasting-record-card"

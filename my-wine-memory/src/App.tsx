@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ErrorProvider } from './contexts/ErrorContext';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import BottomNavigation from './components/BottomNavigation';
 import LoadingSpinner from './components/LoadingSpinner';
 // import { OfflineIndicator } from './components/OfflineIndicator';
@@ -39,11 +40,11 @@ const UserPublicProfile = React.lazy(() => import('./pages/UserPublicProfile'));
 function ConditionalBottomNav() {
   const location = useLocation();
   const isQuizGame = location.pathname.includes('/quiz/play/');
-  
+
   if (isQuizGame) {
     return null;
   }
-  
+
   return <BottomNavigation />;
 }
 
@@ -74,36 +75,38 @@ function App() {
             <div className="app">
               {/* <OfflineIndicator /> */}
               <main className="main-content">
-              <Suspense fallback={
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'center', 
-                  alignItems: 'center', 
-                  height: '50vh' 
-                }}>
-                  <LoadingSpinner message="ページを読み込み中..." />
-                </div>
-              }>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/records" element={<Records />} />
-                  <Route path="/select-wine" element={<SelectWine />} />
-                  <Route path="/add-tasting-record" element={<AddTastingRecord />} />
-                  <Route path="/add-tasting-record/:wineId" element={<AddTastingRecord />} />
-                  <Route path="/edit-tasting-record/:recordId" element={<AddTastingRecord />} />
-                  <Route path="/wine-detail/:wineId" element={<WineDetail />} />
-                  <Route path="/quiz" element={<Quiz />} />
-                  <Route path="/quiz/levels" element={<QuizLevelSelect />} />
-                  <Route path="/quiz/play/:difficulty" element={<QuizGame />} />
-                  <Route path="/stats" element={<Stats />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/profile/:userId" element={<PublicProfile />} />
-                  <Route path="/public-wines/:userId" element={<UserPublicProfile />} />
-                </Routes>
-              </Suspense>
-            </main>
-            <ConditionalBottomNav />
-          </div>
+                <ErrorBoundary>
+                  <Suspense fallback={
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      height: '50vh'
+                    }}>
+                      <LoadingSpinner message="ページを読み込み中..." />
+                    </div>
+                  }>
+                    <Routes>
+                      <Route path="/" element={<Home />} />
+                      <Route path="/records" element={<Records />} />
+                      <Route path="/select-wine" element={<SelectWine />} />
+                      <Route path="/add-tasting-record" element={<AddTastingRecord />} />
+                      <Route path="/add-tasting-record/:wineId" element={<AddTastingRecord />} />
+                      <Route path="/edit-tasting-record/:recordId" element={<AddTastingRecord />} />
+                      <Route path="/wine-detail/:wineId" element={<WineDetail />} />
+                      <Route path="/quiz" element={<Quiz />} />
+                      <Route path="/quiz/levels" element={<QuizLevelSelect />} />
+                      <Route path="/quiz/play/:difficulty" element={<QuizGame />} />
+                      <Route path="/stats" element={<Stats />} />
+                      <Route path="/profile" element={<Profile />} />
+                      <Route path="/profile/:userId" element={<PublicProfile />} />
+                      <Route path="/public-wines/:userId" element={<UserPublicProfile />} />
+                    </Routes>
+                  </Suspense>
+                </ErrorBoundary>
+              </main>
+              <ConditionalBottomNav />
+            </div>
           </Router>
         </AuthProvider>
       </ErrorProvider>

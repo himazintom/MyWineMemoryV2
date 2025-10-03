@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { tastingRecordService } from '../services/tastingRecordService';
+import { wineMasterService } from '../services/wineMasterService';
 import { userService } from '../services/userService';
-import type { PublicWineRecord, User } from '../types';
+import type { WineRecord, User } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import WineCard from '../components/WineCard';
@@ -10,7 +11,7 @@ import { useAsyncOperation } from '../hooks/useAsyncOperation';
 
 interface UserPublicProfileData {
   user: Partial<User>;
-  records: PublicWineRecord[];
+  records: WineRecord[]; // Combined WineMaster + TastingRecord
   stats: {
     totalRecords: number;
     averageRating: number;
@@ -37,18 +38,41 @@ const UserPublicProfile: React.FC = () => {
 
   const loadUserProfile = async () => {
     if (!userId) return;
-    
+
     try {
       const data = await execute(async () => {
         // Get user info
         const user = await userService.getUserProfile(userId);
-        
-        // Get public records
-        const records = await tastingRecordService.getPublicRecords(userId);
-        
-        // Calculate statistics
-        const stats = calculateStats(records);
-        
+
+        // Get public tasting records
+        const publicTastingRecords = await tastingRecordService.getPublicRecords(userId);
+
+        // Fetch WineMaster data for each record and combine
+        const wineIds = publicTastingRecords.map(r => r.wineId).filter(id => id);
+        const wines = await wineMasterService.getWineMastersByIds(wineIds, userId);
+        const wineMap = new Map(wines.map(w => [w.id, w]));
+
+        const wineRecords: WineRecord[] = [];
+        for (const record of publicTastingRecords) {
+          const wine = wineMap.get(record.wineId);
+          if (wine) {
+            wineRecords.push({
+              ...wine,
+              recordId: record.id,
+              overallRating: record.overallRating,
+              tastingDate: record.tastingDate,
+              recordMode: record.recordMode,
+              notes: record.notes,
+              images: record.images,
+              isPublic: record.isPublic,
+              userId: record.userId
+            });
+          }
+        }
+
+        // Calculate statistics with wine data
+        const stats = calculateStats(wineRecords);
+
         return {
           user: {
             displayName: user?.displayName || 'Wine Lover',
@@ -59,11 +83,11 @@ const UserPublicProfile: React.FC = () => {
             totalRecords: user?.totalRecords || 0,
             createdAt: user?.createdAt
           },
-          records,
+          records: wineRecords,
           stats
         };
       });
-      
+
       if (data) {
         setProfileData(data);
       }
@@ -72,7 +96,7 @@ const UserPublicProfile: React.FC = () => {
     }
   };
 
-  const calculateStats = (records: PublicWineRecord[]) => {
+  const calculateStats = (records: WineRecord[]) => {
     if (records.length === 0) {
       return {
         totalRecords: 0,
@@ -85,7 +109,7 @@ const UserPublicProfile: React.FC = () => {
     const totalRating = records.reduce((sum, r) => sum + r.overallRating, 0);
     const averageRating = totalRating / records.length;
 
-    // Count wine types
+    // Count wine types (now we have access to WineMaster data)
     const wineTypes: { [key: string]: number } = {};
     records.forEach(record => {
       const type = record.wineType || 'unknown';

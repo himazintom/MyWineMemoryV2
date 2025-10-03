@@ -1,158 +1,60 @@
-import { 
-  collection, 
-  doc, 
-  addDoc, 
-  getDoc, 
-  getDocs, 
-  updateDoc, 
+import {
+  collection,
+  doc,
+  addDoc,
+  getDoc,
+  getDocs,
+  updateDoc,
   deleteDoc,
-  query, 
-  where, 
-  orderBy, 
+  query,
+  where,
+  orderBy,
   limit as limitQuery,
   Timestamp,
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from './firebase';
-import type { TastingRecord, WineRecord, PublicWineRecord } from '../types';
+import type { TastingRecord } from '../types';
 import { gamificationService } from './gamificationService';
 
 class TastingRecordService {
   private readonly collection = 'tasting_records';
 
-  // Search existing wines by user
-  async searchUserWines(userId: string, searchTerm: string, limit: number = 20): Promise<TastingRecord[]> {
+  // Get tasting records for specific wine by wineId
+  async getTastingRecordsForWineById(userId: string, wineId: string, limit: number = 20): Promise<TastingRecord[]> {
     try {
-      const searches = [
-        // Search by wine name
-        query(
-          collection(db, this.collection),
-          where('userId', '==', userId),
-          where('wineName', '>=', searchTerm),
-          where('wineName', '<=', searchTerm + '\uf8ff'),
-          orderBy('wineName'),
-          limitQuery(limit)
-        ),
-        // Search by producer
-        query(
-          collection(db, this.collection),
-          where('userId', '==', userId),
-          where('producer', '>=', searchTerm),
-          where('producer', '<=', searchTerm + '\uf8ff'),
-          orderBy('producer'),
-          limitQuery(limit)
-        )
-      ];
+      const q = query(
+        collection(db, this.collection),
+        where('userId', '==', userId),
+        where('wineId', '==', wineId),
+        orderBy('tastingDate', 'desc'),
+        limitQuery(limit)
+      );
 
-      const results: TastingRecord[] = [];
-      const seenWines = new Set<string>();
+      const querySnapshot = await getDocs(q);
 
-      for (const q of searches) {
-        const querySnapshot = await getDocs(q);
-        
-        querySnapshot.docs.forEach((doc) => {
-          const record = {
-            id: doc.id,
-            ...doc.data(),
-            tastingDate: doc.data().tastingDate?.toDate() || new Date(),
-            createdAt: doc.data().createdAt?.toDate() || new Date(),
-            updatedAt: doc.data().updatedAt?.toDate() || new Date()
-          } as TastingRecord;
-          
-          const wineKey = `${record.wineName}-${record.producer}`;
-          if (!seenWines.has(wineKey)) {
-            seenWines.add(wineKey);
-            results.push(record);
-          }
-        });
-      }
-
-      // Return unique wines sorted by wine name
-      return results
-        .sort((a, b) => a.wineName.localeCompare(b.wineName))
-        .slice(0, limit);
+      return querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        tastingDate: doc.data().tastingDate?.toDate() || new Date(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+        updatedAt: doc.data().updatedAt?.toDate() || new Date()
+      } as TastingRecord));
     } catch (error) {
-      console.error('Error searching user wines:', error);
-      throw new Error('ワインの検索に失敗しました');
-    }
-  }
-
-  // Get popular wines for user (most recorded)
-  async getUserPopularWines(userId: string, limit: number = 10): Promise<{wineName: string; producer: string; count: number; lastRecord: TastingRecord}[]> {
-    try {
-      const allRecords = await this.getUserTastingRecords(userId, 'date', 1000);
-      
-      const wineGroups: { [key: string]: TastingRecord[] } = {};
-      
-      allRecords.forEach(record => {
-        const wineKey = `${record.wineName}-${record.producer}`;
-        if (!wineGroups[wineKey]) {
-          wineGroups[wineKey] = [];
-        }
-        wineGroups[wineKey].push(record);
-      });
-
-      const popularWines = Object.entries(wineGroups)
-        .map(([, records]) => ({
-          wineName: records[0].wineName,
-          producer: records[0].producer,
-          count: records.length,
-          lastRecord: records[0] // Already sorted by date desc
-        }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, limit);
-
-      return popularWines;
-    } catch (error) {
-      console.error('Error getting user popular wines:', error);
-      return [];
-    }
-  }
-
-  // Get unique wines for user
-  async getUserUniqueWines(userId: string): Promise<{wineName: string; producer: string; country: string; region: string; vintage?: number}[]> {
-    try {
-      const allRecords = await this.getUserTastingRecords(userId, 'date', 1000);
-      
-      const uniqueWines = new Map<string, TastingRecord>();
-      
-      allRecords.forEach(record => {
-        const wineKey = `${record.wineName}-${record.producer}`;
-        if (!uniqueWines.has(wineKey)) {
-          uniqueWines.set(wineKey, record);
-        }
-      });
-
-      return Array.from(uniqueWines.values()).map(record => ({
-        wineName: record.wineName,
-        producer: record.producer,
-        country: record.country,
-        region: record.region,
-        vintage: record.vintage
-      }));
-    } catch (error) {
-      console.error('Error getting unique wines:', error);
-      return [];
+      console.error('Error getting tasting records for wine by ID:', error);
+      throw new Error('ワインのテイスティング記録取得に失敗しました');
     }
   }
 
   // Create new tasting record
   async createTastingRecord(
-    userId: string, 
+    userId: string,
     data: Omit<TastingRecord, 'id' | 'userId' | 'createdAt' | 'updatedAt'>
   ): Promise<string> {
     try {
       // Validate required fields
       if (!data.wineId || typeof data.wineId !== 'string' || data.wineId.trim() === '') {
         throw new Error('wineId is required and must be a non-empty string');
-      }
-      
-      if (!data.wineName || typeof data.wineName !== 'string' || data.wineName.trim() === '') {
-        throw new Error('wineName is required and must be a non-empty string');
-      }
-      
-      if (!data.producer || typeof data.producer !== 'string' || data.producer.trim() === '') {
-        throw new Error('producer is required and must be a non-empty string');
       }
 
       const tastingData: Omit<TastingRecord, 'id'> = {
@@ -162,7 +64,7 @@ class TastingRecordService {
         updatedAt: new Date()
       };
 
-      // Convert tastingDate string to Date - temporarily disable validation
+      // Convert tastingDate string to Date
       const tastingDate = new Date(tastingData.tastingDate);
       const validTastingDate = isNaN(tastingDate.getTime()) ? new Date() : tastingDate;
 
@@ -173,17 +75,12 @@ class TastingRecordService {
         updatedAt: Timestamp.fromDate(tastingData.updatedAt)
       };
 
-      // Debug log for troubleshooting
-      console.log('Creating tasting record with data:', {
+      console.log('Creating tasting record:', {
         userId: firestoreData.userId,
         wineId: firestoreData.wineId,
-        wineName: firestoreData.wineName,
-        producer: firestoreData.producer,
         overallRating: firestoreData.overallRating,
         recordMode: firestoreData.recordMode,
-        tastingDate: validTastingDate.toISOString(),
-        hasImages: !!firestoreData.images,
-        hasDetailedAnalysis: !!firestoreData.detailedAnalysis
+        tastingDate: validTastingDate.toISOString()
       });
 
       const docRef = await addDoc(collection(db, this.collection), firestoreData);
@@ -193,7 +90,6 @@ class TastingRecordService {
         await gamificationService.processWineRecording(userId, data.recordMode);
       } catch (gamificationError) {
         console.error('Error processing gamification for wine record:', gamificationError);
-        // Don't fail the main operation if gamification fails
       }
 
       return docRef.id;
@@ -280,50 +176,6 @@ class TastingRecordService {
     }
   }
 
-  // Get tasting records for specific wine (current user only)
-  async getTastingRecordsForWine(userId: string, wineName: string, producer: string, limit: number = 20): Promise<TastingRecord[]> {
-    try {
-      const q = query(
-        collection(db, this.collection),
-        where('userId', '==', userId),
-        where('wineName', '==', wineName),
-        where('producer', '==', producer),
-        orderBy('tastingDate', 'desc'),
-        limitQuery(limit)
-      );
-
-      const querySnapshot = await getDocs(q);
-      
-      return querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-        tastingDate: doc.data().tastingDate?.toDate() || new Date(),
-        createdAt: doc.data().createdAt?.toDate() || new Date(),
-        updatedAt: doc.data().updatedAt?.toDate() || new Date()
-      } as TastingRecord));
-    } catch (error) {
-      console.error('Error getting tasting records for wine:', error);
-      throw new Error('ワインのテイスティング記録取得に失敗しました');
-    }
-  }
-
-  // Get user's tasting records with wine info (for display)
-  async getUserTastingRecordsWithWineInfo(
-    userId: string, 
-    sortBy: 'date' | 'rating' = 'date',
-    limit: number = 50
-  ): Promise<WineRecord[]> {
-    try {
-      const tastingRecords = await this.getUserTastingRecords(userId, sortBy, limit);
-      
-      // TastingRecord already contains all wine info, just return as WineRecord
-      return tastingRecords as WineRecord[];
-    } catch (error) {
-      console.error('Error getting user tasting records with wine info:', error);
-      // Return empty array instead of throwing error to prevent UI crashes
-      return [];
-    }
-  }
 
   // Update tasting record
   async updateTastingRecord(
@@ -495,40 +347,28 @@ class TastingRecordService {
   async getTastingStatistics(userId: string): Promise<{
     totalRecords: number;
     averageRating: number;
-    winesByCountry: { [country: string]: number };
     recentActivity: TastingRecord[];
   }> {
     try {
       const allRecords = await this.getUserTastingRecords(userId, 'date', 1000);
-      
-      const totalRecords = allRecords.length;
-      const averageRating = totalRecords > 0 
-        ? allRecords.reduce((sum, record) => sum + record.overallRating, 0) / totalRecords 
-        : 0;
 
-      // Calculate country distribution from records directly
-      const winesByCountry: { [country: string]: number } = {};
-      for (const record of allRecords) {
-        if (record.country) {
-          winesByCountry[record.country] = (winesByCountry[record.country] || 0) + 1;
-        }
-      }
+      const totalRecords = allRecords.length;
+      const averageRating = totalRecords > 0
+        ? allRecords.reduce((sum, record) => sum + record.overallRating, 0) / totalRecords
+        : 0;
 
       const recentActivity = allRecords.slice(0, 10);
 
       return {
         totalRecords,
         averageRating: Math.round(averageRating * 10) / 10,
-        winesByCountry,
         recentActivity
       };
     } catch (error) {
       console.error('Error getting tasting statistics:', error);
-      // Return empty statistics instead of throwing error
       return {
         totalRecords: 0,
         averageRating: 0,
-        winesByCountry: {},
         recentActivity: []
       };
     }
@@ -545,7 +385,7 @@ class TastingRecordService {
       recordMode?: 'quick' | 'detailed';
     } = {},
     limit: number = 50
-  ): Promise<WineRecord[]> {
+  ): Promise<TastingRecord[]> {
     try {
       let q = query(
         collection(db, this.collection),
@@ -582,103 +422,24 @@ class TastingRecordService {
         return true;
       });
 
-      // TastingRecord already contains all wine info, just return as WineRecord
-      return filteredRecords as WineRecord[];
+      return filteredRecords;
     } catch (error) {
       console.error('Error searching tasting records:', error);
-      // Return empty array instead of throwing error
       return [];
     }
   }
 
-  // Get public records for sharing (exclude private data)
-  async getPublicRecords(userId: string): Promise<PublicWineRecord[]> {
+  // Get public records for sharing (returns only TastingRecord IDs + metadata)
+  async getPublicRecords(userId: string): Promise<TastingRecord[]> {
     try {
       const allRecords = await this.getUserTastingRecords(userId, 'date', 1000);
-      
-      return allRecords
-        .filter(record => record.isPublic)
-        .map(record => ({
-          id: record.id,
-          wineName: record.wineName,
-          producer: record.producer,
-          country: record.country,
-          region: record.region,
-          vintage: record.vintage,
-          overallRating: record.overallRating,
-          tastingDate: record.tastingDate instanceof Date ? record.tastingDate : new Date(record.tastingDate),
-          recordMode: record.recordMode,
-          notes: record.notes,
-          images: record.images
-          // Exclude: price, purchaseLocation, and other private data
-        } as PublicWineRecord));
+      return allRecords.filter(record => record.isPublic);
     } catch (error) {
       console.error('Error getting public records:', error);
       return [];
     }
   }
 
-  // DEPRECATED: Not aligned with app principles (personal learning focus)
-  // This method fetches records from ALL users, which goes against the fundamental principle
-  // that this is a personal wine learning app, not a social platform
-  // Use getPublicRecords(userId) instead for individual user profiles
-  // @deprecated
-  async getAllPublicRecords(limit: number = 50): Promise<(PublicWineRecord & { userName?: string })[]> {
-    try {
-      const publicRecordsQuery = query(
-        collection(db, this.collection),
-        where('isPublic', '==', true),
-        orderBy('createdAt', 'desc'),
-        limitQuery(limit)
-      );
-      
-      const querySnapshot = await getDocs(publicRecordsQuery);
-      const publicRecords: (PublicWineRecord & { userName?: string })[] = [];
-      
-      for (const docSnapshot of querySnapshot.docs) {
-        const data = docSnapshot.data() as TastingRecord;
-        
-        // Get user name if available
-        let userName = 'Anonymous';
-        try {
-          const userRef = doc(db, 'users', data.userId);
-          const userDoc = await getDoc(userRef);
-          if (userDoc.exists()) {
-            userName = userDoc.data().displayName || 'Wine Lover';
-          }
-        } catch (error) {
-          console.warn('Could not fetch user name:', error);
-        }
-        
-        publicRecords.push({
-          id: docSnapshot.id,
-          wineName: data.wineName,
-          producer: data.producer,
-          country: data.country,
-          region: data.region,
-          vintage: data.vintage,
-          grapeVarieties: data.grapeVarieties,
-          wineType: data.wineType,
-          alcoholContent: data.alcoholContent,
-          overallRating: data.overallRating,
-          tastingDate: data.tastingDate instanceof Timestamp ? data.tastingDate.toDate() : new Date(data.tastingDate),
-          recordMode: data.recordMode,
-          notes: data.notes,
-          images: data.images,
-          detailedAnalysis: data.detailedAnalysis,
-          environment: data.environment,
-          createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(data.createdAt),
-          userName,
-          userId: data.userId
-        } as any);
-      }
-      
-      return publicRecords;
-    } catch (error) {
-      console.error('Error getting all public records:', error);
-      return [];
-    }
-  }
 }
 
 export const tastingRecordService = new TastingRecordService();
