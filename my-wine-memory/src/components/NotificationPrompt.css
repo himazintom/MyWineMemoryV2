@@ -260,13 +260,19 @@
 
 .pwa-install-actions .btn-primary {
   background: white;
-  color: var(--wine-red);
+  color: #722F37 !important;
   padding: 8px 16px;
   border-radius: 6px;
   border: none;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pwa-install-actions .btn-primary:hover {
+  background: #f5f5f5;
+  transform: scale(1.02);
 }
 
 .pwa-install-actions .btn-text {

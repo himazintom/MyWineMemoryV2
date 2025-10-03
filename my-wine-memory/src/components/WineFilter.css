@@ -174,18 +174,18 @@
 
 .filter-chip {
   padding: 6px 12px;
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
+  background: #e9ecef;
+  border: 1px solid #ced4da;
   border-radius: 16px;
   font-size: 12px;
-  color: #666;
+  color: #495057;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .filter-chip:hover {
-  background: #e9ecef;
-  color: #333;
+  background: #dee2e6;
+  color: #212529;
 }
 
 .filter-chip.selected {
@@ -292,92 +292,92 @@
 }
 
 /* Dark theme */
-@media (prefers-color-scheme: dark) {
-  .wine-filter {
-    background: #2d2d2d;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  }
-  
-  .filter-header {
-    border-bottom-color: #444;
-  }
-  
-  .filter-toggle {
-    color: #e0e0e0;
-  }
-  
-  .filter-toggle:hover,
-  .filter-toggle.expanded {
-    color: #ff6b7a;
-  }
-  
-  .filter-clear {
-    color: #bbb;
-  }
-  
-  .filter-clear:hover {
-    background-color: #444;
-    color: #e0e0e0;
-  }
-  
-  .filter-tabs {
-    background: #333;
-    border-bottom-color: #444;
-  }
-  
-  .filter-tab {
-    color: #bbb;
-  }
-  
-  .filter-tab:hover {
-    background: rgba(255, 107, 122, 0.1);
-    color: #ff6b7a;
-  }
-  
-  .filter-tab.active {
-    color: #ff6b7a;
-    background: #2d2d2d;
-    border-bottom-color: #ff6b7a;
-  }
-  
-  .filter-section h4 {
-    color: #e0e0e0;
-  }
-  
-  .wine-type-button {
-    color: #e0e0e0;
-  }
-  
-  .filter-chip {
-    background: #333;
-    border-color: #444;
-    color: #bbb;
-  }
-  
-  .filter-chip:hover {
-    background: #444;
-    color: #e0e0e0;
-  }
-  
-  .filter-chip.selected {
-    background: #ff6b7a;
-    border-color: #ff6b7a;
-  }
-  
-  .range-inputs input {
-    background: #333;
-    border-color: #444;
-    color: #e0e0e0;
-  }
-  
-  .range-inputs input:focus {
-    border-color: #ff6b7a;
-    box-shadow: 0 0 0 2px rgba(255, 107, 122, 0.2);
-  }
-  
-  .range-separator {
-    color: #bbb;
-  }
+[data-theme="dark"] .wine-filter {
+  background: var(--card-bg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .filter-header {
+  border-bottom-color: #444;
+}
+
+[data-theme="dark"] .filter-toggle {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .filter-toggle:hover,
+[data-theme="dark"] .filter-toggle.expanded {
+  color: var(--wine-red);
+}
+
+[data-theme="dark"] .filter-clear {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .filter-clear:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .filter-tabs {
+  background: var(--bg-secondary);
+  border-bottom-color: #444;
+}
+
+[data-theme="dark"] .filter-tab {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .filter-tab:hover {
+  background: rgba(114, 47, 55, 0.1);
+  color: var(--wine-red);
+}
+
+[data-theme="dark"] .filter-tab.active {
+  color: var(--wine-red);
+  background: var(--card-bg);
+  border-bottom-color: var(--wine-red);
+}
+
+[data-theme="dark"] .filter-section h4 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .wine-type-button {
+  color: var(--text-primary);
+  border-color: #444;
+}
+
+[data-theme="dark"] .filter-chip {
+  background: var(--bg-secondary);
+  border-color: #444;
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .filter-chip:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .filter-chip.selected {
+  background: var(--wine-red);
+  border-color: var(--wine-red);
+  color: white;
+}
+
+[data-theme="dark"] .range-inputs input {
+  background: var(--bg-secondary);
+  border-color: #444;
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .range-inputs input:focus {
+  border-color: var(--wine-red);
+  box-shadow: 0 0 0 2px rgba(114, 47, 55, 0.2);
+}
+
+[data-theme="dark"] .range-separator {
+  color: var(--text-secondary);
 }
 
 /* High contrast mode */
