@@ -6,6 +6,7 @@ import { wineMasterService } from '../services/wineMasterService';
 import type { WineMaster } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
+import WineCard from '../components/WineCard';
 import TagInput from '../components/TagInput';
 import GrapeVarietyInput from '../components/GrapeVarietyInput';
 import { useAsyncOperation } from '../hooks/useAsyncOperation';
@@ -262,29 +263,14 @@ const SelectWine: React.FC = () => {
 
           {!isLoading && !error && displayedWines.length > 0 && (
             <div className="wine-list">
-              {displayedWines.map((wine) => (
-                <div 
-                  key={wine.id} 
-                  className="wine-list-item"
+              {displayedWines.map((wine, index) => (
+                <WineCard
+                  key={wine.id}
+                  wine={wine}
+                  variant="list"
+                  index={index}
                   onClick={() => handleSelectWine(wine.id)}
-                >
-                  <div className="wine-info">
-                    <h3 className="wine-name">{wine.wineName}</h3>
-                    <p className="wine-producer">{wine.producer}</p>
-                    <div className="wine-details-mobile">
-                      <p className="wine-location">{wine.country} - {wine.region}</p>
-                      {wine.vintage && (
-                        <p className="wine-vintage">{wine.vintage}年</p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="wine-stats">
-                    <span className="reference-count">
-                      {wine.referenceCount > 0 ? `${wine.referenceCount}回記録` : '新規ワイン'}
-                    </span>
-                    <span className="select-arrow">→</span>
-                  </div>
-                </div>
+                />
               ))}
             </div>
           )}

@@ -9,6 +9,7 @@ import type { WineMaster } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import LoginPrompt from '../components/LoginPrompt';
+import WineCard from '../components/WineCard';
 import DrawingCanvas from '../components/DrawingCanvas';
 import { useAsyncOperation } from '../hooks/useAsyncOperation';
 // import { useOfflineSync } from '../hooks/useOfflineSync';
@@ -530,13 +531,7 @@ const AddTastingRecord: React.FC = () => {
         {/* Wine Information Display */}
         <div className="selected-wine-info">
           <h2>選択されたワイン</h2>
-          <div className="wine-card">
-            <h3>{wine.wineName}</h3>
-            <p><strong>生産者:</strong> {wine.producer}</p>
-            <p><strong>産地:</strong> {wine.country} - {wine.region}</p>
-            {wine.vintage && <p><strong>年:</strong> {wine.vintage}</p>}
-            {wine.wineType && <p><strong>タイプ:</strong> {wine.wineType}</p>}
-          </div>
+          <WineCard wine={wine} variant="simple" />
         </div>
 
         <form onSubmit={handleSubmit} className="tasting-form">

@@ -5,6 +5,7 @@ import { userService } from '../services/userService';
 import type { PublicWineRecord, User } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
+import WineCard from '../components/WineCard';
 import { useAsyncOperation } from '../hooks/useAsyncOperation';
 
 interface UserPublicProfileData {
@@ -138,22 +139,6 @@ const UserPublicProfile: React.FC = () => {
     });
     
     return filtered;
-  };
-
-  const formatDate = (date: Date | string) => {
-    return new Date(date).toLocaleDateString('ja-JP', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
-  const getRatingColor = (rating: number) => {
-    if (rating >= 9) return '#FFD700';
-    if (rating >= 8) return '#FFA500';
-    if (rating >= 7) return '#90EE90';
-    if (rating >= 6) return '#87CEEB';
-    return '#DDA0DD';
   };
 
   const getWineTypeEmoji = (type?: string) => {
@@ -312,61 +297,17 @@ const UserPublicProfile: React.FC = () => {
           </div>
         ) : (
           <div className="wine-records-grid">
-            {filteredRecords.map((record) => (
-              <div key={record.id} className="wine-record-card">
-                {record.images && record.images.length > 0 && (
-                  <div className="record-image">
-                    <img src={record.images[0]} alt={record.wineName} loading="lazy" />
-                  </div>
-                )}
-                
-                <div className="record-content">
-                  <div className="wine-header">
-                    <span className="wine-type-emoji">{getWineTypeEmoji(record.wineType)}</span>
-                    <h4>{record.wineName}</h4>
-                  </div>
-                  
-                  <p className="wine-producer">{record.producer}</p>
-                  
-                  <div className="wine-meta">
-                    <span className="wine-origin">
-                      {record.country} {record.region && `- ${record.region}`}
-                    </span>
-                    {record.vintage && <span className="wine-vintage">{record.vintage}年</span>}
-                  </div>
-                  
-                  <div className="rating-section">
-                    <div 
-                      className="rating-score"
-                      style={{ backgroundColor: getRatingColor(record.overallRating) }}
-                    >
-                      {record.overallRating.toFixed(1)}
-                    </div>
-                    <span className="tasting-date">{formatDate(record.tastingDate)}</span>
-                  </div>
-                  
-                  {record.notes && (
-                    <p className="wine-notes">
-                      {record.notes.length > 80 
-                        ? `${record.notes.substring(0, 80)}...` 
-                        : record.notes}
-                    </p>
-                  )}
-                  
-                  {record.grapeVarieties && record.grapeVarieties.length > 0 && (
-                    <div className="grape-varieties">
-                      {record.grapeVarieties.slice(0, 3).map((variety, index) => (
-                        <span key={index} className="grape-chip">
-                          {variety}
-                        </span>
-                      ))}
-                      {record.grapeVarieties.length > 3 && (
-                        <span className="grape-chip">+{record.grapeVarieties.length - 3}</span>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
+            {filteredRecords.map((record, index) => (
+              <WineCard
+                key={record.id}
+                wine={record}
+                variant="record"
+                index={index}
+                showImage={true}
+                showRating={true}
+                showDate={true}
+                showRecordMode={true}
+              />
             ))}
           </div>
         )}

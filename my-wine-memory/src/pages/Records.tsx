@@ -5,6 +5,7 @@ import type { TastingRecord } from '../types';
 import { tastingRecordService } from '../services/tastingRecordService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
+import WineCard from '../components/WineCard';
 import { useRecordsData } from '../hooks/useRecordsData';
 
 const Records: React.FC = () => {
@@ -27,13 +28,11 @@ const Records: React.FC = () => {
     navigate(`/wine-detail/${wineId}`);
   };
 
-  const handleAddTasting = (wineId: string, event: React.MouseEvent) => {
-    event.stopPropagation();
+  const handleAddTasting = (wineId: string) => {
     navigate(`/add-tasting-record/${wineId}`);
   };
 
-  const handleTogglePrivacy = async (record: TastingRecord, event: React.MouseEvent) => {
-    event.stopPropagation();
+  const handleTogglePrivacy = async (record: TastingRecord) => {
     try {
       await tastingRecordService.updateTastingRecord(record.id, {
         isPublic: !record.isPublic
@@ -44,24 +43,6 @@ const Records: React.FC = () => {
       console.error('Failed to toggle privacy:', error);
       alert('公開設定の変更に失敗しました');
     }
-  };
-
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('ja-JP', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
-
-  const getRatingColor = (rating: number) => {
-    const successColor = getComputedStyle(document.documentElement).getPropertyValue('--success-text') || '#28a745';
-    const warningColor = getComputedStyle(document.documentElement).getPropertyValue('--warning-text') || '#ffc107';
-    const mutedColor = getComputedStyle(document.documentElement).getPropertyValue('--text-muted') || '#6c757d';
-    
-    if (rating >= 8) return successColor;
-    if (rating >= 6) return warningColor;
-    return mutedColor;
   };
 
   if (!currentUser) {
@@ -158,92 +139,26 @@ const Records: React.FC = () => {
 
         {!loading && !error && filteredWineGroups.length > 0 && (
           <div className="wine-groups-list">
-            {filteredWineGroups.map((group) => (
-              <div 
-                key={group.wine.id} 
-                className="wine-group-card"
+            {filteredWineGroups.map((group, index) => (
+              <WineCard
+                key={group.wine.id}
+                wine={{ ...group.wine, ...group.tastingRecords[0] }}
+                variant="group"
+                index={index}
+                showStats={true}
+                showPrice={true}
+                showPurchaseLocation={true}
+                showPrivacyToggle={true}
                 onClick={() => handleWineClick(group.wine.id)}
-              >
-                <div className="wine-group-header">
-                  <div className="wine-info">
-                    <h3 className="wine-name">{group.wine.wineName}</h3>
-                    <p className="wine-producer">{group.wine.producer}</p>
-                    <p className="wine-location">{group.wine.country} - {group.wine.region}</p>
-                    {group.wine.vintage && (
-                      <p className="wine-vintage">{group.wine.vintage}年</p>
-                    )}
-                    {group.tastingRecords[0]?.price && group.tastingRecords[0].price > 0 && (
-                      <p className="wine-price">価格: ¥{group.tastingRecords[0].price.toLocaleString()}</p>
-                    )}
-                    {group.tastingRecords[0]?.purchaseLocation && (
-                      <p className="wine-purchase-location">購入場所: {group.tastingRecords[0].purchaseLocation}</p>
-                    )}
-                  </div>
-                  <div className="wine-stats">
-                    <div className="rating-info">
-                      <span 
-                        className="average-rating"
-                        style={{ color: getRatingColor(group.averageRating) }}
-                      >
-                        {group.averageRating.toFixed(1)}/10
-                      </span>
-                      <span className="rating-label">平均評価</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="tasting-summary">
-                  <div className="tasting-count">
-                    <span className="count">{group.tastingRecords.length}</span>
-                    <span className="label">回記録</span>
-                  </div>
-                  <div className="latest-tasting">
-                    <span className="date">最新: {formatDate(group.latestTasting)}</span>
-                  </div>
-                  <button 
-                    className="add-tasting-btn"
-                    onClick={(e) => handleAddTasting(group.wine.id, e)}
-                    title="新しいテイスティングを追加"
-                  >
-                    ➕
-                  </button>
-                </div>
-
-                {/* Recent Tastings Preview */}
-                <div className="recent-tastings">
-                  <h4>最近のテイスティング</h4>
-                  <div className="tastings-preview">
-                    {group.tastingRecords.slice(0, 3).map((record) => (
-                      <div key={record.id} className="tasting-preview-item">
-                        <div className="tasting-date">
-                          {formatDate(new Date(record.tastingDate))}
-                        </div>
-                        <div 
-                          className="tasting-rating"
-                          style={{ color: getRatingColor(record.overallRating) }}
-                        >
-                          {record.overallRating.toFixed(1)}
-                        </div>
-                        <div className="tasting-mode">
-                          {record.recordMode === 'quick' ? 'クイック' : '詳細'}
-                        </div>
-                        <button
-                          className={`privacy-indicator ${record.isPublic ? 'public' : 'private'}`}
-                          onClick={(e) => handleTogglePrivacy(record, e)}
-                          title={record.isPublic ? '非公開にする' : '公開する'}
-                        >
-                          {record.isPublic ? '🌐' : '🔒'}
-                        </button>
-                      </div>
-                    ))}
-                    {group.tastingRecords.length > 3 && (
-                      <div className="more-tastings">
-                        +{group.tastingRecords.length - 3}件
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+                onAddTasting={handleAddTasting}
+                onTogglePrivacy={handleTogglePrivacy}
+                groupStats={{
+                  averageRating: group.averageRating,
+                  recordCount: group.tastingRecords.length,
+                  latestDate: group.latestTasting,
+                  recentRecords: group.tastingRecords.slice(0, 3)
+                }}
+              />
             ))}
           </div>
         )}
