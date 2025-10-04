@@ -43,7 +43,7 @@ interface RecordsDataState {
   wineGroups: WineWithTastings[];
   filteredWineGroups: WineWithTastings[];
   searchTerm: string;
-  sortBy: 'date' | 'rating' | 'count';
+  sortBy: 'lastUpdated' | 'registered' | 'name' | 'rating' | 'count';
   loading: boolean;
   error: string | null;
 }
@@ -54,7 +54,7 @@ type RecordsDataAction =
   | { type: 'LOAD_SUCCESS'; payload: WineWithTastings[] }
   | { type: 'LOAD_ERROR'; error: string }
   | { type: 'SET_SEARCH_TERM'; searchTerm: string }
-  | { type: 'SET_SORT_BY'; sortBy: 'date' | 'rating' | 'count' }
+  | { type: 'SET_SORT_BY'; sortBy: 'lastUpdated' | 'registered' | 'name' | 'rating' | 'count' }
   | { type: 'RESET' };
 
 // Initial state
@@ -62,7 +62,7 @@ const initialState: RecordsDataState = {
   wineGroups: [],
   filteredWineGroups: [],
   searchTerm: '',
-  sortBy: 'date',
+  sortBy: 'lastUpdated',
   loading: false,
   error: null,
 };
@@ -71,7 +71,7 @@ const initialState: RecordsDataState = {
 function filterAndSort(
   wineGroups: WineWithTastings[],
   searchTerm: string,
-  sortBy: 'date' | 'rating' | 'count'
+  sortBy: 'lastUpdated' | 'registered' | 'name' | 'rating' | 'count'
 ): WineWithTastings[] {
   let filtered = wineGroups;
 
@@ -88,8 +88,21 @@ function filterAndSort(
   // Apply sorting
   const sorted = [...filtered];
   switch (sortBy) {
-    case 'date':
+    case 'lastUpdated':
+      // Sort by latest tasting date
       sorted.sort((a, b) => b.latestTasting.getTime() - a.latestTasting.getTime());
+      break;
+    case 'registered':
+      // Sort by wine registration date (createdAt)
+      sorted.sort((a, b) => {
+        const aTime = a.wine.createdAt ? new Date(a.wine.createdAt).getTime() : 0;
+        const bTime = b.wine.createdAt ? new Date(b.wine.createdAt).getTime() : 0;
+        return bTime - aTime;
+      });
+      break;
+    case 'name':
+      // Sort alphabetically by wine name
+      sorted.sort((a, b) => a.wine.wineName.localeCompare(b.wine.wineName, 'ja'));
       break;
     case 'rating':
       sorted.sort((a, b) => b.averageRating - a.averageRating);
@@ -252,7 +265,7 @@ export function useRecordsData(userId: string | undefined) {
     dispatch({ type: 'SET_SEARCH_TERM', searchTerm });
   }, []);
 
-  const setSortBy = useCallback((sortBy: 'date' | 'rating' | 'count') => {
+  const setSortBy = useCallback((sortBy: 'lastUpdated' | 'registered' | 'name' | 'rating' | 'count') => {
     dispatch({ type: 'SET_SORT_BY', sortBy });
   }, []);
 

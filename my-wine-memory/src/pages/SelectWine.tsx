@@ -129,28 +129,6 @@ const SelectWine: React.FC = () => {
       Object.entries(newWineDataRaw).filter(([, value]) => value !== undefined)
     );
 
-    // Prepare initial tasting record data with purchase info
-    const price = formData.get('price');
-    const purchaseLocation = formData.get('purchaseLocation') as string;
-    const purchaseDate = formData.get('purchaseDate') as string;
-
-    let initialRecordData = null;
-    if (price || purchaseLocation || purchaseDate) {
-      initialRecordData = {
-        price: price ? parseInt(price as string) : undefined,
-        purchaseLocation: purchaseLocation || undefined,
-        tastingDate: purchaseDate ? new Date(purchaseDate) : new Date(),
-        recordMode: 'quick' as const,
-        overallRating: 5.0, // Default rating
-        notes: '購入記録として登録'
-      };
-
-      // Remove undefined values
-      initialRecordData = Object.fromEntries(
-        Object.entries(initialRecordData).filter(([, value]) => value !== undefined)
-      );
-    }
-
     try {
       // Need currentUser for wine creation, show login prompt if not available
       if (!currentUser) {
@@ -158,30 +136,12 @@ const SelectWine: React.FC = () => {
         setIsSaving(false);
         return;
       }
-      
+
       // First, create the wine in WineMaster
       const wineId = await wineMasterService.createOrFindWineMaster(newWineData as any, currentUser.uid);
-      
-      if (initialRecordData) {
-        // Create tasting record with the new wine
-        const recordData = {
-          ...initialRecordData,
-          wineId: wineId,
-          wineName: newWineData.wineName as string,
-          producer: newWineData.producer as string,
-          country: newWineData.country as string,
-          region: newWineData.region as string,
-          vintage: newWineData.vintage as number | undefined,
-          wineType: newWineData.wineType as any,
-          grapeVarieties: newWineData.grapeVarieties as string[] | undefined,
-          isPublic: false
-        };
-        await tastingRecordService.createTastingRecord(currentUser.uid, recordData as any);
-        navigate('/records');
-      } else {
-        // Navigate to add tasting record page with the new wine ID
-        navigate(`/add-tasting-record/${wineId}`);
-      }
+
+      // Always navigate to add tasting record page with the new wine ID
+      navigate(`/add-tasting-record/${wineId}`)
     } catch (error) {
       console.error('Failed to create new wine:', error);
       alert('ワインの登録に失敗しました。再度お試しください。');
@@ -410,47 +370,6 @@ const SelectWine: React.FC = () => {
                     />
                   )}
                   <small className="field-help">Enterまたはカンマで区切って複数入力できます</small>
-                </div>
-
-                <div className="form-section">
-                  <h3>購入情報</h3>
-                  <small className="field-help">価格と購入店舗を入力してください（任意）</small>
-                    <div className="form-row">
-                      <div className="form-group">
-                        <label htmlFor="price">価格</label>
-                        <div className="input-with-unit">
-                          <input
-                            id="price"
-                            name="price"
-                            type="number"
-                            placeholder="3000"
-                            min="0"
-                            step="10"
-                          />
-                          <span className="input-unit">円</span>
-                        </div>
-                      </div>
-
-                      <div className="form-group">
-                        <label htmlFor="purchaseLocation">購入店舗</label>
-                        <input
-                          id="purchaseLocation"
-                          name="purchaseLocation"
-                          type="text"
-                          placeholder="例: ワインショップ○○"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="form-group">
-                      <label htmlFor="purchaseDate">購入日</label>
-                      <input
-                        id="purchaseDate"
-                        name="purchaseDate"
-                        type="date"
-                        defaultValue={new Date().toISOString().split('T')[0]}
-                      />
-                    </div>
                 </div>
 
                 <div className="modal-actions">

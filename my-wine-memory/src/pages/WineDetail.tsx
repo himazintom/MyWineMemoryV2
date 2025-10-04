@@ -179,13 +179,37 @@ const WineDetail: React.FC = () => {
       <main className="wine-detail-content">
         {/* Wine Information */}
         <div className="wine-info-section">
-          <div className="wine-header">
-            <h2>{wine.wineName}</h2>
-            <p className="wine-producer">{wine.producer}</p>
-            <p className="wine-location">{wine.country} - {wine.region}</p>
-            {wine.vintage && <p className="wine-vintage">{wine.vintage}年</p>}
-            {wine.wineType && (
-              <span className="wine-type-badge">
+          <div className="wine-info-row">
+            <span className="wine-info-label">ワイン名</span>
+            <span className="wine-info-value">{wine.wineName}</span>
+          </div>
+
+          <div className="wine-info-row">
+            <span className="wine-info-label">生産者</span>
+            <span className="wine-info-value">{wine.producer}</span>
+          </div>
+
+          <div className="wine-info-row">
+            <span className="wine-info-label">生産国</span>
+            <span className="wine-info-value">{wine.country}</span>
+          </div>
+
+          <div className="wine-info-row">
+            <span className="wine-info-label">地域</span>
+            <span className="wine-info-value">{wine.region}</span>
+          </div>
+
+          {wine.vintage && (
+            <div className="wine-info-row">
+              <span className="wine-info-label">ヴィンテージ</span>
+              <span className="wine-info-value">{wine.vintage}年</span>
+            </div>
+          )}
+
+          {wine.wineType && (
+            <div className="wine-info-row">
+              <span className="wine-info-label">タイプ</span>
+              <span className="wine-info-value">
                 {wine.wineType === 'red' ? '赤ワイン' :
                  wine.wineType === 'white' ? '白ワイン' :
                  wine.wineType === 'rose' ? 'ロゼワイン' :
@@ -194,29 +218,33 @@ const WineDetail: React.FC = () => {
                  wine.wineType === 'fortified' ? '酒精強化ワイン' :
                  wine.wineType}
               </span>
-            )}
-          </div>
-
-          {/* Wine Details */}
-          <div className="wine-details">
-            {wine.grapeVarieties && wine.grapeVarieties.length > 0 && (
-              <div className="detail-item">
-                <strong>ブドウ品種:</strong> {wine.grapeVarieties.join(', ')}
-              </div>
-            )}
-            {wine.alcoholContent && (
-              <div className="detail-item">
-                <strong>アルコール度数:</strong> {wine.alcoholContent}%
-              </div>
-            )}
-            {wine.winemaker && (
-              <div className="detail-item">
-                <strong>ワインメーカー:</strong> {wine.winemaker}
-              </div>
-            )}
-            <div className="detail-item">
-              <strong>参照数:</strong> {wine.referenceCount}人が記録
             </div>
+          )}
+
+          {wine.grapeVarieties && wine.grapeVarieties.length > 0 && (
+            <div className="wine-info-row">
+              <span className="wine-info-label">ブドウ品種</span>
+              <span className="wine-info-value">{wine.grapeVarieties.join(', ')}</span>
+            </div>
+          )}
+
+          {wine.alcoholContent && (
+            <div className="wine-info-row">
+              <span className="wine-info-label">アルコール度数</span>
+              <span className="wine-info-value">{wine.alcoholContent}%</span>
+            </div>
+          )}
+
+          {wine.winemaker && (
+            <div className="wine-info-row">
+              <span className="wine-info-label">ワインメーカー</span>
+              <span className="wine-info-value">{wine.winemaker}</span>
+            </div>
+          )}
+
+          <div className="wine-info-row">
+            <span className="wine-info-label">参照数</span>
+            <span className="wine-info-value">{wine.referenceCount}人が記録</span>
           </div>
         </div>
 

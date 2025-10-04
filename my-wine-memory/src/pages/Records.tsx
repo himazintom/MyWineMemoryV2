@@ -97,10 +97,12 @@ const Records: React.FC = () => {
           <div className="sort-options">
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as 'date' | 'rating' | 'count')}
+              onChange={(e) => setSortBy(e.target.value as 'lastUpdated' | 'registered' | 'name' | 'rating' | 'count')}
               className="sort-select"
             >
-              <option value="date">最新記録順</option>
+              <option value="lastUpdated">最終更新日順</option>
+              <option value="registered">登録日順</option>
+              <option value="name">名前順</option>
               <option value="rating">評価順</option>
               <option value="count">記録数順</option>
             </select>
