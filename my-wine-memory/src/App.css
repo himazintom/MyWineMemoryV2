@@ -6263,7 +6263,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 1.5rem 0;
   border-top: 1px solid var(--border-color);
   position: sticky;
-  bottom: 0;
+  bottom: 70px; /* Space for bottom navigation */
   background: var(--card-bg);
   z-index: 10;
 }
@@ -6312,7 +6312,7 @@ h1, h2, h3, h4, h5, h6 {
 @media (max-width: 767px) {
   .form-actions {
     position: fixed;
-    bottom: 0;
+    bottom: 70px; /* Space for bottom navigation */
     left: 0;
     right: 0;
     padding: 1rem;

@@ -1206,7 +1206,7 @@ const AddTastingRecord: React.FC = () => {
           </div>
 
           {/* Save Buttons */}
-          <div className="form-action">
+          <div className="form-actions">
             <button 
               type="button" 
               className="btn-secondary"
