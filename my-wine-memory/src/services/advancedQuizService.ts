@@ -228,6 +228,26 @@ class AdvancedQuizService {
       total: clearedQuestions.length + unsolvedQuestions.length + wrongQuestions.length
     });
 
+    // Check for data inconsistency (mismatch between progress and actual questions)
+    const totalCategorized = clearedQuestions.length + unsolvedQuestions.length + wrongQuestions.length;
+    if (totalCategorized === 0 && allQuestions.length > 0) {
+      console.warn(`[selectQuestionsForLevel] Data inconsistency detected! Progress has ${progress.totalQuestions} questions but none match current ${allQuestions.length} questions. Resetting progress...`);
+
+      // Reset progress with current questions
+      const newProgress = await this.initializeLevelProgress(userId, level);
+
+      // Reload with fresh data
+      const newUnsolvedQuestions = allQuestions.filter(q =>
+        newProgress.unsolvedQuestions.includes(q.id)
+      );
+
+      console.log(`[selectQuestionsForLevel] Progress reset. Now have ${newUnsolvedQuestions.length} unsolved questions.`);
+
+      // Use the new unsolved questions
+      unsolvedQuestions.length = 0;
+      unsolvedQuestions.push(...newUnsolvedQuestions);
+    }
+
     // If in master mode and no wrong questions, use historical data
     if (progress.mode === 'MASTER_MODE' && wrongQuestions.length === 0) {
       const historicalWrong = await this.getHistoricalWrongQuestions(userId, level);
