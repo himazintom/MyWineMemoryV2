@@ -209,17 +209,24 @@ class AdvancedQuizService {
 
     const allQuestions = await loadQuestionsByLevel(level);
     console.log(`[selectQuestionsForLevel] Loaded ${allQuestions.length} questions for level ${level}`);
-    
+
     // Categorize questions
-    const clearedQuestions = allQuestions.filter(q => 
+    const clearedQuestions = allQuestions.filter(q =>
       progress.clearedQuestions.includes(q.id)
     );
-    const unsolvedQuestions = allQuestions.filter(q => 
+    const unsolvedQuestions = allQuestions.filter(q =>
       progress.unsolvedQuestions.includes(q.id)
     );
-    const wrongQuestions = allQuestions.filter(q => 
+    const wrongQuestions = allQuestions.filter(q =>
       progress.wrongQuestions.includes(q.id)
     );
+
+    console.log(`[selectQuestionsForLevel] Categorized questions:`, {
+      cleared: clearedQuestions.length,
+      unsolved: unsolvedQuestions.length,
+      wrong: wrongQuestions.length,
+      total: clearedQuestions.length + unsolvedQuestions.length + wrongQuestions.length
+    });
 
     // If in master mode and no wrong questions, use historical data
     if (progress.mode === 'MASTER_MODE' && wrongQuestions.length === 0) {
