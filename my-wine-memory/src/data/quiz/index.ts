@@ -256,28 +256,35 @@ const questionCache: Map<number, QuizQuestion[]> = new Map();
  * @returns 問題配列
  */
 export async function loadQuestionsByLevel(level: number): Promise<QuizQuestion[]> {
+  console.log(`[loadQuestionsByLevel] Attempting to load level ${level}`);
+
   // キャッシュチェック
   if (questionCache.has(level)) {
+    console.log(`[loadQuestionsByLevel] Returning cached questions for level ${level}`);
     return questionCache.get(level)!;
   }
 
   // 動的インポート
   const importer = levelImportMap[level];
   if (!importer) {
-    console.warn(`Level ${level} not found, returning empty array`);
+    console.warn(`[loadQuestionsByLevel] Level ${level} not found in levelImportMap, returning empty array`);
+    console.log(`[loadQuestionsByLevel] Available levels:`, Object.keys(levelImportMap));
     return [];
   }
 
   try {
+    console.log(`[loadQuestionsByLevel] Importing questions for level ${level}`);
     const module = await importer();
     const questions = module.default;
-    
+
+    console.log(`[loadQuestionsByLevel] Successfully loaded ${questions?.length || 0} questions for level ${level}`);
+
     // キャッシュに保存
     questionCache.set(level, questions);
-    
+
     return questions;
   } catch (error) {
-    console.error(`Failed to load level ${level}:`, error);
+    console.error(`[loadQuestionsByLevel] Failed to load level ${level}:`, error);
     return [];
   }
 }

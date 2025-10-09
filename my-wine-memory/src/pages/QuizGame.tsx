@@ -87,18 +87,25 @@ const QuizGame: React.FC = () => {
         
         // Initialize quiz with weighted selection
         const difficultyNum = parseInt(difficulty || '1');
+        console.log(`[QuizGame] Initializing quiz for level ${difficultyNum}`);
+
         const quizQuestions = await advancedQuizService.selectQuestionsForLevel(
           currentUser.uid,
           difficultyNum,
           10
         );
+
+        console.log(`[QuizGame] Received ${quizQuestions.length} questions`);
+
         if (quizQuestions.length === 0) {
-          setLoadingError('このレベルにはまだ問題が準備されていません。');
+          const errorMsg = `このレベル(${difficultyNum})にはまだ問題が準備されていません。コンソールログを確認してください。`;
+          console.error(`[QuizGame] No questions loaded for level ${difficultyNum}`);
+          setLoadingError(errorMsg);
           setGameStatus('error');
-          // Redirect to quiz selection after 2 seconds
+          // Redirect to quiz selection after 3 seconds
           setTimeout(() => {
             navigate('/quiz');
-          }, 2000);
+          }, 3000);
         } else {
           setQuestions(quizQuestions);
         }

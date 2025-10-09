@@ -53,8 +53,9 @@ const QuizLevelSelect: React.FC = () => {
       // Initialize missing levels if needed
       if (progress.length === 0) {
         const levelPromises = [];
-        for (let i = 1; i <= 20; i++) {
-          levelPromises.push(advancedQuizService.getLevelProgress(currentUser.uid, i));
+        // Initialize all defined quiz levels
+        for (const levelInfo of QUIZ_LEVELS) {
+          levelPromises.push(advancedQuizService.getLevelProgress(currentUser.uid, levelInfo.level));
         }
         const levels = await Promise.all(levelPromises);
         levels.forEach(levelProg => {

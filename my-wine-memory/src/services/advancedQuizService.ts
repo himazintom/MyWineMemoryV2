@@ -90,9 +90,13 @@ class AdvancedQuizService {
 
   // Initialize level progress for a user
   async initializeLevelProgress(userId: string, level: number): Promise<LevelProgress> {
+    console.log(`[initializeLevelProgress] Initializing level ${level} for user ${userId}`);
+
     const questions = await loadQuestionsByLevel(level);
+    console.log(`[initializeLevelProgress] Loaded ${questions.length} questions for level ${level}`);
+
     const questionIds = questions.map(q => q.id);
-    
+
     const progress: LevelProgress = {
       userId,
       level,
@@ -109,6 +113,12 @@ class AdvancedQuizService {
       createdAt: new Date(),
       updatedAt: new Date()
     };
+
+    console.log(`[initializeLevelProgress] Progress initialized:`, {
+      level,
+      totalQuestions: progress.totalQuestions,
+      isUnlocked: progress.isUnlocked
+    });
 
     await setDoc(doc(this.progressCollection, `${userId}_${level}`), {
       ...progress,
@@ -174,15 +184,31 @@ class AdvancedQuizService {
 
   // Select questions with weighted probability
   async selectQuestionsForLevel(
-    userId: string, 
-    level: number, 
+    userId: string,
+    level: number,
     count: number = 10
   ): Promise<QuizQuestion[]> {
+    console.log(`[selectQuestionsForLevel] Starting for level ${level}, userId: ${userId}`);
+
     const progress = await this.getLevelProgress(userId, level);
-    if (!progress) return [];
+    if (!progress) {
+      console.error(`[selectQuestionsForLevel] No progress found for level ${level}`);
+      return [];
+    }
+
+    console.log(`[selectQuestionsForLevel] Progress loaded:`, {
+      mode: progress.mode,
+      totalQuestions: progress.totalQuestions,
+      cleared: progress.clearedQuestions.length,
+      unsolved: progress.unsolvedQuestions.length,
+      wrong: progress.wrongQuestions.length
+    });
 
     const weights = this.getQuestionWeights(progress);
+    console.log(`[selectQuestionsForLevel] Weights:`, weights);
+
     const allQuestions = await loadQuestionsByLevel(level);
+    console.log(`[selectQuestionsForLevel] Loaded ${allQuestions.length} questions for level ${level}`);
     
     // Categorize questions
     const clearedQuestions = allQuestions.filter(q => 
