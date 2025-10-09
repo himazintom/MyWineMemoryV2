@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthHooks';
-import { tastingRecordService } from '../services/tastingRecordService';
 import { wineMasterService } from '../services/wineMasterService';
 import type { WineMaster } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
