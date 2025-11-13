@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, setPersistence, browserLocalPersistence, browserSessionPersistence } from 'firebase/auth';
 import { getFirestore, enableNetwork, disableNetwork } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { getMessaging, isSupported } from 'firebase/messaging';
@@ -33,6 +33,24 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase services
 export const auth = getAuth(app);
+
+// Configure session persistence for iOS compatibility
+// Use localStorage for persistent sessions, with sessionStorage as fallback
+(async () => {
+  try {
+    // Try to use localStorage persistence first (works on most browsers)
+    await setPersistence(auth, browserLocalPersistence);
+    console.log('Firebase Auth persistence set to localStorage');
+  } catch (error) {
+    try {
+      // Fallback to sessionStorage for restricted environments (Safari private browsing)
+      await setPersistence(auth, browserSessionPersistence);
+      console.log('Firebase Auth persistence fallback to sessionStorage');
+    } catch (fallbackError) {
+      console.warn('Could not set Firebase Auth persistence:', fallbackError);
+    }
+  }
+})();
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 

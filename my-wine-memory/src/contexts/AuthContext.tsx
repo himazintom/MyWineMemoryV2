@@ -24,40 +24,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     provider.setCustomParameters({
       prompt: 'select_account'
     });
-    
+
     try {
       // Check if we're on iOS Safari or in PWA mode
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
-      const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+      const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
                     (window.navigator as any).standalone === true;
-      
+
+      console.log('[Auth] Device detection - iOS:', isIOS, 'PWA:', isPWA);
+      console.log('[Auth] User Agent:', navigator.userAgent);
+
       if (isIOS || isPWA) {
         // Use redirect method for iOS/PWA
-        console.log('Using redirect method for iOS/PWA...');
+        console.log('[Auth] Using redirect method for iOS/PWA...');
+        console.log('[Auth] Current URL before redirect:', window.location.href);
         await signInWithRedirect(auth, provider);
         // The redirect will happen, and result will be handled on page reload
         return null;
       } else {
         // Use popup method for desktop and Android
-        console.log('Starting Google sign-in with popup...');
+        console.log('[Auth] Starting Google sign-in with popup...');
         const result = await signInWithPopup(auth, provider);
-        
+        console.log('[Auth] Popup sign-in successful for user:', result.user.uid);
+
         // Create or update user profile in Firestore
         const userProfile = await userService.createOrUpdateUser(result.user);
         setUserProfile(userProfile);
-        
+        console.log('[Auth] User profile created/updated after popup sign-in');
+
         return result;
       }
     } catch (error: unknown) {
-      console.error('Google sign-in error:', error);
-      
+      console.error('[Auth] Google sign-in error:', error);
+
       if (error && typeof error === 'object' && 'code' in error) {
         const authError = error as { code: string; message?: string };
+        console.log('[Auth] Auth error code:', authError.code);
+
         if (authError.code === 'auth/popup-closed-by-user') {
           throw new Error('サインインがキャンセルされました');
         } else if (authError.code === 'auth/popup-blocked') {
           // If popup is blocked, fallback to redirect
-          console.log('Popup blocked, using redirect method...');
+          console.log('[Auth] Popup blocked, using redirect method...');
           await signInWithRedirect(auth, provider);
           return null;
         } else if (authError.code === 'auth/unauthorized-domain') {
@@ -155,15 +163,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Check for redirect result when component mounts
     const handleRedirectResult = async () => {
       try {
+        console.log('[Auth] Checking for redirect result...');
         const result = await getRedirectResult(auth);
+
         if (result && result.user) {
-          console.log('Redirect sign-in successful');
+          console.log('[Auth] Redirect sign-in successful for user:', result.user.uid);
           // Create or update user profile in Firestore
           const userProfile = await userService.createOrUpdateUser(result.user);
           setUserProfile(userProfile);
-          
+          console.log('[Auth] User profile created/updated');
+
           // Migrate guest data if available (new architecture)
           if (guestDataService.hasGuestData()) {
+            console.log('[Auth] Migrating guest data...');
             const guestTastingRecords = guestDataService.getGuestTastingRecords();
             for (const guestRecord of guestTastingRecords) {
               // Step 1: Create or find WineMaster
@@ -186,42 +198,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
 
             guestDataService.clearAllGuestData();
-            console.log('Guest data migration completed after redirect');
+            console.log('[Auth] Guest data migration completed after redirect');
           }
+        } else {
+          console.log('[Auth] No redirect result found (normal if not returning from OAuth)');
         }
       } catch (error) {
-        console.error('Error handling redirect result:', error);
+        // This is expected when the user hasn't just completed an OAuth flow
+        console.debug('[Auth] No pending redirect result:', error instanceof Error ? error.message : String(error));
       }
     };
-    
+
     handleRedirectResult();
-    
+
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      console.log('[Auth] onAuthStateChanged fired, user:', user?.uid || 'null');
       setCurrentUser(user);
-      
+
       if (user) {
         try {
-          // Wait a moment to ensure token is fully available
-          await new Promise(resolve => setTimeout(resolve, 100));
-          
+          // Wait longer to ensure token is fully available and propagated
+          await new Promise(resolve => setTimeout(resolve, 500));
+
+          console.log('[Auth] Loading user profile for:', user.uid);
           // Fetch user profile from Firestore
           const profile = await userService.getUserProfile(user.uid);
           setUserProfile(profile);
-          
+          console.log('[Auth] User profile loaded successfully');
+
           // Initialize notification schedules for the user
           await notificationScheduler.initializeUserNotifications(user.uid);
+          console.log('[Auth] Notifications initialized');
         } catch (error) {
-          console.error('Failed to load user profile:', error);
+          console.error('[Auth] Failed to load user profile:', error);
         }
       } else {
         setUserProfile(null);
-        
+
         // Cancel all notifications when user logs out
         if (currentUser) {
           notificationScheduler.cancelAllUserNotifications(currentUser.uid);
         }
       }
-      
+
       setLoading(false);
     });
 
