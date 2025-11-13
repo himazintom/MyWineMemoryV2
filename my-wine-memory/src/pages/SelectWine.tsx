@@ -12,6 +12,8 @@ import { useAsyncOperation } from '../hooks/useAsyncOperation';
 // import { useOfflineSync } from '../hooks/useOfflineSync';
 // import { useNetworkStatus } from '../hooks/useNetworkStatus';
 
+type SortOption = 'referenceCount' | 'createdAt' | 'wineName' | 'producer' | 'vintage-desc' | 'vintage-asc';
+
 const SelectWine: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
@@ -24,27 +26,50 @@ const SelectWine: React.FC = () => {
   const [usePercentageMode, setUsePercentageMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [, setIsUsingOfflineData] = useState(false);
-  
+  const [sortBy, setSortBy] = useState<SortOption>('referenceCount');
+
   const { loading: searchLoading, error: searchError, execute: executeSearch } = useAsyncOperation<WineMaster[]>();
   const { loading: popularLoading, error: popularError, execute: executeLoadPopular } = useAsyncOperation<WineMaster[]>();
   // const { isOnline } = useNetworkStatus();
   // const { searchCachedWines, getCachedWines, cacheWines } = useOfflineSync(currentUser?.uid);
 
 
-  const loadPopularWines = useCallback(async () => {
+  const loadWines = useCallback(async () => {
     if (!currentUser) return;
-    
+
     try {
-      const wines = await executeLoadPopular(() => wineMasterService.getPopularWineMasters(currentUser.uid, 10));
+      // Parse sort option
+      let sortField: 'referenceCount' | 'createdAt' | 'wineName' | 'producer' | 'vintage' = 'referenceCount';
+      let sortOrder: 'asc' | 'desc' = 'desc';
+
+      if (sortBy === 'vintage-desc') {
+        sortField = 'vintage';
+        sortOrder = 'desc';
+      } else if (sortBy === 'vintage-asc') {
+        sortField = 'vintage';
+        sortOrder = 'asc';
+      } else {
+        sortField = sortBy as 'referenceCount' | 'createdAt' | 'wineName' | 'producer';
+        // Default sort order based on field
+        if (sortField === 'wineName' || sortField === 'producer') {
+          sortOrder = 'asc';
+        } else {
+          sortOrder = 'desc';
+        }
+      }
+
+      const wines = await executeLoadPopular(() =>
+        wineMasterService.getWineMasters(currentUser.uid, sortField, sortOrder, 50)
+      );
       if (wines) {
         setPopularWines(wines);
         setIsUsingOfflineData(false);
       }
     } catch (error) {
-      console.error('Failed to load popular wines:', error);
+      console.error('Failed to load wines:', error);
       setPopularWines([]);
     }
-  }, [executeLoadPopular, currentUser]);
+  }, [executeLoadPopular, currentUser, sortBy]);
 
   const searchWines = useCallback(async () => {
     if (!searchTerm.trim() || !currentUser) return;
@@ -64,8 +89,8 @@ const SelectWine: React.FC = () => {
   }, [searchTerm, executeSearch, currentUser]);
 
   useEffect(() => {
-    loadPopularWines();
-  }, [loadPopularWines]);
+    loadWines();
+  }, [loadWines]);
 
   useEffect(() => {
     if (searchTerm.trim()) {
@@ -174,8 +199,30 @@ const SelectWine: React.FC = () => {
               className="search-input"
             />
           </div>
-          
-          <button 
+
+          {/* Sort Selector - Only show when not searching */}
+          {!searchTerm.trim() && (
+            <div className="sort-section">
+              <label htmlFor="sortBy" className="sort-label">
+                並び順:
+              </label>
+              <select
+                id="sortBy"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortOption)}
+                className="sort-select"
+              >
+                <option value="referenceCount">📊 記録回数順</option>
+                <option value="createdAt">🆕 最近追加した順</option>
+                <option value="wineName">🔤 ワイン名順</option>
+                <option value="producer">🏭 生産者名順</option>
+                <option value="vintage-desc">📅 ヴィンテージ（新→古）</option>
+                <option value="vintage-asc">📅 ヴィンテージ（古→新）</option>
+              </select>
+            </div>
+          )}
+
+          <button
             className="create-new-wine-button"
             onClick={handleCreateNewWine}
           >
@@ -186,14 +233,14 @@ const SelectWine: React.FC = () => {
         {/* Wine List */}
         <div className="wine-list-section">
           <h2>
-            {searchTerm.trim() ? `"${searchTerm}" の検索結果` : '人気のワイン'}
+            {searchTerm.trim() ? `"${searchTerm}" の検索結果` : 'ワイン一覧'}
           </h2>
 
           {error && (
             <ErrorMessage
               title="エラーが発生しました"
               message={error}
-              onRetry={searchTerm.trim() ? searchWines : loadPopularWines}
+              onRetry={searchTerm.trim() ? searchWines : loadWines}
             />
           )}
 

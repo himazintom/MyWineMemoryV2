@@ -234,22 +234,49 @@ class WineMasterService {
 
   // Get popular wine masters (within user's scope - sorted by user's reference count)
   async getPopularWineMasters(userId: string, limit: number = 10): Promise<WineMaster[]> {
+    return this.getWineMasters(userId, 'referenceCount', 'desc', limit);
+  }
+
+  // Generic method to get wine masters with flexible sorting
+  async getWineMasters(
+    userId: string,
+    sortBy: 'referenceCount' | 'createdAt' | 'wineName' | 'producer' | 'vintage' = 'referenceCount',
+    sortOrder: 'asc' | 'desc' = 'desc',
+    limit: number = 10
+  ): Promise<WineMaster[]> {
     try {
       const q = query(
         collection(db, this.getCollectionPath(userId)),
-        orderBy('referenceCount', 'desc'),
+        orderBy(sortBy, sortOrder),
         limitQuery(limit)
       );
 
       const querySnapshot = await getDocs(q);
-      return querySnapshot.docs.map(doc => ({
+      const wines = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
         createdAt: doc.data().createdAt?.toDate() || new Date(),
         updatedAt: doc.data().updatedAt?.toDate() || new Date()
       } as WineMaster));
+
+      // For vintage sorting, handle wines without vintage (place them at the end)
+      if (sortBy === 'vintage') {
+        const winesWithVintage = wines.filter(w => w.vintage !== undefined);
+        const winesWithoutVintage = wines.filter(w => w.vintage === undefined);
+
+        // Sort wines with vintage
+        winesWithVintage.sort((a, b) => {
+          const aVintage = a.vintage || 0;
+          const bVintage = b.vintage || 0;
+          return sortOrder === 'desc' ? bVintage - aVintage : aVintage - bVintage;
+        });
+
+        return [...winesWithVintage, ...winesWithoutVintage];
+      }
+
+      return wines;
     } catch (error) {
-      console.error('Error getting popular wine masters:', error);
+      console.error('Error getting wine masters:', error);
       return [];
     }
   }
