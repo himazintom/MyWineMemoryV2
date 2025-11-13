@@ -9,8 +9,8 @@ import { learningInsightService, type LearningInsight } from '../services/learni
 const QuizGame: React.FC = () => {
   const navigate = useNavigate();
   const { difficulty } = useParams<{ difficulty: string }>();
-  const { currentUser } = useAuth();
-  
+  const { currentUser, userProfile } = useAuth();
+
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -28,6 +28,9 @@ const QuizGame: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [learningInsight, setLearningInsight] = useState<LearningInsight | null>(null);
   const [isLoadingInsight, setIsLoadingInsight] = useState(false);
+
+  // Check if user is in infinite mode (default to infinite if not set)
+  const isInfiniteMode = userProfile?.quizMode !== 'normal';
   
   // Sound effects refs
   const correctSoundRef = useRef<HTMLAudioElement | null>(null);
@@ -70,21 +73,26 @@ const QuizGame: React.FC = () => {
 
     const initializeQuiz = async () => {
       try {
-        // Get user's current hearts
-        const userStats = await quizProgressService.getUserQuizStats(currentUser.uid);
-        if (userStats) {
-          const recoveredHearts = await quizProgressService.recoverHearts(currentUser.uid);
-          setHearts(recoveredHearts);
-          
-          if (recoveredHearts <= 0) {
-            setShowNoHeartsMessage(true);
-            setTimeout(() => {
-              navigate('/quiz');
-            }, 3000);
-            return;
+        // Get user's current hearts (only in normal mode)
+        if (!isInfiniteMode) {
+          const userStats = await quizProgressService.getUserQuizStats(currentUser.uid);
+          if (userStats) {
+            const recoveredHearts = await quizProgressService.recoverHearts(currentUser.uid);
+            setHearts(recoveredHearts);
+
+            if (recoveredHearts <= 0) {
+              setShowNoHeartsMessage(true);
+              setTimeout(() => {
+                navigate('/quiz');
+              }, 3000);
+              return;
+            }
           }
+        } else {
+          // Infinite mode: always set hearts to 5 (for display)
+          setHearts(5);
         }
-        
+
         // Initialize quiz with weighted selection
         const difficultyNum = parseInt(difficulty || '1');
         console.log(`[QuizGame] Initializing quiz for level ${difficultyNum}`);
@@ -115,9 +123,9 @@ const QuizGame: React.FC = () => {
         setGameStatus('error');
       }
     };
-    
+
     initializeQuiz();
-  }, [currentUser, difficulty, navigate]);
+  }, [currentUser, difficulty, navigate, isInfiniteMode]);
 
   // Shuffle array helper
   const shuffleArray = <T,>(array: T[]): T[] => {
@@ -196,24 +204,27 @@ const QuizGame: React.FC = () => {
       setScore(score + 1);
       setCorrectAnswers([...correctAnswers, currentQuestion.id]);
     } else {
-      // Use heart
-      if (currentUser) {
-        try {
-          const remainingHearts = await quizProgressService.useHeart(currentUser.uid);
-          newHearts = remainingHearts;
-        } catch (error) {
-          console.error('Failed to use heart:', error);
+      // Use heart (only in normal mode)
+      if (!isInfiniteMode) {
+        if (currentUser) {
+          try {
+            const remainingHearts = await quizProgressService.useHeart(currentUser.uid);
+            newHearts = remainingHearts;
+          } catch (error) {
+            console.error('Failed to use heart:', error);
+            newHearts = Math.max(0, hearts - 1);
+          }
+        } else {
           newHearts = Math.max(0, hearts - 1);
         }
-      } else {
-        newHearts = Math.max(0, hearts - 1);
+        setHearts(newHearts);
       }
-      setHearts(newHearts);
+      // In infinite mode, hearts remain unchanged
     }
 
     // Show explanation immediately
     setShowExplanation(true);
-    
+
     // Update question status in background (non-blocking)
     if (currentUser) {
       advancedQuizService.updateQuestionStatus(
@@ -224,8 +235,8 @@ const QuizGame: React.FC = () => {
       ).catch(error => console.error('Failed to update question status:', error));
     }
 
-    // Check if game should end due to no hearts remaining
-    if (newHearts <= 0 && !correct) {
+    // Check if game should end due to no hearts remaining (only in normal mode)
+    if (!isInfiniteMode && newHearts <= 0 && !correct) {
       setTimeout(() => setGameStatus('finished'), 1000);
     }
     
@@ -457,17 +468,24 @@ const QuizGame: React.FC = () => {
     <div className="page-container">
       <header className="quiz-header-compact">
         <div className="quiz-header-content">
-          <div className="quiz-hearts-section">
-            <span className="hearts-label">体力:</span>
-            <div className="hearts-compact">
-              {Array.from({ length: hearts }).map((_, i) => (
-                <span key={i} className="heart-icon">❤️</span>
-              ))}
-              {hearts < 5 && Array.from({ length: 5 - hearts }).map((_, i) => (
-                <span key={`empty-${i}`} className="heart-icon empty">🤍</span>
-              ))}
+          {!isInfiniteMode && (
+            <div className="quiz-hearts-section">
+              <span className="hearts-label">体力:</span>
+              <div className="hearts-compact">
+                {Array.from({ length: hearts }).map((_, i) => (
+                  <span key={i} className="heart-icon">❤️</span>
+                ))}
+                {hearts < 5 && Array.from({ length: 5 - hearts }).map((_, i) => (
+                  <span key={`empty-${i}`} className="heart-icon empty">🤍</span>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+          {isInfiniteMode && (
+            <div className="quiz-hearts-section">
+              <span className="hearts-label">♾️ 無限モード</span>
+            </div>
+          )}
           <div className="quiz-progress-section">
             <span className="progress-label">進捗:</span>
             <div className="quiz-progress-text">
@@ -476,8 +494,8 @@ const QuizGame: React.FC = () => {
           </div>
         </div>
         <div className="progress-bar-thin">
-          <div 
-            className="progress-fill" 
+          <div
+            className="progress-fill"
             style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
           />
         </div>

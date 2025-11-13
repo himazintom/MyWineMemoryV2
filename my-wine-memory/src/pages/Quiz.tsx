@@ -7,13 +7,16 @@ import LoadingSpinner from '../components/LoadingSpinner';
 
 const Quiz: React.FC = () => {
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
-  
+  const { currentUser, userProfile } = useAuth();
+
   const [, setUserProgress] = useState<QuizProgress[]>([]);
   const [userStats, setUserStats] = useState<UserQuizStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [hearts, setHearts] = useState(5);
   const [quizInitialized, setQuizInitialized] = useState(false);
+
+  // Check if user is in infinite mode (default to infinite if not set)
+  const isInfiniteMode = userProfile?.quizMode !== 'normal';
 
   const startGeneralQuiz = () => {
     // Start with difficulty 1 for general quiz
@@ -64,14 +67,17 @@ const Quiz: React.FC = () => {
           quizProgressService.getAllUserProgress(currentUser.uid),
           quizProgressService.getUserQuizStats(currentUser.uid)
         ]);
-        
+
         setUserProgress(progress);
         setUserStats(stats);
-        
-        // Recover hearts if needed
-        if (stats) {
+
+        // Recover hearts if needed (only in normal mode)
+        if (stats && userProfile?.quizMode === 'normal') {
           const recoveredHearts = await quizProgressService.recoverHearts(currentUser.uid);
           setHearts(recoveredHearts);
+        } else {
+          // Infinite mode: always show full hearts (for display purposes)
+          setHearts(5);
         }
       } catch (error) {
         console.error('Failed to load user quiz data:', error);
@@ -79,9 +85,9 @@ const Quiz: React.FC = () => {
         setLoading(false);
       }
     };
-    
+
     loadUserData();
-  }, [currentUser, quizInitialized]);
+  }, [currentUser, quizInitialized, userProfile?.quizMode]);
   
   const getHeartDisplay = () => {
     return '❤️'.repeat(hearts) + '🤍'.repeat(5 - hearts);
@@ -92,7 +98,11 @@ const Quiz: React.FC = () => {
       <header className="page-header">
         <h1>ワインクイズ</h1>
         <div className="quiz-stats">
-          <span>{getHeartDisplay()}</span>
+          {isInfiniteMode ? (
+            <span>♾️ 無限モード</span>
+          ) : (
+            <span>{getHeartDisplay()}</span>
+          )}
           <span>レベル {userStats?.level || 1}</span>
           {userStats && (
             <span>正答率: {userStats.overallAccuracy.toFixed(1)}%</span>
