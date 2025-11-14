@@ -7,7 +7,7 @@
 **Location:** Firebase Console → Authentication → Settings → Authorized domains
 
 **Required Domains:**
-- ✅ `my-wine-memory.himazi.com` (production custom domain)
+- ✅ `wine.himazi.com` (production custom domain)
 - ✅ `mywinememory-4bdf9.firebaseapp.com` (Firebase default)
 - ✅ `mywinememory-4bdf9.web.app` (Firebase Web App)
 - ✅ `localhost` (development only)
@@ -42,7 +42,7 @@
 
 **Required Configuration:**
 
-**Domain:** `my-wine-memory.himazi.com`
+**Domain:** `wine.himazi.com`
 - ✅ Status: **Connected**
 - ✅ SSL Certificate: **Active**
 - ✅ DNS Records: **Verified**
@@ -50,11 +50,11 @@
 **DNS Configuration (for reference):**
 ```
 Type: A
-Name: my-wine-memory
+Name: wine
 Value: [Firebase IP addresses]
 
 Type: TXT
-Name: my-wine-memory
+Name: wine
 Value: [Firebase verification code]
 ```
 
@@ -68,7 +68,7 @@ Value: [Firebase verification code]
 - ✅ User Type: **External** (for public app)
 - ✅ App name: `MyWineMemory`
 - ✅ User support email: Your email
-- ✅ App domain: `my-wine-memory.himazi.com`
+- ✅ App domain: `wine.himazi.com`
 - ✅ Authorized domains: `himazi.com`
 - ✅ Developer contact information: Your email
 
@@ -82,7 +82,7 @@ Value: [Firebase verification code]
 
 **Authorized JavaScript origins:**
 ```
-https://my-wine-memory.himazi.com
+https://wine.himazi.com
 https://mywinememory-4bdf9.firebaseapp.com
 https://mywinememory-4bdf9.web.app
 http://localhost:5173 (development)
@@ -90,7 +90,7 @@ http://localhost:5173 (development)
 
 **Authorized redirect URIs:**
 ```
-https://my-wine-memory.himazi.com/__/auth/handler
+https://wine.himazi.com/__/auth/handler
 https://mywinememory-4bdf9.firebaseapp.com/__/auth/handler
 https://mywinememory-4bdf9.web.app/__/auth/handler
 http://localhost:5173/__/auth/handler (development)
@@ -110,7 +110,7 @@ http://localhost:5173/__/auth/handler (development)
 ```bash
 # Critical: Use custom domain for authDomain
 VITE_FIREBASE_API_KEY=your-api-key
-VITE_FIREBASE_AUTH_DOMAIN=my-wine-memory.himazi.com  # ← MUST be custom domain
+VITE_FIREBASE_AUTH_DOMAIN=wine.himazi.com  # ← MUST be custom domain
 VITE_FIREBASE_PROJECT_ID=mywinememory-4bdf9
 VITE_FIREBASE_STORAGE_BUCKET=mywinememory-4bdf9.appspot.com
 VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
@@ -123,7 +123,7 @@ VITE_FIREBASE_APP_ID=your-app-id
 VITE_FIREBASE_AUTH_DOMAIN=mywinememory-4bdf9.firebaseapp.com
 
 # ✅ CORRECT - matches hosting domain
-VITE_FIREBASE_AUTH_DOMAIN=my-wine-memory.himazi.com
+VITE_FIREBASE_AUTH_DOMAIN=wine.himazi.com
 ```
 
 ---
@@ -159,13 +159,13 @@ service cloud.firestore {
 
 1. **Test Custom Domain Access:**
    ```
-   Open: https://my-wine-memory.himazi.com
+   Open: https://wine.himazi.com
    Expected: Site loads correctly
    ```
 
 2. **Test Auth Handler Endpoint:**
    ```
-   Open: https://my-wine-memory.himazi.com/__/auth/handler
+   Open: https://wine.himazi.com/__/auth/handler
    Expected: Firebase auth handler page (blank is OK)
    ```
 
@@ -173,7 +173,7 @@ service cloud.firestore {
    ```javascript
    // In site console
    console.log(firebase.app().options.authDomain)
-   // Expected: "my-wine-memory.himazi.com"
+   // Expected: "wine.himazi.com"
    ```
 
 4. **Test Login Flow:**
@@ -242,7 +242,7 @@ Before deploying:
 
 **85% of issues solved by:**
 
-1. Setting `VITE_FIREBASE_AUTH_DOMAIN=my-wine-memory.himazi.com`
+1. Setting `VITE_FIREBASE_AUTH_DOMAIN=wine.himazi.com`
 2. Rebuilding: `npm run build`
 3. Deploying: `firebase deploy`
 

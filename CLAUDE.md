@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 MyWineMemory is a PWA (Progressive Web App) for wine enthusiasts to record tasting notes, learn about wine through quizzes, and track their wine journey. The project is inspired by Duolingo's gamification approach and targets users who are beginning their wine journey.
 
-**Live URL**: my-wine-memory.himazi.com
+**Live URL**: wine.himazi.com
 
 ## 🎯 Fundamental Principles (基本理念)
 

@@ -19,7 +19,7 @@ This causes cross-origin cookie blocking between `firebaseapp.com` and `himazi.c
 **Required Fix:**
 ```bash
 # Update .env or production environment variables
-VITE_FIREBASE_AUTH_DOMAIN=my-wine-memory.himazi.com
+VITE_FIREBASE_AUTH_DOMAIN=wine.himazi.com
 ```
 
 **Why this works:**
@@ -33,7 +33,7 @@ VITE_FIREBASE_AUTH_DOMAIN=my-wine-memory.himazi.com
 1. **Verify Firebase Hosting Custom Domain:**
    ```
    Firebase Console → Hosting → Domains
-   Ensure: my-wine-memory.himazi.com is connected
+   Ensure: wine.himazi.com is connected
    ```
 
 2. **Update Environment Variables:**
@@ -44,7 +44,7 @@ VITE_FIREBASE_AUTH_DOMAIN=my-wine-memory.himazi.com
    ```
    Firebase Console → Authentication → Settings → Authorized domains
    Ensure both domains are listed:
-   - my-wine-memory.himazi.com ✅
+   - wine.himazi.com ✅
    - mywinememory-4bdf9.firebaseapp.com ✅
    ```
 
@@ -69,7 +69,7 @@ Google Cloud Console
 
 **Required URIs:**
 ```
-https://my-wine-memory.himazi.com/__/auth/handler
+https://wine.himazi.com/__/auth/handler
 https://mywinememory-4bdf9.firebaseapp.com/__/auth/handler
 ```
 
@@ -160,7 +160,7 @@ Consider implementing:
 ## ⚡ Quick Fix Summary
 
 **Most likely fix (85% success):**
-1. Change `VITE_FIREBASE_AUTH_DOMAIN` to `my-wine-memory.himazi.com`
+1. Change `VITE_FIREBASE_AUTH_DOMAIN` to `wine.himazi.com`
 2. Verify domain in Firebase Console authorized domains
 3. Rebuild and deploy
 4. Test on iPhone Safari
