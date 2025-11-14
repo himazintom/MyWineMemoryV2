@@ -26,23 +26,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     try {
-      // Check if we're on iOS Safari or in PWA mode
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+      // Improved iOS/iPadOS detection
+      const userAgent = navigator.userAgent.toLowerCase();
+      const isIOS = (/iphone|ipad|ipod/.test(userAgent) && !(window as any).MSStream) ||
+                    // Detect iPadOS 13+ which reports as MacOS
+                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
       const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
                     (window.navigator as any).standalone === true;
+      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
-      console.log('[Auth] Device detection - iOS:', isIOS, 'PWA:', isPWA);
-      console.log('[Auth] User Agent:', navigator.userAgent);
+      // Use redirect for iOS, PWA, or Safari
+      const shouldUseRedirect = isIOS || isPWA || isSafari;
 
-      if (isIOS || isPWA) {
-        // Use redirect method for iOS/PWA
-        console.log('[Auth] Using redirect method for iOS/PWA...');
+      console.log('[Auth] Device detection:', {
+        isIOS,
+        isPWA,
+        isSafari,
+        shouldUseRedirect,
+        userAgent: navigator.userAgent,
+        platform: navigator.platform,
+        maxTouchPoints: navigator.maxTouchPoints
+      });
+
+      if (shouldUseRedirect) {
+        // Use redirect method for iOS/PWA/Safari
+        console.log('[Auth] Using redirect method for better compatibility...');
         console.log('[Auth] Current URL before redirect:', window.location.href);
         await signInWithRedirect(auth, provider);
         // The redirect will happen, and result will be handled on page reload
         return null;
       } else {
-        // Use popup method for desktop and Android
+        // Use popup method for desktop Chrome/Firefox/Edge
         console.log('[Auth] Starting Google sign-in with popup...');
         const result = await signInWithPopup(auth, provider);
         console.log('[Auth] Popup sign-in successful for user:', result.user.uid);
@@ -168,10 +182,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (result && result.user) {
           console.log('[Auth] Redirect sign-in successful for user:', result.user.uid);
+          console.log('[Auth] User email:', result.user.email);
+          console.log('[Auth] User display name:', result.user.displayName);
+
           // Create or update user profile in Firestore
           const userProfile = await userService.createOrUpdateUser(result.user);
           setUserProfile(userProfile);
-          console.log('[Auth] User profile created/updated');
+          console.log('[Auth] User profile created/updated successfully');
 
           // Migrate guest data if available (new architecture)
           if (guestDataService.hasGuestData()) {
@@ -204,8 +221,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.log('[Auth] No redirect result found (normal if not returning from OAuth)');
         }
       } catch (error) {
-        // This is expected when the user hasn't just completed an OAuth flow
-        console.debug('[Auth] No pending redirect result:', error instanceof Error ? error.message : String(error));
+        // Enhanced error logging for debugging
+        console.error('[Auth] Error handling redirect result:', error);
+        if (error && typeof error === 'object' && 'code' in error) {
+          const authError = error as { code: string; message?: string };
+          console.error('[Auth] Error code:', authError.code);
+          console.error('[Auth] Error message:', authError.message);
+
+          // Show user-friendly error message
+          if (authError.code === 'auth/unauthorized-domain') {
+            console.error('[Auth] Domain authorization issue. Please check Firebase Console.');
+          } else if (authError.code === 'auth/popup-blocked') {
+            console.error('[Auth] Popup was blocked by browser.');
+          }
+        }
       }
     };
 
