@@ -56,7 +56,8 @@ export const userService = {
         badges: [],
         createdAt: new Date(),
         updatedAt: new Date(),
-        isPublic: false
+        isPublic: false,
+        quizMode: 'infinite' // Default to infinite mode
       };
 
       await setDoc(userRef, {

@@ -21,6 +21,8 @@ export interface User {
   // Public sharing
   isPublic?: boolean;
   publicSlug?: string;
+  // Quiz mode settings
+  quizMode?: 'normal' | 'infinite'; // 'normal' = hearts system, 'infinite' = unlimited attempts
 }
 
 // Tasting record: User's personal experience with a wine
