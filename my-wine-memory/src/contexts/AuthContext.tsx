@@ -17,7 +17,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [userProfile, setUserProfile] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Check if localStorage is available (fails in Safari private browsing)
+  const checkStorageAvailability = (): boolean => {
+    try {
+      const testKey = '__firebase_storage_test__';
+      localStorage.setItem(testKey, 'test');
+      localStorage.removeItem(testKey);
+      return true;
+    } catch (e) {
+      console.error('[Auth] localStorage not available - likely Safari private browsing mode');
+      console.error('[Auth] Error:', e);
+      return false;
+    }
+  };
+
   const signInWithGoogle = async () => {
+    // Check storage availability before attempting auth
+    if (!checkStorageAvailability()) {
+      throw new Error(
+        'ブラウザのプライベートブラウジングモードが有効になっている可能性があります。' +
+        '通常モードでお試しください。'
+      );
+    }
     const provider = new GoogleAuthProvider();
     provider.addScope('profile');
     provider.addScope('email');
