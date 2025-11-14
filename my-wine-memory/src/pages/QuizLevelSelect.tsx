@@ -269,7 +269,7 @@ const QuizLevelSelect: React.FC = () => {
             unsolvedQuestions: [],
             wrongQuestions: [],
             completionRate: 0,
-            isUnlocked: levelInfo.level === 1,
+            isUnlocked: true, // All levels are unlocked
             perfectClearCount: 0,
             createdAt: new Date(),
             updatedAt: new Date()
@@ -278,7 +278,7 @@ const QuizLevelSelect: React.FC = () => {
           const stats = levelStats.get(levelInfo.level);
           const mode = getModeDisplay(progress);
           const { clearedPercent, wrongPercent, unsolvedPercent } = getProgressBarSegments(progress);
-          const isLocked = !progress.isUnlocked;
+          const isLocked = false; // All levels are always unlocked
           const canUnlockNow = canUnlock(levelInfo.level);
 
           return (
