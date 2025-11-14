@@ -107,8 +107,8 @@ class AdvancedQuizService {
       unsolvedQuestions: questionIds,
       wrongQuestions: [],
       completionRate: 0,
-      isUnlocked: level === 1, // Level 1 is always unlocked
-      unlockedAt: level === 1 ? new Date() : undefined,
+      isUnlocked: true, // All levels are unlocked
+      unlockedAt: new Date(),
       perfectClearCount: 0,
       createdAt: new Date(),
       updatedAt: new Date()

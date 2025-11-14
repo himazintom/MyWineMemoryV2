@@ -17,7 +17,8 @@
     "setup:git": "node scripts/git-setup.js",
     "security:check": "npm audit && npm run validate:env",
     "pre-commit": "npm run lint && npm run test && npm run validate:env",
-    "migrate:quiz-mode": "node scripts/migrate-quiz-mode.js"
+    "migrate:quiz-mode": "node scripts/migrate-quiz-mode.js",
+    "migrate:unlock-levels": "node scripts/unlock-all-levels.js"
   },
   "dependencies": {
     "@sentry/react": "^10.5.0",
