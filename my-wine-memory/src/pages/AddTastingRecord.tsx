@@ -1215,20 +1215,23 @@ const AddTastingRecord: React.FC = () => {
 
           {/* Save Buttons */}
           <div className="form-actions">
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="btn-secondary"
               onClick={() => navigate(-1)}
             >
               キャンセル
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="btn-primary"
               disabled={!isFormValid || saveLoading}
             >
               {saveLoading ? (
-                <LoadingSpinner size="small" message="保存中..." />
+                <span className="loading-content">
+                  <LoadingSpinner size="small" message="" />
+                  <span className="loading-text">保存中...</span>
+                </span>
               ) : (
                 '記録を保存'
               )}
