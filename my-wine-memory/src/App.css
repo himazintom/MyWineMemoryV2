@@ -4741,6 +4741,7 @@ body {
 }
 
 .wine-group-card {
+  position: relative;
   background: var(--card-bg);
   border-radius: 8px;
   padding: 1rem;
@@ -4749,6 +4750,30 @@ body {
   transition: all 0.2s ease;
   border: 1px solid var(--border-color);
   overflow: hidden;
+  min-height: 180px;
+}
+
+.wine-group-card .wine-card-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transform: translateZ(0) scale(1.02);
+  filter: saturate(1.03);
+  z-index: 0;
+}
+
+.wine-group-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.75) 0%,
+    rgba(0, 0, 0, 0.5) 50%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+  z-index: 1;
 }
 
 .wine-group-card:hover {
@@ -4758,6 +4783,8 @@ body {
 }
 
 .wine-group-header {
+  position: relative;
+  z-index: 2;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -4765,51 +4792,39 @@ body {
   gap: 0.75rem;
 }
 
-.wine-group-image {
-  flex-shrink: 0;
-  width: 80px;
-  height: 80px;
-  border-radius: 6px;
-  overflow: hidden;
-  background: var(--bg-secondary);
-}
-
-.wine-group-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-}
-
 .wine-group-header .wine-info h3 {
-  color: var(--text-primary);
+  color: #ffffff;
   margin: 0 0 0.25rem 0;
   font-size: 1.1rem;
   line-height: 1.3;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .wine-group-header .wine-producer {
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.9);
   margin: 0.15rem 0;
   font-weight: 500;
   font-size: 0.9rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .wine-group-header .wine-location {
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.85);
   font-size: 0.85rem;
   margin: 0.1rem 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .wine-group-header .wine-vintage,
 .wine-group-header .wine-price,
 .wine-group-header .wine-purchase-location {
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.8rem;
   margin: 0.1rem 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.rating-info {
+.wine-group-card .rating-info {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -4817,48 +4832,58 @@ body {
   min-width: 65px;
 }
 
-.average-rating {
+.wine-group-card .average-rating {
   font-size: 1.1rem;
   font-weight: 600;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
-.rating-label {
+.wine-group-card .rating-label {
   font-size: 0.75rem;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.tasting-summary {
+.wine-group-card .tasting-summary {
+  position: relative;
+  z-index: 2;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem 0;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
   margin-top: 0.75rem;
 }
 
-.tasting-count {
+.wine-group-card .tasting-count {
   display: flex;
   align-items: baseline;
   gap: 0.2rem;
 }
 
-.tasting-count .count {
+.wine-group-card .tasting-count .count {
   font-size: 1.3rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
-.tasting-count .label {
+.wine-group-card .tasting-count .label {
   font-size: 0.8rem;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.latest-tasting .date {
+.wine-group-card .latest-tasting .date {
   font-size: 0.8rem;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.add-tasting-btn {
+.wine-group-card .add-tasting-btn {
+  position: relative;
+  z-index: 3;
   background: var(--primary-color);
   color: var(--btn-primary-text);
   border: none;
@@ -4870,59 +4895,88 @@ body {
   min-width: 36px;
 }
 
-.add-tasting-btn:hover {
+.wine-group-card .add-tasting-btn:hover {
   background: var(--primary-color);
   transform: scale(1.03);
 }
 
-.recent-tastings h4 {
-  color: var(--text-primary);
+.wine-group-card .recent-tastings {
+  position: relative;
+  z-index: 2;
+}
+
+.wine-group-card .recent-tastings h4 {
+  color: #ffffff;
   margin-bottom: 0.5rem;
   font-size: 0.9rem;
   font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.tastings-preview {
+.wine-group-card .tastings-preview {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
 }
 
-.tasting-preview-item {
+.wine-group-card .tasting-preview-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0.4rem 0.6rem;
-  background: var(--bg-secondary);
+  background: rgba(0, 0, 0, 0.3);
   border-radius: 4px;
+  backdrop-filter: blur(4px);
 }
 
-.tasting-preview-item .tasting-date {
+.wine-group-card .tasting-preview-item .tasting-date {
   font-size: 0.75rem;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.85);
 }
 
-.tasting-preview-item .tasting-rating {
+.wine-group-card .tasting-preview-item .tasting-rating {
   font-weight: 600;
   font-size: 0.8rem;
+  color: #ffffff;
 }
 
-.tasting-preview-item .tasting-mode {
+.wine-group-card .tasting-preview-item .tasting-mode {
   font-size: 0.7rem;
-  background: rgba(114, 47, 55, 0.1);
-  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.9);
   padding: 0.2rem 0.4rem;
   border-radius: 3px;
 }
 
-.more-tastings {
+.wine-group-card .more-tastings {
   text-align: center;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.75rem;
   padding: 0.4rem;
-  background: var(--bg-secondary);
+  background: rgba(0, 0, 0, 0.3);
   border-radius: 4px;
   font-style: italic;
+  backdrop-filter: blur(4px);
+}
+
+.wine-group-card .privacy-indicator {
+  position: relative;
+  z-index: 3;
+  background: rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(4px);
+}
+
+.wine-group-card .privacy-indicator.public {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: rgba(34, 197, 94, 0.6);
+  color: rgba(34, 197, 94, 1);
+}
+
+.wine-group-card .privacy-indicator.private {
+  background: rgba(107, 114, 128, 0.2);
+  border-color: rgba(107, 114, 128, 0.6);
+  color: rgba(200, 200, 200, 1);
 }
 
 /* Responsive design for wine-group-card */
