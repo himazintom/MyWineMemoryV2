@@ -35,10 +35,10 @@ const WineDetail: React.FC = () => {
 
   const loadTastingRecords = useCallback(async () => {
     if (!wineId || !currentUser) return;
-    
+
     try {
-      const records = await executeLoadRecords(() => 
-        tastingRecordService.getUserTastingRecords(currentUser.uid, 'date', 100)
+      const records = await executeLoadRecords(() =>
+        tastingRecordService.getTastingRecordsForWineById(currentUser.uid, wineId, 100)
       );
       setTastingRecords(records);
     } catch (error) {
