@@ -6720,25 +6720,57 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .image-gallery {
-    grid-template-columns: 300px repeat(2, 100px);
-    grid-template-rows: 110px 110px;
-    gap: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+    gap: 1rem;
   }
-}
 
-@media (max-width: 480px) {
-  .image-gallery {
-    grid-template-columns: 280px repeat(2, 80px);
-    grid-template-rows: 90px 90px;
-    gap: 0.5rem;
+  /* 1枚目は大きく表示 */
+  .image-gallery-item:first-child {
+    height: 280px;
+    width: 100%;
   }
-  
+
+  /* 2枚目以降は2列グリッドで表示 */
+  .image-gallery-item:nth-child(n+2) {
+    height: 140px;
+    width: calc(50% - 0.5rem);
+    display: inline-block;
+    vertical-align: top;
+  }
+
+  .image-gallery-item:nth-child(2n) {
+    margin-right: 1rem;
+  }
+
+  /* Add button positioning for mobile */
+  .image-gallery-add.pos-1 {
+    height: 280px;
+    width: 100%;
+  }
+
+  .image-gallery-add.pos-2,
+  .image-gallery-add.pos-3,
+  .image-gallery-add.pos-4,
+  .image-gallery-add.pos-5 {
+    height: 140px;
+    width: calc(50% - 0.5rem);
+    display: inline-block;
+    vertical-align: top;
+  }
+
+  .image-gallery-add.pos-2,
+  .image-gallery-add.pos-4 {
+    margin-right: 1rem;
+  }
+
   .remove-image-button {
-    width: 18px;
-    height: 18px;
-    font-size: 12px;
+    width: 20px;
+    height: 20px;
+    font-size: 14px;
   }
 }
 
