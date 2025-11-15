@@ -194,12 +194,10 @@ const WineCard: React.FC<WineCardProps> = ({
         transition={{ duration: 0.2, delay: index * 0.05 }}
         whileHover={{ y: -1 }}
       >
+        {showImage && cover && (
+          <div className="wine-card-bg" style={{ backgroundImage: `url(${cover})` }} />
+        )}
         <div className="wine-group-header">
-          {showImage && cover && (
-            <div className="wine-group-image">
-              <img src={cover} alt={wine.wineName} loading="lazy" />
-            </div>
-          )}
           <div className="wine-info">
             <h3 className="wine-name">{wine.wineName}</h3>
             <p className="wine-producer">{wine.producer}</p>
