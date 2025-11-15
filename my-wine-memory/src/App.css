@@ -6348,6 +6348,26 @@ h1, h2, h3, h4, h5, h6 {
   transform: none;
 }
 
+/* Loading state styles for buttons */
+.loading-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.loading-text {
+  white-space: nowrap;
+}
+
+/* Ensure buttons have proper layout for loading state */
+.form-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+}
+
 /* Mobile adjustments for form actions */
 @media (max-width: 767px) {
   .form-actions {
