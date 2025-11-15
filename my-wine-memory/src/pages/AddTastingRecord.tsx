@@ -535,10 +535,10 @@ const AddTastingRecord: React.FC = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="tasting-form">
-          {/* Required Fields */}
+          {/* Basic Information Section */}
           <div className="form-section">
-            <h3>テイスティング記録 <span className="required">*必須</span></h3>
-            
+            <h3>基本情報</h3>
+
             <div className="form-group">
               <label htmlFor="tastingDate">テイスティング日 *</label>
               <input
@@ -551,53 +551,12 @@ const AddTastingRecord: React.FC = () => {
                 required
               />
             </div>
-
-
-            {/* Rating Slider */}
-            <div className="form-group">
-              <label>総合評価 * ({formData.overallRating.toFixed(1)}/10)</label>
-              <div className="rating-container">
-                <div className="rating-slider-container">
-                  <input
-                    type="range"
-                    className="rating-slider"
-                    min="0"
-                    max="10"
-                    step="0.1"
-                    value={formData.overallRating}
-                    onChange={(e) => handleRatingChange(parseFloat(e.target.value))}
-                  />
-                  <div className="rating-labels">
-                    <span>0.0</span>
-                    <span>5.0</span>
-                    <span>10.0</span>
-                  </div>
-                </div>
-                <div className="rating-display">
-                  <span className="rating-value">{formData.overallRating.toFixed(1)}</span>
-                  <span className="rating-scale">/10</span>
-                </div>
-              </div>
-            </div>
           </div>
 
-          {/* Optional Fields */}
+          {/* Photos Section */}
           <div className="form-section">
-            <h3>追加情報</h3>
-            
-            
-            <div className="form-group">
-              <label htmlFor="notes">テイスティングメモ</label>
-              <textarea
-                id="notes"
-                name="notes"
-                value={formData.notes}
-                onChange={handleInputChange}
-                placeholder="香り、味わい、印象など自由に記入してください"
-                rows={4}
-              />
-            </div>
-            
+            <h3>ワインや食事、同席者の写真</h3>
+
             <div className="form-group">
               <label>写真登録 (最大4枚)</label>
               <div className="image-suggestion-text">
@@ -608,16 +567,16 @@ const AddTastingRecord: React.FC = () => {
                   ※1枚目の写真はメインサムネイルとして記録一覧で表示されます
                 </p>
               </div>
-              
+
               <div className="image-gallery">
                 {formData.images.map((image, index) => (
                   <div key={index} className="image-gallery-item">
-                    <img 
+                    <img
                       src={URL.createObjectURL(image)}
                       alt={`アップロード画像 ${index + 1}`}
                       className="gallery-image"
                     />
-                    <button 
+                    <button
                       type="button"
                       className="remove-image-button"
                       onClick={() => removeImage(index)}
@@ -627,7 +586,7 @@ const AddTastingRecord: React.FC = () => {
                     </button>
                   </div>
                 ))}
-                
+
                 {formData.images.length < 4 && (
                   <div className={`image-gallery-add pos-${formData.images.length + 1}`}>
                     <input
@@ -645,44 +604,11 @@ const AddTastingRecord: React.FC = () => {
                   </div>
                 )}
               </div>
-              
+
               {formData.images.length > 0 && (
                 <p className="image-count">
                   {formData.images.length}/4枚の画像を選択中
                 </p>
-              )}
-            </div>
-
-            {/* Drawing Section */}
-            <div className="form-group">
-              <label>手書きメモ・スケッチ</label>
-              <p className="text-muted" style={{fontSize: '0.9rem', marginBottom: '1rem'}}>
-                テイスティングの印象をスケッチしたり、手書きでメモを残すことができます
-              </p>
-              
-              {formData.drawingDataUrl ? (
-                <div className="drawing-preview">
-                  <img 
-                    src={formData.drawingDataUrl} 
-                    alt="手書きスケッチ" 
-                    className="drawing-preview-image"
-                  />
-                  <div className="drawing-preview-actions">
-                    <button
-                      type="button"
-                      onClick={clearDrawing}
-                      className="btn-secondary small"
-                    >
-                      削除
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <DrawingCanvas 
-                  onSave={handleDrawingSave}
-                  width={400}
-                  height={300}
-                />
               )}
             </div>
           </div>
@@ -1122,9 +1048,9 @@ const AddTastingRecord: React.FC = () => {
                 </div>
               </div>
 
-              {/* Food Pairings and Additional Notes */}
+              {/* Food Pairings */}
               <div className="form-section">
-                <h3>フードペアリング・追加メモ</h3>
+                <h3>フードペアリング</h3>
                 <div className="form-group">
                   <label htmlFor="foodPairings">料理との相性</label>
                   <textarea
@@ -1133,17 +1059,6 @@ const AddTastingRecord: React.FC = () => {
                     value={formData.foodPairings}
                     onChange={handleInputChange}
                     placeholder="一緒に楽しんだ料理や、合いそうな料理"
-                    rows={3}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="personalNotes">個人的なメモ</label>
-                  <textarea
-                    id="personalNotes"
-                    name="personalNotes"
-                    value={formData.personalNotes}
-                    onChange={handleInputChange}
-                    placeholder="シチュエーション、同席者、特別な思い出など"
                     rows={3}
                   />
                 </div>
@@ -1179,6 +1094,99 @@ const AddTastingRecord: React.FC = () => {
               </div>
             </>
           )}
+
+          {/* Final Evaluation Section */}
+          <div className="form-section">
+            <h3>最終評価</h3>
+
+            {recordMode === 'quick' && (
+              <div className="form-group">
+                <label htmlFor="notes">テイスティングメモ</label>
+                <textarea
+                  id="notes"
+                  name="notes"
+                  value={formData.notes}
+                  onChange={handleInputChange}
+                  placeholder="香り、味わい、印象など自由に記入してください"
+                  rows={4}
+                />
+              </div>
+            )}
+
+            {recordMode === 'detailed' && (
+              <div className="form-group">
+                <label htmlFor="personalNotes">個人的なメモ</label>
+                <textarea
+                  id="personalNotes"
+                  name="personalNotes"
+                  value={formData.personalNotes}
+                  onChange={handleInputChange}
+                  placeholder="シチュエーション、同席者、特別な思い出など"
+                  rows={3}
+                />
+              </div>
+            )}
+
+            {/* Drawing Section */}
+            <div className="form-group">
+              <label>手書きメモ・スケッチ</label>
+              <p className="text-muted" style={{fontSize: '0.9rem', marginBottom: '1rem'}}>
+                テイスティングの印象をスケッチしたり、手書きでメモを残すことができます
+              </p>
+
+              {formData.drawingDataUrl ? (
+                <div className="drawing-preview">
+                  <img
+                    src={formData.drawingDataUrl}
+                    alt="手書きスケッチ"
+                    className="drawing-preview-image"
+                  />
+                  <div className="drawing-preview-actions">
+                    <button
+                      type="button"
+                      onClick={clearDrawing}
+                      className="btn-secondary small"
+                    >
+                      削除
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <DrawingCanvas
+                  onSave={handleDrawingSave}
+                  width={400}
+                  height={300}
+                />
+              )}
+            </div>
+
+            {/* Overall Rating */}
+            <div className="form-group">
+              <label>総合評価 * ({formData.overallRating.toFixed(1)}/10)</label>
+              <div className="rating-container">
+                <div className="rating-slider-container">
+                  <input
+                    type="range"
+                    className="rating-slider"
+                    min="0"
+                    max="10"
+                    step="0.1"
+                    value={formData.overallRating}
+                    onChange={(e) => handleRatingChange(parseFloat(e.target.value))}
+                  />
+                  <div className="rating-labels">
+                    <span>0.0</span>
+                    <span>5.0</span>
+                    <span>10.0</span>
+                  </div>
+                </div>
+                <div className="rating-display">
+                  <span className="rating-value">{formData.overallRating.toFixed(1)}</span>
+                  <span className="rating-scale">/10</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Privacy Settings */}
           <div className="form-section privacy-settings">
