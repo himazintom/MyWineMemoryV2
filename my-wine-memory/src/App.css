@@ -6329,7 +6329,7 @@ h1, h2, h3, h4, h5, h6 {
 .form-actions .btn-primary {
   background: linear-gradient(135deg, #722F37, #8B4513);
   color: var(--btn-primary-text);
-  border: none;
+  border: 2px solid transparent;
 }
 
 .form-actions .btn-secondary:hover {
