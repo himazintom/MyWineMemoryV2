@@ -4,7 +4,6 @@ import { useAuth } from '../contexts/AuthHooks';
 import { badgeService } from '../services/badgeService';
 import { userService } from '../services/userService';
 import { gamificationService } from '../services/gamificationService';
-import ThemeToggle from '../components/ThemeToggle';
 import NotificationSettings from '../components/NotificationSettings';
 import BadgeDisplay, { EarnedBadges, LevelDisplay, StreakDisplay } from '../components/BadgeDisplay';
 import type { Badge, UserStats, DailyGoal } from '../types';
@@ -395,13 +394,6 @@ const Profile: React.FC = () => {
                 </p>
               </div>
             )}
-          </div>
-          
-          <div className="setting-item">
-            <div className="setting-label">
-              <span>テーマ</span>
-              <ThemeToggle />
-            </div>
           </div>
         </div>
       </main>

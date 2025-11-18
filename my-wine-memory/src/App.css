@@ -6,44 +6,6 @@
  */
 @import './styles/variables.css';
 
-/* Legacy CSS variables - DEPRECATED, use variables.css tokens instead */
-/* These are kept temporarily for backward compatibility during migration */
-:root {
-  /* Legacy typography - use --text-* from variables.css */
-  --btn-primary-text: var(--color-primary-contrast);
-  --btn-secondary-text: var(--text-secondary);
-  --btn-tertiary-text: var(--color-primary-main);
-
-  /* Legacy interactive text */
-  --link-text: var(--color-primary-main);
-  --link-hover-text: var(--color-primary-dark);
-  --error-text: var(--color-error);
-  --success-text: var(--color-success);
-  --warning-text: var(--color-warning);
-
-  /* Legacy background colors - use --bg-* from variables.css */
-  --card-bg: var(--bg-card);
-  --primary-color: var(--color-primary-main);
-  --secondary-bg: var(--bg-secondary);
-  --tag-bg: var(--bg-tertiary);
-  --tag-text: var(--text-tertiary);
-}
-
-[data-theme="dark"] {
-  /* Dark theme legacy mappings */
-  --btn-primary-text: var(--color-primary-contrast);
-  --btn-secondary-text: var(--text-secondary);
-  --btn-tertiary-text: var(--text-primary);
-
-  --link-text: var(--text-primary);
-  --link-hover-text: var(--text-secondary);
-  --error-text: var(--color-error);
-  --success-text: var(--color-success);
-  --warning-text: var(--color-warning);
-
-  --tag-bg: var(--bg-tertiary);
-  --tag-text: var(--text-secondary);
-}
 
 /* Typography Classes */
 .text-primary { color: var(--text-primary); }
@@ -325,15 +287,6 @@ body {
   margin: 0 0 0.5rem 0;
   opacity: 0.95;
   text-shadow: 0 1px 3px rgba(0,0,0,0.7);
-}
-
-[data-theme="light"] .hero-overlay {
-  color: var(--text-primary);
-  text-shadow: 0 1px 3px rgba(255,255,255,0.9);
-}
-
-[data-theme="light"] .hero-overlay p {
-  text-shadow: 0 1px 2px rgba(255,255,255,0.8);
 }
 
 .hero-actions {
@@ -1057,19 +1010,6 @@ body {
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
-}
-
-/* Light mode specific styles for mode buttons */
-[data-theme="light"] .mode-button {
-  border: 2px solid var(--border-color);
-  color: var(--text-primary);
-  background: var(--bg-secondary);
-}
-
-[data-theme="light"] .mode-button:hover {
-  background: var(--primary-color);
-  color: var(--btn-primary-text);
-  border-color: var(--primary-color);
 }
 
 .mode-button.active {
