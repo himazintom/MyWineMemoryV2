@@ -6774,6 +6774,40 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+/* Collapsible Section Styles */
+.collapsible-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.collapse-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.collapse-toggle:hover {
+  background: var(--card-bg);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.collapse-icon {
+  font-size: 1rem;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
 /* Drawing Canvas Styles */
 .drawing-canvas-container {
   background: var(--card-bg);

@@ -31,6 +31,7 @@ const AddTastingRecord: React.FC = () => {
   const [showInsightModal, setShowInsightModal] = useState(false);
   const [learningInsight, setLearningInsight] = useState<LearningInsight | null>(null);
   const [isLoadingInsight, setIsLoadingInsight] = useState(false);
+  const [isDrawingSectionOpen, setIsDrawingSectionOpen] = useState(false);
   // const [currentDraftId, setCurrentDraftId] = useState<string | null>(null);
   
   const { loading: wineLoading, error: wineError, execute: executeLoadWine } = useAsyncOperation<WineMaster | null>();
@@ -1129,34 +1130,50 @@ const AddTastingRecord: React.FC = () => {
 
             {/* Drawing Section */}
             <div className="form-group">
-              <label>手書きメモ・スケッチ</label>
-              <p className="text-muted" style={{fontSize: '0.9rem', marginBottom: '1rem'}}>
-                テイスティングの印象をスケッチしたり、手書きでメモを残すことができます
-              </p>
+              <div className="collapsible-header">
+                <label>手書きメモ・スケッチ（オプション）</label>
+                <button
+                  type="button"
+                  className="collapse-toggle"
+                  onClick={() => setIsDrawingSectionOpen(!isDrawingSectionOpen)}
+                  aria-expanded={isDrawingSectionOpen}
+                >
+                  <span className="collapse-icon">{isDrawingSectionOpen ? '︿' : '﹀'}</span>
+                  {isDrawingSectionOpen ? '閉じる' : '開く'}
+                </button>
+              </div>
 
-              {formData.drawingDataUrl ? (
-                <div className="drawing-preview">
-                  <img
-                    src={formData.drawingDataUrl}
-                    alt="手書きスケッチ"
-                    className="drawing-preview-image"
-                  />
-                  <div className="drawing-preview-actions">
-                    <button
-                      type="button"
-                      onClick={clearDrawing}
-                      className="btn-secondary small"
-                    >
-                      削除
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <DrawingCanvas
-                  onSave={handleDrawingSave}
-                  width={400}
-                  height={300}
-                />
+              {isDrawingSectionOpen && (
+                <>
+                  <p className="text-muted" style={{fontSize: '0.9rem', marginBottom: '1rem'}}>
+                    テイスティングの印象をスケッチしたり、手書きでメモを残すことができます
+                  </p>
+
+                  {formData.drawingDataUrl ? (
+                    <div className="drawing-preview">
+                      <img
+                        src={formData.drawingDataUrl}
+                        alt="手書きスケッチ"
+                        className="drawing-preview-image"
+                      />
+                      <div className="drawing-preview-actions">
+                        <button
+                          type="button"
+                          onClick={clearDrawing}
+                          className="btn-secondary small"
+                        >
+                          削除
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <DrawingCanvas
+                      onSave={handleDrawingSave}
+                      width={400}
+                      height={300}
+                    />
+                  )}
+                </>
               )}
             </div>
 
