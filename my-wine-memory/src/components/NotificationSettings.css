@@ -198,7 +198,7 @@
 
 .btn-install {
   background: #ffc107;
-  color: #000;
+  color: var(--text-inverse);
   border: none;
   padding: 8px 16px;
   border-radius: 6px;

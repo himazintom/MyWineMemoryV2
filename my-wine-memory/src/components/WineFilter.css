@@ -307,7 +307,7 @@
   
   .filter-chip.selected,
   .wine-type-button.selected {
-    border-color: #000;
+    border-color: var(--color-primary-main);
     font-weight: bold;
   }
 }

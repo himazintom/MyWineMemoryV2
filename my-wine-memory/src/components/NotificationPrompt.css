@@ -239,8 +239,8 @@
 }
 
 .pwa-install-actions .btn-primary {
-  background: white;
-  color: #722F37 !important;
+  background: var(--gradient-primary);
+  color: var(--color-primary-contrast) !important;
   padding: 8px 16px;
   border-radius: 6px;
   border: none;
