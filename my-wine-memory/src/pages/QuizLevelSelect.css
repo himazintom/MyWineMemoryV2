@@ -41,14 +41,10 @@
 
 /* Review Section */
 .review-section {
-  background: linear-gradient(135deg, #fff3cd, #ffe8a1);
+  background: linear-gradient(135deg, #3a3a2a, #4a4a3a);
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 30px;
-}
-
-[data-theme="dark"] .review-section {
-  background: linear-gradient(135deg, #3a3a2a, #4a4a3a);
 }
 
 .review-section h2 {
@@ -56,10 +52,6 @@
   align-items: center;
   gap: 10px;
   margin: 0 0 15px 0;
-  color: #856404;
-}
-
-[data-theme="dark"] .review-section h2 {
   color: #ffc107;
 }
 
@@ -93,17 +85,13 @@
 }
 
 .wrong-answer-item {
-  background: white;
+  background: #2a2a2a;
+  border: 1px solid var(--border-color);
   padding: 12px;
   border-radius: 8px;
   display: flex;
   align-items: center;
   gap: 15px;
-}
-
-[data-theme="dark"] .wrong-answer-item {
-  background: #2a2a2a;
-  border: 1px solid var(--border-color);
 }
 
 .level-badge {
@@ -202,28 +190,18 @@
 }
 
 .mode-badge.first-round {
-  background: #e3f2fd;
-  color: #1976d2;
+  background: #1a2a3a;
+  color: #64b5f6;
 }
 
 .mode-badge.review {
-  background: #fff3e0;
-  color: #f57c00;
+  background: #3a2a1a;
+  color: #ffb74d;
 }
 
 .mode-badge.master {
   background: linear-gradient(135deg, #ffd700, #ffed4e);
   color: #000;
-}
-
-[data-theme="dark"] .mode-badge.first-round {
-  background: #1a2a3a;
-  color: #64b5f6;
-}
-
-[data-theme="dark"] .mode-badge.review {
-  background: #3a2a1a;
-  color: #ffb74d;
 }
 
 /* Level Info */
@@ -280,14 +258,10 @@
 
 .progress-bar {
   height: 24px;
-  background: #f0f0f0;
+  background: #1a1a1a;
   border-radius: 12px;
   overflow: hidden;
   position: relative;
-}
-
-[data-theme="dark"] .progress-bar {
-  background: #1a1a1a;
 }
 
 .progress-segment {

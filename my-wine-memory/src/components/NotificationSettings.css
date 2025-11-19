@@ -1,7 +1,7 @@
 /* Notification Settings Styles */
 .notification-settings {
   margin: 20px 0;
-  background: var(--card-bg);
+  background: #2a2a2a;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -17,7 +17,7 @@
 }
 
 .setting-header:hover {
-  background: var(--bg-hover);
+  background: #333;
 }
 
 .setting-label {
@@ -83,7 +83,7 @@
 }
 
 .explanation-box.important {
-  background: linear-gradient(135deg, #fff3cd, #ffe8a1);
+  background: linear-gradient(135deg, #3a3a2a, #4a4a3a);
   border: 1px solid #ffc107;
 }
 
@@ -95,13 +95,13 @@
 .explanation-box strong {
   display: block;
   margin-bottom: 4px;
-  color: #856404;
+  color: #ffc107;
 }
 
 .explanation-box p {
   margin: 0;
   font-size: 14px;
-  color: #856404;
+  color: #ffc107;
 }
 
 /* Comparison Grid */
@@ -115,7 +115,8 @@
 .option-card {
   padding: 16px;
   border-radius: 8px;
-  border: 1px solid var(--border-color);
+  background: #333;
+  border: 1px solid #555;
 }
 
 .option-card h5 {
@@ -125,7 +126,7 @@
 }
 
 .option-card.recommended {
-  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  background: linear-gradient(135deg, #1b3a1b, #2a4a2a);
   border-color: #4caf50;
 }
 
@@ -160,7 +161,8 @@
 }
 
 .install-instruction {
-  background: #e3f2fd;
+  background: #1a2a3a;
+  color: #64b5f6;
   padding: 12px;
   border-radius: 8px;
   font-size: 13px;
@@ -173,7 +175,7 @@
   display: flex;
   gap: 12px;
   padding: 12px;
-  background: #fff3cd;
+  background: #3a3a2a;
   border: 1px solid #ffc107;
   border-radius: 8px;
   margin-bottom: 16px;
@@ -191,7 +193,7 @@
 .banner-content p {
   margin: 0 0 8px 0;
   font-size: 14px;
-  color: #856404;
+  color: #ffc107;
 }
 
 .btn-install {
@@ -470,48 +472,6 @@
 /* Loading spinner */
 .notification-settings .loading-spinner {
   padding: 20px;
-}
-
-/* Dark mode */
-[data-theme="dark"] .notification-settings {
-  background: #2a2a2a;
-}
-
-[data-theme="dark"] .setting-header:hover {
-  background: #333;
-}
-
-[data-theme="dark"] .explanation-box.important {
-  background: linear-gradient(135deg, #3a3a2a, #4a4a3a);
-  border-color: #ffc107;
-}
-
-[data-theme="dark"] .explanation-box strong,
-[data-theme="dark"] .explanation-box p {
-  color: #ffc107;
-}
-
-[data-theme="dark"] .option-card {
-  background: #333;
-  border-color: #555;
-}
-
-[data-theme="dark"] .option-card.recommended {
-  background: linear-gradient(135deg, #1b3a1b, #2a4a2a);
-}
-
-[data-theme="dark"] .install-instruction {
-  background: #1a2a3a;
-  color: #64b5f6;
-}
-
-[data-theme="dark"] .pwa-status-banner {
-  background: #3a3a2a;
-  border-color: #ffc107;
-}
-
-[data-theme="dark"] .banner-content p {
-  color: #ffc107;
 }
 
 /* Mobile responsive */

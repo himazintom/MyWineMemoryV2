@@ -7,9 +7,9 @@
   z-index: 1000;
   width: 90%;
   max-width: 600px;
-  background: var(--card-bg);
+  background: #2a2a2a;
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
   padding: 20px;
   animation: slideUp 0.3s ease-out;
 }
@@ -39,12 +39,12 @@
 .notification-prompt-text h3 {
   font-size: 18px;
   margin: 0 0 8px 0;
-  color: var(--text-primary);
+  color: #ffffff;
 }
 
 .notification-prompt-text p {
   font-size: 14px;
-  color: var(--text-secondary);
+  color: #cccccc;
   margin: 0 0 12px 0;
 }
 
@@ -59,7 +59,7 @@
 
 .notification-benefits li {
   font-size: 14px;
-  color: var(--text-secondary);
+  color: #cccccc;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -93,12 +93,12 @@
 
 .notification-prompt-actions .btn-secondary {
   background: transparent;
-  color: var(--text-secondary);
-  border: 1px solid var(--border-color);
+  color: #cccccc;
+  border: 1px solid #444;
 }
 
 .notification-prompt-actions .btn-secondary:hover {
-  background: var(--bg-secondary);
+  background: #333;
 }
 
 .notification-prompt-warning {
@@ -110,17 +110,12 @@
 
 /* Important notice styling */
 .important-notice {
-  background: linear-gradient(135deg, #fff3cd, #ffe8a1);
+  background: linear-gradient(135deg, #3a3a2a, #4a4a3a);
   border-left: 4px solid #ffc107;
   padding: 12px;
   margin: 12px 0;
   border-radius: 8px;
   font-size: 14px;
-  color: #856404;
-}
-
-[data-theme="dark"] .important-notice {
-  background: linear-gradient(135deg, #3a3a2a, #4a4a3a);
   color: #ffc107;
 }
 
@@ -139,23 +134,13 @@
 }
 
 .comparison-item.browser {
-  background: #f8f9fa;
-  border: 1px solid #dee2e6;
+  background: #2a2a2a;
+  border: 1px solid #444;
 }
 
 .comparison-item.pwa {
-  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
-  border: 1px solid #4caf50;
-}
-
-[data-theme="dark"] .comparison-item.browser {
-  background: #2a2a2a;
-  border-color: #444;
-}
-
-[data-theme="dark"] .comparison-item.pwa {
   background: linear-gradient(135deg, #1b3a1b, #2a4a2a);
-  border-color: #4caf50;
+  border: 1px solid #4caf50;
 }
 
 .comparison-item h4 {
@@ -177,17 +162,12 @@
 }
 
 .install-guide {
-  background: #e3f2fd;
+  background: #1a2a3a;
   padding: 12px;
   border-radius: 8px;
   font-size: 13px;
   text-align: center;
   margin-top: 16px;
-  color: #1976d2;
-}
-
-[data-theme="dark"] .install-guide {
-  background: #1a2a3a;
   color: #64b5f6;
 }
 
@@ -320,28 +300,4 @@
     top: 10px;
     width: 95%;
   }
-}
-
-/* Dark mode */
-[data-theme="dark"] .notification-prompt {
-  background: #2a2a2a;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-}
-
-[data-theme="dark"] .notification-prompt-text h3 {
-  color: #ffffff;
-}
-
-[data-theme="dark"] .notification-prompt-text p,
-[data-theme="dark"] .notification-benefits li {
-  color: #cccccc;
-}
-
-[data-theme="dark"] .notification-prompt-actions .btn-secondary {
-  border-color: #444;
-  color: #cccccc;
-}
-
-[data-theme="dark"] .notification-prompt-actions .btn-secondary:hover {
-  background: #333;
 }
