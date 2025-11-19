@@ -57,14 +57,27 @@
   --color-gold: #FFD700;
   --color-bronze: #CD7F32;
   --color-silver: #C0C0C0;
+  --color-xp-green: #4CAF50;
+
+  /* Wine type colors */
+  --wine-red: #722f37;
+  --wine-white: #f9f2e5;
+  --wine-rose: #e8a4a4;
+  --wine-sparkling: #fff9c4;
+  --wine-dessert: #d4a574;
+  --wine-fortified: #8b4513;
 
   /* ========================================
      GRADIENTS
      ======================================== */
 
   --gradient-primary: linear-gradient(135deg, #722F37, #8B4513);
+  --gradient-primary-90: linear-gradient(90deg, #722F37, #8B4513);
+  --gradient-primary-180: linear-gradient(180deg, #722F37, #8B4513);
   --gradient-hero: linear-gradient(180deg, rgba(0, 0, 0, 0.28) 0%, rgba(0, 0, 0, 0.58) 100%);
   --gradient-success: linear-gradient(90deg, #4CAF50, #8BC34A);
+  --gradient-success-135: linear-gradient(135deg, #4CAF50, #45a049);
+  --gradient-success-wine: linear-gradient(90deg, #722F37, #2E7D32);
 
   /* ========================================
      TRANSPARENCY VARIANTS
@@ -75,9 +88,18 @@
   --primary-alpha-30: rgba(212, 99, 111, 0.3);
   --primary-alpha-50: rgba(212, 99, 111, 0.5);
 
+  --primary-dark-alpha-05: rgba(114, 47, 55, 0.05);
   --primary-dark-alpha-10: rgba(114, 47, 55, 0.1);
+  --primary-dark-alpha-15: rgba(114, 47, 55, 0.15);
   --primary-dark-alpha-20: rgba(114, 47, 55, 0.2);
   --primary-dark-alpha-30: rgba(114, 47, 55, 0.3);
+  --primary-dark-alpha-40: rgba(114, 47, 55, 0.4);
+  --primary-dark-alpha-50: rgba(114, 47, 55, 0.5);
+  --primary-dark-alpha-60: rgba(114, 47, 55, 0.6);
+  --primary-dark-alpha-70: rgba(114, 47, 55, 0.7);
+  --primary-dark-alpha-80: rgba(114, 47, 55, 0.8);
+  --primary-dark-alpha-90: rgba(114, 47, 55, 0.9);
+  --primary-dark-full: rgba(114, 47, 55, 1);
 
   /* ========================================
      SPACING - 8px baseline grid

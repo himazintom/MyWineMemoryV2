@@ -31,7 +31,7 @@
 
 /* Online/reconnected state */
 .offline-indicator.online.reconnected {
-  background: linear-gradient(135deg, #4CAF50, #45a049);
+  background: var(--gradient-success-135);
   color: white;
   animation: slideInBounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }

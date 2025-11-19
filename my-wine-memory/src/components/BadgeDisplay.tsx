@@ -228,7 +228,7 @@ const styles = `
 
 .badge-item.earned {
   border-color: var(--primary-color);
-  box-shadow: 0 2px 8px rgba(114, 47, 55, 0.1);
+  box-shadow: 0 2px 8px var(--primary-dark-alpha-10);
 }
 
 .badge-item.not-earned {
@@ -285,7 +285,7 @@ const styles = `
 }
 
 .level-progress-fill {
-  background: linear-gradient(90deg, #4CAF50, #8BC34A);
+  background: var(--gradient-success);
 }
 
 .progress-text {
