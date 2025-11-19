@@ -10,6 +10,7 @@
   z-index: 1000;
   padding: 12px 20px;
   border-radius: 24px;
+  border-bottom-color: rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(10px);
   font-size: 14px;
@@ -129,13 +130,6 @@
   
   .status-icon {
     font-size: 16px;
-  }
-}
-
-/* Dark theme adjustments */
-@media (prefers-color-scheme: dark) {
-  .offline-indicator {
-    border-bottom-color: rgba(255, 255, 255, 0.1);
   }
 }
 

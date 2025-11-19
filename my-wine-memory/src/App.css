@@ -5541,25 +5541,6 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-primary);
 }
 
-/* Theme Toggle Styles */
-.theme-toggle-container {
-  cursor: pointer;
-}
-
-.theme-toggle {
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 0;
-  margin-bottom: 4px;
-  transition: transform 0.2s ease;
-}
-
-.theme-toggle:hover {
-  transform: scale(1.1);
-}
-
 /* ===============================
    IMPROVED BUTTON LAYOUTS
    =============================== */
@@ -5800,7 +5781,6 @@ h1, h2, h3, h4, h5, h6 {
    =============================== */
 
 /* Focus states */
-.theme-toggle:focus,
 .nav-item:focus,
 .action-button:focus,
 .btn-primary:focus,
