@@ -250,21 +250,21 @@ const WineDetail: React.FC = () => {
 
         {/* Tab Navigation */}
         <div className="tab-navigation">
-          <button 
-            className={`tab-button ${activeTab === 'overview' ? 'active' : ''}`}
+          <button
+            className={`btn btn-tab ${activeTab === 'overview' ? 'active' : ''}`}
             onClick={() => setActiveTab('overview')}
           >
             概要
           </button>
-          <button 
-            className={`tab-button ${activeTab === 'records' ? 'active' : ''}`}
+          <button
+            className={`btn btn-tab ${activeTab === 'records' ? 'active' : ''}`}
             onClick={() => setActiveTab('records')}
           >
             記録一覧 ({tastingRecords.length})
           </button>
           {hasDetailedAnalysis() && (
-            <button 
-              className={`tab-button ${activeTab === 'analysis' ? 'active' : ''}`}
+            <button
+              className={`btn btn-tab ${activeTab === 'analysis' ? 'active' : ''}`}
               onClick={() => setActiveTab('analysis')}
             >
               詳細分析 ({getDetailedRecords().length})

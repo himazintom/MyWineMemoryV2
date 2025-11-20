@@ -249,20 +249,20 @@ const Profile: React.FC = () => {
 
         {/* Tab Navigation */}
         <div className="profile-tabs">
-          <button 
-            className={`tab-button ${selectedTab === 'stats' ? 'active' : ''}`}
+          <button
+            className={`btn btn-tab ${selectedTab === 'stats' ? 'active' : ''}`}
             onClick={() => setSelectedTab('stats')}
           >
             統計
           </button>
-          <button 
-            className={`tab-button ${selectedTab === 'badges' ? 'active' : ''}`}
+          <button
+            className={`btn btn-tab ${selectedTab === 'badges' ? 'active' : ''}`}
             onClick={() => setSelectedTab('badges')}
           >
             獲得バッジ
           </button>
-          <button 
-            className={`tab-button ${selectedTab === 'achievements' ? 'active' : ''}`}
+          <button
+            className={`btn btn-tab ${selectedTab === 'achievements' ? 'active' : ''}`}
             onClick={() => setSelectedTab('achievements')}
           >
             全バッジ

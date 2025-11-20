@@ -512,14 +512,14 @@ const AddTastingRecord: React.FC = () => {
         <h1>テイスティング記録</h1>
         
         <div className="mode-toggle">
-          <button 
-            className={`mode-button ${recordMode === 'quick' ? 'active' : ''}`}
+          <button
+            className={`btn btn-toggle ${recordMode === 'quick' ? 'active' : ''}`}
             onClick={() => setRecordMode('quick')}
           >
             クイック
           </button>
-          <button 
-            className={`mode-button ${recordMode === 'detailed' ? 'active' : ''}`}
+          <button
+            className={`btn btn-toggle ${recordMode === 'detailed' ? 'active' : ''}`}
             onClick={() => setRecordMode('detailed')}
           >
             詳細
