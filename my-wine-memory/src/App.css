@@ -1337,69 +1337,6 @@ body {
   align-items: center;
 }
 
-.btn-primary,
-.btn-secondary,
-.btn-draft {
-  flex: 1;
-  padding: 12px 8px;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-primary {
-  background: var(--gradient-primary);
-  color: var(--btn-primary-text);
-}
-
-.btn-primary:disabled {
-  background: var(--text-muted);
-  color: var(--text-inverse);
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-.btn-secondary {
-  background: var(--bg-secondary, #f5f5f5);
-  color: var(--text-primary, #333);
-  border: 2px solid var(--text-tertiary);
-}
-
-.btn-draft {
-  background: var(--warning-text);
-  color: var(--text-primary);
-  border: 2px solid var(--warning-text);
-}
-
-.btn-primary:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px var(--primary-dark-alpha-30);
-}
-
-.btn-secondary:hover {
-  background: var(--hover-bg, #e9ecef);
-}
-
-.btn-draft:hover:not(:disabled) {
-  background: var(--warning-text);
-  transform: translateY(-1px);
-}
-
-/* Prevent button size changes on click/focus */
-.btn-primary:active,
-.btn-secondary:active,
-.btn-draft:active,
-.btn-primary:focus,
-.btn-secondary:focus,
-.btn-draft:focus {
-  transform: none !important;
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary-dark-alpha-30);
-}
-
 /* Removed old wine-group-card background styling - now handled in Records Page section */
 
 /* Additional images as icons */
@@ -5586,23 +5523,6 @@ h1, h2, h3, h4, h5, h6 {
   border-color: var(--wine-primary);
 }
 
-/* Buttons */
-.btn-primary {
-  background: linear-gradient(135deg, var(--wine-primary), var(--wine-secondary));
-}
-
-.btn-secondary {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  border: 2px solid var(--border-color);
-}
-
-.action-button.secondary {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  border: 2px solid var(--border-color);
-}
-
 /* Answer options in quiz */
 .answer-option {
   background: var(--bg-primary);
@@ -5686,8 +5606,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Better button sizing */
 .action-button,
 .btn-primary,
-.btn-secondary,
-.btn-draft {
+.btn-secondary {
   min-height: 48px;
   max-width: 100%;
   word-wrap: break-word;
