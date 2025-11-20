@@ -24,6 +24,196 @@
 .success-text { color: var(--success-text); }
 .warning-text { color: var(--warning-text); }
 
+/* ========================================
+   UNIFIED BUTTON SYSTEM
+   ======================================== */
+
+/* Base button styles - shared across all button types */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--padding-sm) var(--padding-md);
+  border-radius: var(--radius-button);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-base);
+  line-height: var(--line-height-tight);
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-base);
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Primary button - Main CTAs */
+.btn-primary {
+  background: var(--gradient-primary);
+  color: var(--btn-primary-text);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-hover-md);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Secondary button - Alternative actions */
+.btn-secondary {
+  background: var(--bg-secondary);
+  color: var(--btn-secondary-text);
+  border: 2px solid var(--border-color);
+  box-shadow: var(--shadow-xs);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg-tertiary);
+  border-color: var(--color-primary-main);
+  transform: translateY(-1px);
+}
+
+.btn-secondary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Tertiary button - Text/ghost buttons */
+.btn-tertiary {
+  background: transparent;
+  color: var(--btn-tertiary-text);
+  padding: var(--padding-sm) var(--padding-md);
+}
+
+.btn-tertiary:hover:not(:disabled) {
+  background: var(--hover-bg);
+  color: var(--text-primary);
+}
+
+.btn-tertiary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Danger button - Destructive actions */
+.btn-danger {
+  background: var(--color-error);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: var(--color-error-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-hover-md);
+}
+
+.btn-danger:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Icon button - Circular icon-only buttons */
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: var(--radius-full);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-icon:hover:not(:disabled) {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  transform: scale(1.05);
+}
+
+.btn-icon:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* Size modifiers */
+.btn-sm {
+  padding: var(--padding-xs) var(--padding-sm);
+  font-size: var(--font-size-sm);
+  gap: var(--space-xs);
+}
+
+.btn-lg {
+  padding: var(--padding-md) var(--padding-lg);
+  font-size: var(--font-size-lg);
+  gap: var(--space-md);
+}
+
+.btn-icon.btn-sm {
+  width: 32px;
+  height: 32px;
+}
+
+.btn-icon.btn-lg {
+  width: 48px;
+  height: 48px;
+}
+
+/* Full width modifier */
+.btn-full {
+  width: 100%;
+}
+
+/* Loading state */
+.btn.is-loading {
+  position: relative;
+  color: transparent;
+  pointer-events: none;
+}
+
+.btn.is-loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  left: 50%;
+  margin-left: -8px;
+  margin-top: -8px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: btn-spin 0.6s linear infinite;
+}
+
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Focus styles for accessibility */
+.btn:focus-visible {
+  outline: 2px solid var(--color-primary-main);
+  outline-offset: 2px;
+}
+
 html, body {
   width: 100%;
   overflow-x: hidden;
@@ -101,7 +291,7 @@ body {
 }
 
 /* スマートフォン */
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .main-content {
     padding-bottom: 80px;
   }
@@ -112,7 +302,7 @@ body {
 }
 
 /* タブレット */
-@media (min-width: 768px) and (max-width: 1023px) {
+@media (min-width: 768px) and (max-width: 1024px) {
   .main-content {
     padding-bottom: 100px;
   }
@@ -300,7 +490,7 @@ body {
   .hero-overlay h1 { font-size: 2.4rem; }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .home-hero { height: 46vh; min-height: 260px; border-radius: 12px; }
   .hero-overlay { padding: 1.25rem; }
   .hero-actions { gap: 0.5rem; }
@@ -415,7 +605,7 @@ body {
   gap: 1rem;
 }
 
-@media (min-width: 600px) {
+@media (min-width: 480px) {
   .wine-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
@@ -1939,7 +2129,7 @@ body {
 }
 
 /* タブレット (768px-1023px) - 全画面使用 */
-@media (min-width: 768px) and (max-width: 1023px) {
+@media (min-width: 768px) and (max-width: 1024px) {
   .add-wine-content {
     width: 100%;
     padding: 0 2rem 2rem;
@@ -1968,7 +2158,7 @@ body {
 }
 
 /* スマートフォン (767px以下) - 全画面使用 */
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .app {
     width: 100vw;
     box-shadow: none;
@@ -2381,7 +2571,7 @@ body {
 }
 
 .page-error {
-  max-width: 600px;
+  max-width: 480px;
   margin: 0 auto;
   padding: 2rem 1rem;
 }
@@ -2868,7 +3058,7 @@ body {
 }
 
 /* Responsive Login Styles */
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .login-section {
     margin: 1rem 0;
     padding: 2rem 1rem;
@@ -2999,7 +3189,7 @@ body {
 }
 
 /* レスポンシブWineCard */
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .wine-card {
     padding: 1rem;
     margin-bottom: 0.75rem;
@@ -3031,7 +3221,7 @@ body {
   }
 }
 
-@media (min-width: 768px) and (max-width: 1023px) {
+@media (min-width: 768px) and (max-width: 1024px) {
   .wine-card {
     padding: 1.25rem;
   }
@@ -4181,7 +4371,7 @@ body {
 }
 
 /* Responsive Design */
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .public-records-grid {
     grid-template-columns: 1fr;
   }
@@ -4282,7 +4472,7 @@ body {
 }
 
 /* Responsive Rating Styles */
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .rating-slider-container {
     margin: 1rem 0;
   }
@@ -4458,7 +4648,7 @@ body {
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   width: 95%;
-  max-width: 600px;
+  max-width: 480px;
   max-height: 90vh;
   overflow-y: auto;
   margin: 1rem;
@@ -4842,7 +5032,7 @@ body {
 }
 
 /* Responsive design for wine-group-card */
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .wine-group-card {
     padding: 0.8rem;
   }
@@ -5223,7 +5413,7 @@ body {
   }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .wine-group-header {
     flex-direction: column;
     align-items: flex-start;
@@ -5261,7 +5451,7 @@ body {
 }
 
 /* Tablet modal styles */
-@media (min-width: 768px) and (max-width: 1023px) {
+@media (min-width: 768px) and (max-width: 1024px) {
   .modal-content {
     width: 90%;
     max-width: 700px;
@@ -5452,7 +5642,7 @@ h1, h2, h3, h4, h5, h6 {
 @media (min-width: 768px) {
   .form-actions {
     grid-template-columns: repeat(2, 1fr);
-    max-width: 600px;
+    max-width: 480px;
     margin: 0 auto;
   }
   
@@ -5629,7 +5819,7 @@ h1, h2, h3, h4, h5, h6 {
    MOBILE IMPROVEMENTS
    =============================== */
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   /* Single column layout for mobile */
   .form-actions {
     grid-template-columns: 1fr;
@@ -6249,7 +6439,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Mobile adjustments for form actions */
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .form-actions {
     position: fixed;
     bottom: 70px; /* Space for bottom navigation */
@@ -6558,7 +6748,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Responsive adjustments */
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .image-gallery {
     display: flex;
     flex-direction: column;
@@ -8212,7 +8402,7 @@ input[type="number"] {
 }
 
 /* Mobile adjustments for centered elements */
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .quiz-action-button {
     padding: 1rem;
     max-width: 100%;
@@ -8361,7 +8551,7 @@ input[type='radio'] {
 }
 
 .error-boundary-content {
-  max-width: 600px;
+  max-width: 480px;
   text-align: center;
 }
 

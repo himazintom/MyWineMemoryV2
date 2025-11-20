@@ -133,11 +133,36 @@
 
   /* Wine type colors */
   --wine-red: #722f37;
+  --wine-red-dark: #5a2529;
   --wine-white: #f9f2e5;
   --wine-rose: #e8a4a4;
   --wine-sparkling: #fff9c4;
   --wine-dessert: #d4a574;
   --wine-fortified: #8b4513;
+
+  /* ========================================
+     ALIASES & LEGACY SUPPORT
+     ======================================== */
+
+  /* Button text colors */
+  --btn-primary-text: var(--text-primary);
+  --btn-secondary-text: var(--text-secondary);
+  --btn-tertiary-text: var(--text-tertiary);
+
+  /* Component aliases for backward compatibility */
+  --primary-color: var(--color-primary-main);
+  --card-bg: var(--bg-card);
+  --hover-bg: var(--bg-secondary);
+
+  /* Link colors */
+  --link-text: var(--color-blue-purple);
+  --link-hover-text: var(--color-blue-purple-dark);
+
+  /* Semantic text colors */
+  --error-text: var(--color-error-text);
+  --success-text: var(--color-success-text);
+  --warning-text: var(--color-warning-text);
+  --warning-color: var(--color-warning);
 
   /* ========================================
      GRADIENTS
