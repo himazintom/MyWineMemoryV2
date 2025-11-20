@@ -383,7 +383,7 @@ const WineCard: React.FC<WineCardProps> = ({
           <div className="record-actions">
             {onEdit && (
               <button
-                className="edit-record-button"
+                className="btn btn-secondary btn-sm"
                 onClick={(e) => {
                   e.stopPropagation();
                   onEdit();
@@ -394,7 +394,7 @@ const WineCard: React.FC<WineCardProps> = ({
             )}
             {onDelete && (
               <button
-                className="delete-record-button"
+                className="btn btn-danger btn-sm"
                 onClick={(e) => {
                   e.stopPropagation();
                   onDelete();

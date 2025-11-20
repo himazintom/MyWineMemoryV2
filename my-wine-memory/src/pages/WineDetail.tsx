@@ -434,8 +434,8 @@ const WineDetail: React.FC = () => {
                           )}
 
                           <div className="record-actions">
-                            <button 
-                              className="edit-record-button"
+                            <button
+                              className="btn btn-secondary btn-sm"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleEditRecord(record.id);
@@ -443,8 +443,8 @@ const WineDetail: React.FC = () => {
                             >
                               ✏️ 編集
                             </button>
-                            <button 
-                              className="delete-record-button"
+                            <button
+                              className="btn btn-danger btn-sm"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleDeleteRecord(record.id);

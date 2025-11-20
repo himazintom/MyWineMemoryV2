@@ -81,10 +81,10 @@ const Home: React.FC = () => {
             </div>
             <p>写真で残す、あなただけのワイン体験</p>
             <div className="hero-actions">
-              <button className="action-button primary" onClick={() => navigate('/select-wine')}>
+              <button className="btn btn-primary" onClick={() => navigate('/select-wine')}>
                 🍷 ワインを記録する
               </button>
-              <button className="action-button secondary" onClick={() => navigate('/quiz')}>
+              <button className="btn btn-secondary" onClick={() => navigate('/quiz')}>
                 🧠 クイズに挑戦する
               </button>
             </div>

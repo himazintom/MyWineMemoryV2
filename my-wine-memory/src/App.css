@@ -501,8 +501,7 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .wine-card:hover,
   .wine-list-item:hover,
-  .wine-group-card:hover,
-  .action-button:hover {
+  .wine-group-card:hover {
     transform: none;
     box-shadow: none;
   }
@@ -512,38 +511,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-}
-
-.action-button {
-  padding: 1rem;
-  border: none;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.action-button.primary {
-  background: var(--gradient-primary);
-  color: var(--btn-primary-text);
-}
-
-.action-button.secondary {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  border: 2px solid var(--border-color);
-}
-
-.action-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.action-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
 }
 
 .daily-goals {
@@ -2055,11 +2022,6 @@ body {
     gap: 2rem;
   }
   
-  .action-button {
-    flex: 1;
-    max-width: 400px;
-  }
-  
   .wine-form {
     max-width: none;
   }
@@ -2087,10 +2049,6 @@ body {
   .quick-actions {
     flex-direction: row;
     gap: 1.5rem;
-  }
-  
-  .action-button {
-    flex: 1;
   }
 }
 
@@ -5288,33 +5246,6 @@ body {
   border-top: 1px solid var(--border-color);
 }
 
-.edit-record-button,
-.delete-record-button {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.edit-record-button {
-  background: var(--warning-text);
-  color: var(--text-primary);
-}
-
-.edit-record-button:hover {
-  background: var(--warning-text);
-}
-
-.delete-record-button {
-  background: var(--error-text);
-  color: var(--btn-primary-text);
-}
-
-.delete-record-button:hover {
-  background: var(--error-text);
-}
 
 /* Header Button Styles */
 .add-record-button,
@@ -5604,7 +5535,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Better button sizing */
-.action-button,
 .btn-primary,
 .btn-secondary {
   min-height: 48px;
@@ -5757,8 +5687,7 @@ h1, h2, h3, h4, h5, h6 {
     min-height: 60px;
     padding: 12px 8px;
   }
-  
-  .action-button,
+
   .btn-primary,
   .btn-secondary {
     min-height: 50px;
@@ -5785,7 +5714,6 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Focus states */
 .nav-item:focus,
-.action-button:focus,
 .btn-primary:focus,
 .btn-secondary:focus {
   outline: 2px solid var(--wine-primary);
@@ -8414,8 +8342,7 @@ a:focus-visible {
   }
   
   .wine-card,
-  .button,
-  .action-button {
+  .button {
     border: 2px solid var(--border-color);
   }
 }
