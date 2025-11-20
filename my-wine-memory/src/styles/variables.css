@@ -94,7 +94,10 @@
   --bg-secondary: #2a2a2a;
   --bg-tertiary: #3a3a3a;
   --bg-quaternary: #3a3a2a;
+  --bg-quaternary-lighter: #4a4a3a;
   --bg-card: #242424;
+  --bg-green-dark: #1b3a1b;
+  --bg-green-gray: #2a4a2a;
 
   /* Text colors */
   --text-primary: #ffffff;
@@ -105,6 +108,7 @@
 
   /* Border & Divider */
   --border-color: #404040;
+  --border-gray: #555;
   --divider-color: #333333;
 
   /* Special colors */
@@ -132,6 +136,8 @@
   --gradient-success: linear-gradient(90deg, #4CAF50, #8BC34A);
   --gradient-success-135: linear-gradient(135deg, #4CAF50, #45a049);
   --gradient-success-wine: linear-gradient(90deg, #722F37, #2E7D32);
+  --gradient-brown-warning: linear-gradient(135deg, #3a3a2a, #4a4a3a);
+  --gradient-green-dark: linear-gradient(135deg, #1b3a1b, #2a4a2a);
 
   /* ========================================
      TRANSPARENCY VARIANTS

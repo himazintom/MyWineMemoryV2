@@ -83,7 +83,7 @@
 }
 
 .explanation-box.important {
-  background: linear-gradient(135deg, var(--bg-quaternary), #4a4a3a);
+  background: var(--gradient-brown-warning);
   border: 1px solid var(--color-warning);
 }
 
@@ -116,7 +116,7 @@
   padding: 16px;
   border-radius: 8px;
   background: var(--color-gray-dark);
-  border: 1px solid #555;
+  border: 1px solid var(--border-gray);
 }
 
 .option-card h5 {
@@ -126,7 +126,7 @@
 }
 
 .option-card.recommended {
-  background: linear-gradient(135deg, #1b3a1b, #2a4a2a);
+  background: var(--gradient-green-dark);
   border-color: var(--color-success-border);
 }
 
