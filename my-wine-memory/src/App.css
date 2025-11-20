@@ -67,7 +67,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #FFF8E1 0%, #F3E5AB 100%);
+  background: var(--gradient-gold);
 }
 
 #root {
@@ -216,7 +216,7 @@ body {
   min-height: 300px;
   border-radius: 16px;
   overflow: hidden;
-  background: linear-gradient(135deg, #3a1f23, #151012);
+  background: var(--gradient-very-dark);
   background-size: cover;
   background-position: center;
 }
@@ -3590,7 +3590,7 @@ body {
 }
 
 .public-profile-button {
-  background: linear-gradient(135deg, var(--color-success-green), #16a34a);
+  background: var(--gradient-success-darker);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -3794,7 +3794,7 @@ body {
   height: 200px;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-purple);
 }
 
 .wine-image {
@@ -5292,7 +5292,7 @@ body {
   --bg-primary: #1a1a1a;
   --bg-secondary: #2d2d2d;
   --bg-tertiary: var(--border-color);
-  --bg-gradient: linear-gradient(135deg, #2d1b69 0%, #1a1a2e 100%);
+  --bg-gradient: var(--gradient-dark-purple);
   --text-primary: #ffffff;
   --text-secondary: #cccccc;
   --text-tertiary: #999999;

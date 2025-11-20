@@ -25,7 +25,7 @@
 
 /* Offline state */
 .offline-indicator.offline {
-  background: linear-gradient(135deg, #ff4444, #cc3333);
+  background: var(--gradient-red);
   color: white;
 }
 
@@ -44,7 +44,7 @@
 
 /* Slow connection warning */
 .offline-indicator .slow-connection {
-  background: linear-gradient(135deg, #ff9800, #f57c00);
+  background: var(--gradient-orange);
   color: white;
 }
 

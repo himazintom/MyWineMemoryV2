@@ -41,7 +41,7 @@
 
 /* Review Section */
 .review-section {
-  background: linear-gradient(135deg, #3a3a2a, #4a4a3a);
+  background: var(--gradient-brown-warning);
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 30px;
@@ -200,7 +200,7 @@
 }
 
 .mode-badge.master {
-  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  background: var(--gradient-gold);
   color: var(--text-inverse);
 }
 
@@ -271,15 +271,15 @@
 }
 
 .progress-segment.cleared {
-  background: linear-gradient(135deg, var(--color-success-border), #66bb6a);
+  background: var(--gradient-success-light);
 }
 
 .progress-segment.wrong {
-  background: linear-gradient(135deg, var(--color-coral-red), #ff8787);
+  background: var(--gradient-coral);
 }
 
 .progress-segment.unsolved {
-  background: linear-gradient(135deg, var(--color-gray), #bdbdbd);
+  background: var(--gradient-gray);
 }
 
 .progress-text {
@@ -402,7 +402,7 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  background: var(--gradient-gold);
   color: var(--text-inverse);
   padding: 6px 12px;
   border-radius: 20px;

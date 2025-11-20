@@ -63,31 +63,45 @@
   /* Additional colors */
   --color-success-green: #22c55e;
   --color-success-dark-green: #45a049;
+  --color-success-green-light: #66bb6a;
+  --color-success-green-darker: #16a34a;
   --color-green-dark: #008000;
   --color-dark-golden: #B8860B;
   --color-red-dark: #dc2626;
   --color-red-darker: #d32f2f;
   --color-red-cc: #cc0000;
+  --color-red-light: #ff4444;
+  --color-red-lighter: #cc3333;
   --color-coral-red: #ff6b6b;
+  --color-coral-red-light: #ff8787;
   --color-cyan: #4ecdc4;
   --color-orange-light: #ffb74d;
   --color-orange: #ff9800;
   --color-orange-dark: #ff6f00;
+  --color-orange-darker: #f57c00;
   --color-deep-orange: #ff5722;
   --color-deep-orange-dark: #d84315;
   --color-blue: #2196f3;
   --color-blue-dark: #1976d2;
   --color-blue-purple: #646cff;
   --color-blue-purple-dark: #535bf2;
+  --color-blue-purple-light: #667eea;
+  --color-purple-gradient: #764ba2;
   --color-blue-gray: #607d8b;
   --color-blue-gray-dark: #455a64;
   --color-purple: #9c27b0;
   --color-purple-dark: #7b1fa2;
+  --color-purple-very-dark: #2d1b69;
   --color-pink: #f48fb1;
+  --color-gold-light: #ffed4e;
   --color-gray: #9e9e9e;
+  --color-gray-light-2: #bdbdbd;
   --bg-dark-brown: #3a2a1a;
   --bg-dark-gray: #2d2d2d;
   --bg-very-dark: #1e1e1e;
+  --bg-very-dark-blue: #1a1a2e;
+  --bg-dark-purple: #3a1f23;
+  --bg-very-dark-purple: #151012;
 
   /* Background colors - Dark bar ambiance */
   --bg-primary: #1a1a1a;
@@ -135,9 +149,19 @@
   --gradient-hero: linear-gradient(180deg, rgba(0, 0, 0, 0.28) 0%, rgba(0, 0, 0, 0.58) 100%);
   --gradient-success: linear-gradient(90deg, #4CAF50, #8BC34A);
   --gradient-success-135: linear-gradient(135deg, #4CAF50, #45a049);
+  --gradient-success-light: linear-gradient(135deg, var(--color-success-border), var(--color-success-green-light));
+  --gradient-success-darker: linear-gradient(135deg, var(--color-success-green), var(--color-success-green-darker));
   --gradient-success-wine: linear-gradient(90deg, #722F37, #2E7D32);
-  --gradient-brown-warning: linear-gradient(135deg, #3a3a2a, #4a4a3a);
-  --gradient-green-dark: linear-gradient(135deg, #1b3a1b, #2a4a2a);
+  --gradient-brown-warning: linear-gradient(135deg, var(--bg-quaternary), var(--bg-quaternary-lighter));
+  --gradient-green-dark: linear-gradient(135deg, var(--bg-green-dark), var(--bg-green-gray));
+  --gradient-gold: linear-gradient(135deg, var(--color-gold), var(--color-gold-light));
+  --gradient-coral: linear-gradient(135deg, var(--color-coral-red), var(--color-coral-red-light));
+  --gradient-gray: linear-gradient(135deg, var(--color-gray), var(--color-gray-light-2));
+  --gradient-red: linear-gradient(135deg, var(--color-red-light), var(--color-red-lighter));
+  --gradient-orange: linear-gradient(135deg, var(--color-orange), var(--color-orange-darker));
+  --gradient-purple: linear-gradient(135deg, var(--color-blue-purple-light), var(--color-purple-gradient));
+  --gradient-dark-purple: linear-gradient(135deg, var(--color-purple-very-dark), var(--bg-very-dark-blue));
+  --gradient-very-dark: linear-gradient(135deg, var(--bg-dark-purple), var(--bg-very-dark-purple));
 
   /* ========================================
      TRANSPARENCY VARIANTS
