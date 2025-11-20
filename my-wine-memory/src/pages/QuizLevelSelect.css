@@ -52,11 +52,11 @@
   align-items: center;
   gap: 10px;
   margin: 0 0 15px 0;
-  color: #ffc107;
+  color: var(--color-warning);
 }
 
 .review-count {
-  background: #ff6b6b;
+  background: var(--color-coral-red);
   color: white;
   padding: 2px 10px;
   border-radius: 12px;
@@ -64,7 +64,7 @@
 }
 
 .btn-review {
-  background: #ffc107;
+  background: var(--color-warning);
   color: var(--text-inverse);
   border: none;
   padding: 8px 16px;
@@ -75,7 +75,7 @@
 }
 
 .btn-review:hover {
-  background: #ffb300;
+  background: var(--color-warning-darker);
 }
 
 .wrong-answers-list {
@@ -85,7 +85,7 @@
 }
 
 .wrong-answer-item {
-  background: #2a2a2a;
+  background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   padding: 12px;
   border-radius: 8px;
@@ -104,7 +104,7 @@
 }
 
 .wrong-count {
-  color: #ff6b6b;
+  color: var(--color-coral-red);
   font-size: 14px;
 }
 
@@ -115,7 +115,7 @@
 }
 
 .btn-review-now {
-  background: #4ecdc4;
+  background: var(--color-cyan);
   color: white;
   border: none;
   padding: 6px 12px;
@@ -190,13 +190,13 @@
 }
 
 .mode-badge.first-round {
-  background: #1a2a3a;
-  color: #64b5f6;
+  background: var(--color-info-dark-bg);
+  color: var(--color-info-lighter);
 }
 
 .mode-badge.review {
-  background: #3a2a1a;
-  color: #ffb74d;
+  background: var(--bg-dark-brown);
+  color: var(--color-orange-light);
 }
 
 .mode-badge.master {
@@ -237,7 +237,7 @@
 }
 
 .btn-unlock {
-  background: #4caf50;
+  background: var(--color-success-border);
   color: white;
   border: none;
   padding: 8px 20px;
@@ -248,7 +248,7 @@
 }
 
 .btn-unlock:hover {
-  background: #45a049;
+  background: var(--color-success-dark-green);
 }
 
 /* Progress Section */
@@ -258,7 +258,7 @@
 
 .progress-bar {
   height: 24px;
-  background: #1a1a1a;
+  background: var(--bg-primary);
   border-radius: 12px;
   overflow: hidden;
   position: relative;
@@ -271,15 +271,15 @@
 }
 
 .progress-segment.cleared {
-  background: linear-gradient(135deg, #4caf50, #66bb6a);
+  background: linear-gradient(135deg, var(--color-success-border), #66bb6a);
 }
 
 .progress-segment.wrong {
-  background: linear-gradient(135deg, #ff6b6b, #ff8787);
+  background: linear-gradient(135deg, var(--color-coral-red), #ff8787);
 }
 
 .progress-segment.unsolved {
-  background: linear-gradient(135deg, #9e9e9e, #bdbdbd);
+  background: linear-gradient(135deg, var(--color-gray), #bdbdbd);
 }
 
 .progress-text {
@@ -308,15 +308,15 @@
 }
 
 .stat.cleared {
-  color: #4caf50;
+  color: var(--color-success-border);
 }
 
 .stat.wrong {
-  color: #ff6b6b;
+  color: var(--color-coral-red);
 }
 
 .stat.unsolved {
-  color: #9e9e9e;
+  color: var(--color-gray);
 }
 
 /* Level Statistics */
@@ -455,23 +455,23 @@
 }
 
 .challenge-mode.time-attack {
-  border-color: #ff6b6b;
-  color: #ff6b6b;
+  border-color: var(--color-coral-red);
+  color: var(--color-coral-red);
 }
 
 .challenge-mode.perfect-run {
-  border-color: #4caf50;
-  color: #4caf50;
+  border-color: var(--color-success-border);
+  color: var(--color-success-border);
 }
 
 .challenge-mode.random-100 {
-  border-color: #2196f3;
-  color: #2196f3;
+  border-color: var(--color-blue);
+  color: var(--color-blue);
 }
 
 .challenge-mode.blind-test {
-  border-color: #9c27b0;
-  color: #9c27b0;
+  border-color: var(--color-purple);
+  color: var(--color-purple);
 }
 
 /* Mobile Responsive */

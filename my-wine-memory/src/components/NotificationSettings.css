@@ -1,7 +1,7 @@
 /* Notification Settings Styles */
 .notification-settings {
   margin: 20px 0;
-  background: #2a2a2a;
+  background: var(--bg-secondary);
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -17,7 +17,7 @@
 }
 
 .setting-header:hover {
-  background: #333;
+  background: var(--color-gray-dark);
 }
 
 .setting-label {
@@ -45,23 +45,23 @@
 }
 
 .status-badge.enabled {
-  background: #d4edda;
-  color: #155724;
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
 }
 
 .status-badge.disabled {
-  background: #f8d7da;
-  color: #721c24;
+  background: var(--color-error-bg);
+  color: var(--color-error-text);
 }
 
 .status-badge.warning {
-  background: #fff3cd;
-  color: #856404;
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
 }
 
 .status-badge.error {
-  background: #f5f5f5;
-  color: #6c757d;
+  background: var(--color-info-bg);
+  color: var(--color-info-text);
 }
 
 .notification-settings-content {
@@ -83,8 +83,8 @@
 }
 
 .explanation-box.important {
-  background: linear-gradient(135deg, #3a3a2a, #4a4a3a);
-  border: 1px solid #ffc107;
+  background: linear-gradient(135deg, var(--bg-quaternary), #4a4a3a);
+  border: 1px solid var(--color-warning);
 }
 
 .explanation-box .icon {
@@ -95,13 +95,13 @@
 .explanation-box strong {
   display: block;
   margin-bottom: 4px;
-  color: #ffc107;
+  color: var(--color-warning);
 }
 
 .explanation-box p {
   margin: 0;
   font-size: 14px;
-  color: #ffc107;
+  color: var(--color-warning);
 }
 
 /* Comparison Grid */
@@ -115,7 +115,7 @@
 .option-card {
   padding: 16px;
   border-radius: 8px;
-  background: #333;
+  background: var(--color-gray-dark);
   border: 1px solid #555;
 }
 
@@ -127,7 +127,7 @@
 
 .option-card.recommended {
   background: linear-gradient(135deg, #1b3a1b, #2a4a2a);
-  border-color: #4caf50;
+  border-color: var(--color-success-border);
 }
 
 .pros-cons {
@@ -146,7 +146,7 @@
 
 .pros-cons li.pro::before {
   content: '✓';
-  color: #4caf50;
+  color: var(--color-success-border);
   position: absolute;
   left: 0;
   font-weight: bold;
@@ -154,15 +154,15 @@
 
 .pros-cons li.con::before {
   content: '✗';
-  color: #f44336;
+  color: var(--color-error-red);
   position: absolute;
   left: 0;
   font-weight: bold;
 }
 
 .install-instruction {
-  background: #1a2a3a;
-  color: #64b5f6;
+  background: var(--color-info-dark-bg);
+  color: var(--color-info-lighter);
   padding: 12px;
   border-radius: 8px;
   font-size: 13px;
@@ -175,8 +175,8 @@
   display: flex;
   gap: 12px;
   padding: 12px;
-  background: #3a3a2a;
-  border: 1px solid #ffc107;
+  background: var(--bg-quaternary);
+  border: 1px solid var(--color-warning);
   border-radius: 8px;
   margin-bottom: 16px;
 }
@@ -193,11 +193,11 @@
 .banner-content p {
   margin: 0 0 8px 0;
   font-size: 14px;
-  color: #ffc107;
+  color: var(--color-warning);
 }
 
 .btn-install {
-  background: #ffc107;
+  background: var(--color-warning);
   color: var(--text-inverse);
   border: none;
   padding: 8px 16px;
@@ -209,7 +209,7 @@
 }
 
 .btn-install:hover {
-  background: #ffb300;
+  background: var(--color-warning-darker);
 }
 
 /* Permission section */
@@ -281,7 +281,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
+  background-color: var(--color-gray-light);
   transition: 0.4s;
   border-radius: 24px;
 }
@@ -299,7 +299,7 @@
 }
 
 .setting-toggle:checked + .toggle-slider {
-  background-color: #4caf50;
+  background-color: var(--color-success-border);
 }
 
 .setting-toggle:checked + .toggle-slider:before {
@@ -435,19 +435,19 @@
   align-items: center;
   gap: 8px;
   padding: 12px;
-  background: #f8d7da;
-  border: 1px solid #f5c6cb;
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
   border-radius: 8px;
   margin-bottom: 16px;
   font-size: 14px;
-  color: #721c24;
+  color: var(--color-error-text);
 }
 
 .error-dismiss {
   margin-left: auto;
   background: transparent;
   border: none;
-  color: #721c24;
+  color: var(--color-error-text);
   font-size: 20px;
   cursor: pointer;
   padding: 0;

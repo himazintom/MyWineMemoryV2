@@ -157,12 +157,12 @@
   }
   
   .offline-indicator.offline {
-    background: #cc0000;
-    border-color: #ffffff;
+    background: var(--color-red-cc);
+    border-color: var(--text-primary);
   }
   
   .offline-indicator.online.reconnected {
-    background: #008000;
-    border-color: #ffffff;
+    background: var(--color-green-dark);
+    border-color: var(--text-primary);
   }
 }

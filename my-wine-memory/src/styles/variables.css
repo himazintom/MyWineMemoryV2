@@ -23,23 +23,77 @@
   --color-success: #28a745;
   --color-success-light: #34ce57;
   --color-success-dark: #1e7e34;
+  --color-success-bg: #d4edda;
+  --color-success-text: #155724;
+  --color-success-border: #4caf50;
 
   --color-error: #dc3545;
   --color-error-light: #e4606d;
   --color-error-dark: #bd2130;
+  --color-error-red: #f44336;
+  --color-error-bg: #f8d7da;
+  --color-error-border: #f5c6cb;
+  --color-error-text: #721c24;
 
   --color-warning: #ffc107;
   --color-warning-light: #ffd54f;
   --color-warning-dark: #c79100;
+  --color-warning-darker: #ffb300;
+  --color-warning-bg: #fff3cd;
+  --color-warning-text: #856404;
 
   --color-info: #17a2b8;
   --color-info-light: #58c4d4;
+  --color-info-lighter: #64b5f6;
   --color-info-dark: #117a8b;
+  --color-info-bg: #f5f5f5;
+  --color-info-bg-light: #d1ecf1;
+  --color-info-text: #6c757d;
+  --color-info-text-dark: #0c5460;
+  --color-info-dark-bg: #1a2a3a;
+
+  /* Neutral grays */
+  --color-gray-light: #ccc;
+  --color-gray-medium: #6b7280;
+  --color-gray-text: #6b7280;
+  --color-gray-dark: #333;
+  --color-gray-999: #999;
+  --color-gray-666: #666;
+
+  /* Additional colors */
+  --color-success-green: #22c55e;
+  --color-success-dark-green: #45a049;
+  --color-green-dark: #008000;
+  --color-dark-golden: #B8860B;
+  --color-red-dark: #dc2626;
+  --color-red-darker: #d32f2f;
+  --color-red-cc: #cc0000;
+  --color-coral-red: #ff6b6b;
+  --color-cyan: #4ecdc4;
+  --color-orange-light: #ffb74d;
+  --color-orange: #ff9800;
+  --color-orange-dark: #ff6f00;
+  --color-deep-orange: #ff5722;
+  --color-deep-orange-dark: #d84315;
+  --color-blue: #2196f3;
+  --color-blue-dark: #1976d2;
+  --color-blue-purple: #646cff;
+  --color-blue-purple-dark: #535bf2;
+  --color-blue-gray: #607d8b;
+  --color-blue-gray-dark: #455a64;
+  --color-purple: #9c27b0;
+  --color-purple-dark: #7b1fa2;
+  --color-pink: #f48fb1;
+  --color-gray: #9e9e9e;
+  --bg-dark-brown: #3a2a1a;
+  --bg-dark-gray: #2d2d2d;
+  --bg-very-dark: #1e1e1e;
 
   /* Background colors - Dark bar ambiance */
   --bg-primary: #1a1a1a;
   --bg-secondary: #2a2a2a;
   --bg-tertiary: #3a3a3a;
+  --bg-quaternary: #3a3a2a;
   --bg-card: #242424;
 
   /* Text colors */

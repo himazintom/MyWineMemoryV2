@@ -24,13 +24,13 @@
   margin: 0;
   font-size: 14px;
   font-weight: 600;
-  color: #f48fb1;
+  color: var(--color-pink);
 }
 
 .error-clear-all {
   background: none;
   border: none;
-  color: #f48fb1;
+  color: var(--color-pink);
   font-size: 12px;
   cursor: pointer;
   padding: 4px 8px;
@@ -49,7 +49,7 @@
 }
 
 .error-item {
-  background: #2d2d2d;
+  background: var(--bg-dark-gray);
   border-radius: 8px;
   padding: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -59,23 +59,23 @@
 }
 
 .error-item.error-network {
-  border-left-color: #ff9800;
+  border-left-color: var(--color-orange);
 }
 
 .error-item.error-auth {
-  border-left-color: #f44336;
+  border-left-color: var(--color-error-red);
 }
 
 .error-item.error-validation {
-  border-left-color: #ff5722;
+  border-left-color: var(--color-deep-orange);
 }
 
 .error-item.error-server {
-  border-left-color: #9c27b0;
+  border-left-color: var(--color-purple);
 }
 
 .error-item.error-unknown {
-  border-left-color: #607d8b;
+  border-left-color: var(--color-blue-gray);
 }
 
 .error-content {
@@ -106,13 +106,13 @@
 .error-message {
   font-size: 14px;
   line-height: 1.4;
-  color: #e0e0e0;
+  color: var(--text-secondary);
   margin-bottom: 4px;
 }
 
 .error-time {
   font-size: 11px;
-  color: #999;
+  color: var(--color-gray-999);
 }
 
 .error-actions {
@@ -133,7 +133,7 @@
 }
 
 .error-retry {
-  color: #1976d2;
+  color: var(--color-blue-dark);
   font-weight: 500;
 }
 
@@ -142,7 +142,7 @@
 }
 
 .error-dismiss {
-  color: #666;
+  color: var(--color-gray-666);
   font-size: 16px;
   font-weight: bold;
   width: 24px;
@@ -154,7 +154,7 @@
 
 .error-dismiss:hover {
   background-color: rgba(0, 0, 0, 0.1);
-  color: #333;
+  color: var(--color-gray-dark);
 }
 
 .error-details {
@@ -165,15 +165,15 @@
 
 .error-details summary {
   font-size: 11px;
-  color: #666;
+  color: var(--color-gray-666);
   cursor: pointer;
   margin-bottom: 4px;
 }
 
 .error-debug {
   font-size: 10px;
-  background: #1e1e1e;
-  color: #e0e0e0;
+  background: var(--bg-very-dark);
+  color: var(--text-secondary);
   padding: 8px;
   border-radius: 4px;
   overflow: auto;
@@ -234,23 +234,23 @@
   }
   
   .error-network {
-    border-color: #ff6f00;
+    border-color: var(--color-orange-dark);
   }
   
   .error-auth {
-    border-color: #d32f2f;
+    border-color: var(--color-red-darker);
   }
   
   .error-validation {
-    border-color: #d84315;
+    border-color: var(--color-deep-orange-dark);
   }
   
   .error-server {
-    border-color: #7b1fa2;
+    border-color: var(--color-purple-dark);
   }
   
   .error-unknown {
-    border-color: #455a64;
+    border-color: var(--color-blue-gray-dark);
   }
 }
 

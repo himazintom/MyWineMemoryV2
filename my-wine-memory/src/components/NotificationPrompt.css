@@ -7,7 +7,7 @@
   z-index: 1000;
   width: 90%;
   max-width: 600px;
-  background: #2a2a2a;
+  background: var(--bg-secondary);
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
   padding: 20px;
@@ -39,12 +39,12 @@
 .notification-prompt-text h3 {
   font-size: 18px;
   margin: 0 0 8px 0;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .notification-prompt-text p {
   font-size: 14px;
-  color: #cccccc;
+  color: var(--color-gray-light);
   margin: 0 0 12px 0;
 }
 
@@ -59,7 +59,7 @@
 
 .notification-benefits li {
   font-size: 14px;
-  color: #cccccc;
+  color: var(--color-gray-light);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -93,12 +93,12 @@
 
 .notification-prompt-actions .btn-secondary {
   background: transparent;
-  color: #cccccc;
+  color: var(--color-gray-light);
   border: 1px solid #444;
 }
 
 .notification-prompt-actions .btn-secondary:hover {
-  background: #333;
+  background: var(--color-gray-dark);
 }
 
 .notification-prompt-warning {
@@ -111,12 +111,12 @@
 /* Important notice styling */
 .important-notice {
   background: linear-gradient(135deg, #3a3a2a, #4a4a3a);
-  border-left: 4px solid #ffc107;
+  border-left: 4px solid var(--color-warning);
   padding: 12px;
   margin: 12px 0;
   border-radius: 8px;
   font-size: 14px;
-  color: #ffc107;
+  color: var(--color-warning);
 }
 
 /* Comparison section */
@@ -134,7 +134,7 @@
 }
 
 .comparison-item.browser {
-  background: #2a2a2a;
+  background: var(--bg-secondary);
   border: 1px solid #444;
 }
 
@@ -162,13 +162,13 @@
 }
 
 .install-guide {
-  background: #1a2a3a;
+  background: var(--color-info-dark-bg);
   padding: 12px;
   border-radius: 8px;
   font-size: 13px;
   text-align: center;
   margin-top: 16px;
-  color: #64b5f6;
+  color: var(--color-info-lighter);
 }
 
 /* PWA Install Prompt */
@@ -251,7 +251,7 @@
 }
 
 .pwa-install-actions .btn-primary:hover {
-  background: #f5f5f5;
+  background: var(--color-info-bg);
   transform: scale(1.02);
 }
 
