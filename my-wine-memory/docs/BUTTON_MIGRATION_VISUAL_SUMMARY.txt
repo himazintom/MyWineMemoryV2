@@ -1,0 +1,220 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                    BUTTON MIGRATION ANALYSIS - VISUAL SUMMARY                  ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+UNIFIED BUTTON SYSTEM AVAILABLE
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ .btn-primary          │ Main CTAs with gradient                             │
+│ .btn-secondary        │ Alternative actions with border                     │
+│ .btn-tertiary         │ Text/ghost buttons                                  │
+│ .btn-danger           │ Destructive actions (delete, logout)                │
+│ .btn-icon             │ Circular icon-only buttons                          │
+│ .btn-tab              │ Tab navigation                                      │
+│ .btn-toggle           │ State-based toggle buttons                          │
+│ .btn-mode             │ Large mode selection cards                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+MIGRATION STATUS
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│  ✅ ALREADY MIGRATED (5)                                                    │
+│     action-button, edit-record-button, delete-record-button,               │
+│     tab-button, mode-button                                                │
+│                                                                             │
+│  🔴 HIGH PRIORITY (12 buttons / 16 uses)                                    │
+│     ├─ back-button (5)              [KEEP CUSTOM - absolute positioning]  │
+│     ├─ challenge-mode (5)           [→ btn-mode]                          │
+│     ├─ get-started-button (3)       [→ btn-primary btn-full]              │
+│     └─ close-button (3)             [→ btn-icon btn-sm]                   │
+│                                                                             │
+│  🟠 MEDIUM PRIORITY (20 buttons / 20 uses)                                  │
+│     ├─ CTA Buttons (8)              [→ btn-primary variations]            │
+│     │   add-tasting, add-first-record, add-detailed-record,               │
+│     │   add-record, create-new-wine, cta, view-all-*, view-all-records   │
+│     │                                                                      │
+│     ├─ Auth Buttons (3)             [→ btn-secondary / btn-primary]       │
+│     │   google-signin, google-login, login-suggestion                     │
+│     │                                                                      │
+│     ├─ Action Buttons (4)           [→ btn-primary / btn-mode]            │
+│     │   next, retry, quiz-action, public-profile                         │
+│     │                                                                      │
+│     ├─ Utility Buttons (5)          [→ btn-danger / btn-secondary]        │
+│     │   logout, cancel, copy, view-analysis, remove-url                  │
+│     │                                                                      │
+│     └─ Positional Buttons (1)       [→ btn-primary + wrapper]            │
+│         next-button-fixed                                                 │
+│                                                                             │
+│  🟡 KEEP CUSTOM (7 buttons)                                                 │
+│     ├─ back-button (5)              [absolute positioning in headers]     │
+│     ├─ category-button (1)          [pill-style border-radius: 20px]      │
+│     ├─ wine-type-button (1)         [dynamic color styling - data-driven]│
+│     ├─ add-url-button (1)           [dashed border distinctive UX]        │
+│     ├─ image-add-button (1)         [grid layout positioning]             │
+│     ├─ remove-image-button (1)      [absolute positioned delete icon]    │
+│     └─ privacy-toggle-button (1)    [state-based styling]                 │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+MIGRATION ROADMAP
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ PHASE 1: HIGH PRIORITY (2-3 commits)                                       ║
+├─────────────────────────────────────────────────────────────────────────────┤
+║                                                                             ║
+║  Commit 1: CTA Buttons (8)                                                 ║
+║    add-tasting → btn-primary                                              ║
+║    add-first-record → btn-primary btn-full                                ║
+║    add-detailed-record → btn-primary                                      ║
+║    add-record → btn-primary                                               ║
+║    create-new-wine → btn-primary btn-full                                 ║
+║    cta → btn-primary btn-full                                             ║
+║    view-all → btn-secondary btn-full                                      ║
+║    view-all-records → btn-secondary btn-full                              ║
+║                                                                             ║
+║  Commit 2: Challenge/Quiz Buttons (3)                                      ║
+║    challenge-mode (5 uses) → btn-mode                                     ║
+║    quiz-action → btn-mode                                                 ║
+║    level-button → btn-primary with state modifiers                        ║
+║                                                                             ║
+║  Commit 3: Auth & Utility (5)                                              ║
+║    google-signin → btn-secondary                                          ║
+║    google-login → btn-secondary                                           ║
+║    login-suggestion → btn-primary                                         ║
+║    logout → btn-danger                                                    ║
+║    close → btn-icon btn-sm                                                ║
+║                                                                             ║
+╠═════════════════════════════════════════════════════════════════════════════╣
+║ PHASE 2: MEDIUM PRIORITY (2-3 commits)                                     ║
+├─────────────────────────────────────────────────────────────────────────────┤
+║                                                                             ║
+║  Commit 4: Navigation & Secondary Actions (5)                              ║
+║    next-button → btn-primary                                              ║
+║    retry-button → btn-primary                                             ║
+║    cancel-button → btn-secondary                                          ║
+║    public-profile → btn-secondary                                         ║
+║    view-analysis → btn-secondary                                          ║
+║                                                                             ║
+║  Commit 5: Small Utilities (3)                                              ║
+║    copy-button → btn-secondary btn-sm                                     ║
+║    remove-url → btn-danger btn-sm                                         ║
+║    privacy-toggle → btn-toggle (optional)                                 ║
+║                                                                             ║
+║  Commit 6: Fixed Positioning (1)                                            ║
+║    next-button-fixed → btn-primary (with wrapper div)                    ║
+║                                                                             ║
+╠═════════════════════════════════════════════════════════════════════════════╣
+║ PHASE 3: PRESERVE CUSTOM (No changes)                                      ║
+├─────────────────────────────────────────────────────────────────────────────┤
+║                                                                             ║
+║  Keep as-is:                                                               ║
+║    back-button                (absolute positioning)                       ║
+║    category-button            (pill styling)                               ║
+║    wine-type-button           (dynamic colors)                             ║
+║    add-url-button             (dashed border UX)                           ║
+║    image-add-button           (grid layout)                                ║
+║    remove-image-button        (positioned icon)                            ║
+║                                                                             ║
+╚═════════════════════════════════════════════════════════════════════════════╝
+
+QUICK IMPLEMENTATION CHECKLIST
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ FOR EACH MIGRATION:                                                        │
+│                                                                            │
+│ 1. Update JSX className                                                   │
+│    Before:  className="get-started-button"                               │
+│    After:   className="btn btn-primary btn-full"                         │
+│                                                                            │
+│ 2. Test appearance                                                        │
+│    [ ] Light theme                                                        │
+│    [ ] Dark theme                                                         │
+│    [ ] Mobile view (< 480px)                                              │
+│    [ ] Tablet view (480px - 768px)                                        │
+│    [ ] Desktop view (> 768px)                                             │
+│                                                                            │
+│ 3. Test interaction                                                       │
+│    [ ] Hover state                                                        │
+│    [ ] Active state                                                       │
+│    [ ] Focus/keyboard navigation                                          │
+│    [ ] Disabled state (if applicable)                                     │
+│                                                                            │
+│ 4. Remove CSS (if not needed)                                            │
+│    Delete from App.css, leaving only custom buttons                      │
+│                                                                            │
+│ 5. Commit with descriptive message                                        │
+│    "refactor: Migrate [button-name] buttons to unified system"           │
+│                                                                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+STATISTICS
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Total custom button classes:          32+                                   │
+│ Already migrated:                     5                                     │
+│ Remaining to migrate:                 20                                    │
+│ To keep custom:                       7                                     │
+│                                                                             │
+│ Total files with buttons:             15+ TSX files                        │
+│ Total button usages:                  57 instances                         │
+│                                                                             │
+│ Estimated effort:                                                          │
+│   Phase 1 (High Priority):            2-3 hours                           │
+│   Phase 2 (Medium Priority):          3-4 hours                           │
+│   Phase 3 (Custom):                   0 hours (preserve)                  │
+│   Total:                              5-7 hours                           │
+│                                                                             │
+│ CSS lines to remove:                  ~400 lines                           │
+│ Lines to keep custom:                 ~150 lines                           │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+EXAMPLE MIGRATIONS
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│ SIMPLE PRIMARY BUTTON:                                                     │
+│   Before: <button className="get-started-button">Start</button>           │
+│   After:  <button className="btn btn-primary btn-full">Start</button>     │
+│                                                                             │
+│ SECONDARY BUTTON WITH ICON:                                               │
+│   Before: <button className="google-signin-button">                       │
+│              <GoogleIcon /> Sign In                                       │
+│            </button>                                                       │
+│   After:  <button className="btn btn-secondary">                          │
+│              <GoogleIcon /> Sign In                                       │
+│            </button>                                                       │
+│                                                                             │
+│ MODAL CLOSE BUTTON:                                                        │
+│   Before: <button className="close-button">×</button>                     │
+│   After:  <button className="btn btn-icon btn-sm">×</button>             │
+│                                                                             │
+│ DESTRUCTIVE ACTION:                                                        │
+│   Before: <button className="remove-url-button">Remove</button>           │
+│   After:  <button className="btn btn-danger btn-sm">Remove</button>      │
+│                                                                             │
+│ MODE SELECTION CARD:                                                       │
+│   Before: <button className="challenge-mode time-attack">                │
+│              ⏱️ Time Attack                                               │
+│            </button>                                                       │
+│   After:  <button className="btn btn-mode">                              │
+│              ⏱️ Time Attack                                               │
+│            </button>                                                       │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+DOCUMENTATION FILES GENERATED
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ /docs/BUTTON_MIGRATION_ANALYSIS.md                                         │
+│   • Comprehensive analysis with 32 buttons documented                      │
+│   • File locations and line numbers                                        │
+│   • Current CSS and styling details                                        │
+│   • Unified button mapping recommendations                                 │
+│   • Implementation guidelines                                              │
+│                                                                             │
+│ /docs/BUTTON_MIGRATION_QUICK_REFERENCE.md                                 │
+│   • Quick lookup tables and code examples                                  │
+│   • Implementation order (6 commits)                                       │
+│   • Testing checklist                                                      │
+│   • CSS cleanup list                                                       │
+│                                                                             │
+│ /docs/BUTTON_MIGRATION_VISUAL_SUMMARY.txt                                 │
+│   • This file - visual overview and statistics                             │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+

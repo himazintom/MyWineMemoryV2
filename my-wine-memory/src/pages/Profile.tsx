@@ -188,7 +188,7 @@ const Profile: React.FC = () => {
             >
               🌐 公開プロフィールを見る
             </button>
-            <button className="logout-button" onClick={handleLogout}>
+            <button className="btn btn-danger" onClick={handleLogout}>
               ログアウト
             </button>
           </div>

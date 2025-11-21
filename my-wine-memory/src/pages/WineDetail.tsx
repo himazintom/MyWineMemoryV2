@@ -332,8 +332,8 @@ const WineDetail: React.FC = () => {
                   ))}
                 </div>
                 {tastingRecords.length > 3 && (
-                  <button 
-                    className="view-all-records-button"
+                  <button
+                    className="btn btn-secondary"
                     onClick={() => setActiveTab('records')}
                   >
                     全ての記録を見る ({tastingRecords.length}件)
@@ -345,8 +345,8 @@ const WineDetail: React.FC = () => {
             {tastingRecords.length === 0 && (
               <div className="no-records">
                 <p>まだこのワインの記録がありません</p>
-                <button 
-                  className="add-first-record-button"
+                <button
+                  className="btn btn-primary"
                   onClick={handleAddTasting}
                 >
                   🍷 最初の記録を追加

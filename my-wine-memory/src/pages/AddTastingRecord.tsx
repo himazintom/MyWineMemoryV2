@@ -478,7 +478,7 @@ const AddTastingRecord: React.FC = () => {
           <div className="insight-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="insight-modal-header">
               <h2>✅ 記録が保存されました！</h2>
-              <button className="close-button" onClick={() => setShowInsightModal(false)}>×</button>
+              <button className="btn btn-icon" onClick={() => setShowInsightModal(false)}>×</button>
             </div>
             <div className="insight-modal-body">
               {(learningInsight || isLoadingInsight) && (

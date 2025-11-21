@@ -288,8 +288,8 @@ const SelectWine: React.FC = () => {
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
                 <h2>新しいワインを登録</h2>
-                <button 
-                  className="close-button"
+                <button
+                  className="btn btn-icon"
                   onClick={() => setShowNewWineForm(false)}
                 >
                   ×

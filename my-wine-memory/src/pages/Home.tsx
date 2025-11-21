@@ -248,8 +248,8 @@ const Home: React.FC = () => {
                   />
                 ))}
               </div>
-              <button 
-                className="view-all-button"
+              <button
+                className="btn btn-secondary"
                 onClick={() => navigate('/records')}
               >
                 すべての記録を見る →
@@ -258,8 +258,8 @@ const Home: React.FC = () => {
           ) : (
             <div className="empty-state">
               <p>{currentUser ? 'まだワインの記録がありません' : 'まだワインの記録がありません（ゲストモード）'}</p>
-              <button 
-                className="get-started-button"
+              <button
+                className="btn btn-primary"
                 onClick={() => navigate('/select-wine')}
               >
                 最初の1本を記録する 🍷
