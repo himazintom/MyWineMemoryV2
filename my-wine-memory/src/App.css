@@ -655,41 +655,6 @@ body {
   .wine-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
-.view-all-button {
-  width: 100%;
-  padding: 1rem;
-  border: 2px solid var(--primary-color);
-  background: var(--card-bg);
-  color: var(--text-primary);
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  margin-top: 1rem;
-  transition: all 0.2s ease;
-}
-
-.view-all-button:hover {
-  background: var(--primary-color);
-  color: var(--btn-primary-text);
-}
-
-.get-started-button {
-  width: 100%;
-  padding: 1rem;
-  border: none;
-  background: var(--gradient-primary);
-  color: var(--btn-primary-text);
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  margin-top: 1rem;
-  transition: all 0.2s ease;
-}
-
-.get-started-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px var(--primary-dark-alpha-30);
-}
 
 /* Gamification Styles */
 .user-stats-summary {
@@ -1006,15 +971,6 @@ body {
   background: var(--link-hover-text);
 }
 
-.logout-button {
-  background: var(--error-text);
-  color: var(--btn-primary-text);
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-}
 
 /* Profile page styles */
 .profile-content {
@@ -2916,21 +2872,6 @@ body {
   margin: 0;
 }
 
-.close-button {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: 0.25rem;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.close-button:hover {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-}
 
 .login-prompt-content {
   padding: 1.5rem;
@@ -2949,21 +2890,6 @@ body {
   gap: 1rem;
 }
 
-.cancel-button {
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.cancel-button:hover {
-  background: var(--border-color);
-  color: var(--text-primary);
-}
 
 /* Responsive Login Styles */
 @media (max-width: 768px) {
@@ -5109,22 +5035,6 @@ body {
   padding: 2rem;
 }
 
-.add-first-record-button {
-  background: var(--primary-color);
-  color: var(--btn-primary-text);
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  margin-top: 1rem;
-  transition: all 0.2s ease;
-}
-
-.add-first-record-button:hover {
-  background: var(--primary-color);
-  transform: translateY(-1px);
-}
 
 .tasting-record-card {
   border: 1px solid var(--border-color);
@@ -6040,22 +5950,6 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 12px;
 }
 
-.view-all-records-button {
-  width: 100%;
-  padding: 0.75rem;
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  border: 2px solid var(--primary-color);
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.view-all-records-button:hover {
-  background: var(--primary-color);
-  color: var(--btn-primary-text);
-}
 
 .view-analysis-button {
   background: var(--link-text);
@@ -6391,22 +6285,6 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 2rem;
 }
 
-.get-started-button.primary {
-  background: var(--gradient-primary);
-  color: var(--btn-primary-text);
-  border: none;
-  padding: 1rem 2rem;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.get-started-button.primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px var(--primary-dark-alpha-30);
-}
 
 /* Image Gallery Styles */
 .image-suggestion-text {
