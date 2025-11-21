@@ -182,8 +182,8 @@ const Profile: React.FC = () => {
           </div>
         ) : (
           <div className="action-buttons">
-            <button 
-              className="public-profile-button" 
+            <button
+              className="btn btn-secondary"
               onClick={() => navigate(`/public-wines/${currentUser.uid}`)}
             >
               🌐 公開プロフィールを見る
@@ -381,8 +381,8 @@ const Profile: React.FC = () => {
               <div className="share-url-container">
                 <div className="share-url-box">
                   <span className="share-url-text">{generateShareUrl()}</span>
-                  <button 
-                    className={`copy-button ${copySuccess ? 'copied' : ''}`}
+                  <button
+                    className={`btn btn-icon ${copySuccess ? 'copied' : ''}`}
                     onClick={copyToClipboard}
                     title="クリップボードにコピー"
                   >

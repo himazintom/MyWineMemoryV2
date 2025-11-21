@@ -2405,26 +2405,6 @@ body {
   max-width: 400px;
 }
 
-.retry-button {
-  background: var(--primary-color);
-  color: var(--btn-primary-text);
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.retry-button:hover {
-  background: var(--primary-color);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px var(--primary-dark-alpha-30);
-}
 
 /* Page Loading States */
 .page-loading {
@@ -2811,27 +2791,6 @@ body {
   margin-bottom: 1.5rem;
 }
 
-.login-suggestion-button {
-  background: var(--primary-color);
-  color: var(--btn-primary-text);
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  margin: 0 auto;
-}
-
-.login-suggestion-button:hover:not(:disabled) {
-  background: var(--primary-color);
-  transform: translateY(-1px);
-}
 
 /* Login Prompt Modal Styles */
 .login-prompt-backdrop {
@@ -3613,22 +3572,6 @@ body {
   margin-top: 1rem;
 }
 
-.public-profile-button {
-  background: var(--gradient-success-darker);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.public-profile-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
-}
 
 .toggle-switch {
   position: relative;
@@ -4375,23 +4318,6 @@ body {
   box-shadow: 0 0 0 3px var(--primary-dark-alpha-10);
 }
 
-.create-new-wine-button {
-  width: 100%;
-  padding: 1rem;
-  margin-top: 1rem;
-  background: var(--primary-color);
-  color: var(--btn-primary-text);
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.create-new-wine-button:hover {
-  background: var(--primary-color);
-  transform: translateY(-1px);
-}
 
 .wine-list-section h2 {
   color: var(--text-primary);
@@ -5888,23 +5814,6 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.6;
 }
 
-.add-detailed-record-button {
-  background: var(--gradient-primary);
-  color: var(--btn-primary-text);
-  border: none;
-  padding: 1rem 2rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-top: 1rem;
-}
-
-.add-detailed-record-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px var(--primary-dark-alpha-30);
-}
 
 /* Recent Records Section */
 .recent-records-section {
@@ -5951,20 +5860,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 
-.view-analysis-button {
-  background: var(--link-text);
-  color: var(--btn-primary-text);
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.view-analysis-button:hover {
-  background: var(--link-hover-text);
-}
 
 /* Mobile responsive for detailed forms */
 @media (max-width: 768px) {
@@ -7105,32 +7000,6 @@ input[type="number"] {
   line-height: 1.4;
 }
 
-.copy-button {
-  background: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 12px;
-  margin-left: 12px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: all 0.2s ease;
-  min-width: 44px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.copy-button:hover {
-  background: var(--link-hover-text);
-  transform: scale(1.05);
-}
-
-.copy-button.copied {
-  background: var(--success-text);
-  animation: pulse 0.3s ease-in-out;
-}
 
 @keyframes pulse {
   0% {
@@ -7913,28 +7782,6 @@ input[type="number"] {
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.next-button-fixed {
-  background: var(--primary-color);
-  color: white;
-  border: none;
-  padding: 0.875rem 2.5rem;
-  border-radius: 30px;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  min-width: 200px;
-}
-
-.next-button-fixed:hover {
-  background: var(--primary-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px var(--primary-dark-alpha-30);
-}
-
-.next-button-fixed:active {
-  transform: translateY(0);
-}
 
 /* Hide bottom navigation during quiz */
 .page-container:has(.quiz-header-compact) ~ .bottom-navigation,

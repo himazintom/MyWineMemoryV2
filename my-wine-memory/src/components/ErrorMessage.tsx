@@ -21,7 +21,7 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
       <h3 className="error-title">{title}</h3>
       <p className="error-text">{message}</p>
       {onRetry && (
-        <button className="retry-button" onClick={onRetry}>
+        <button className="btn btn-primary" onClick={onRetry}>
           🔄 {retryText}
         </button>
       )}

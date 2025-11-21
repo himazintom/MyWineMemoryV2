@@ -463,8 +463,8 @@ const WineDetail: React.FC = () => {
                               {record.isPublic ? '🌐 公開中' : '🔒 非公開'}
                             </button>
                             {record.detailedAnalysis && (
-                              <button 
-                                className="view-analysis-button"
+                              <button
+                                className="btn btn-secondary btn-sm"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setSelectedRecord(record);
@@ -494,8 +494,8 @@ const WineDetail: React.FC = () => {
                 <div className="no-detailed-analysis">
                   <p>詳細モードで記録されたテイスティングデータがありません</p>
                   <p>詳細モードで新しい記録を追加すると、グラフによる分析が表示されます。</p>
-                  <button 
-                    className="add-detailed-record-button"
+                  <button
+                    className="btn btn-primary"
                     onClick={handleAddTasting}
                   >
                     詳細記録を追加

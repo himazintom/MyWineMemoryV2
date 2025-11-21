@@ -223,7 +223,7 @@ const SelectWine: React.FC = () => {
           )}
 
           <button
-            className="create-new-wine-button"
+            className="btn btn-primary"
             onClick={handleCreateNewWine}
           >
             📝 新しいワインを登録
@@ -258,8 +258,8 @@ const SelectWine: React.FC = () => {
               <div className="empty-icon">🍷</div>
               <h3>まだワインが登録されていません</h3>
               <p>最初のワインを登録して、あなたのワイン学習を始めましょう！</p>
-              <button 
-                className="btn-primary"
+              <button
+                className="btn btn-primary"
                 onClick={handleCreateNewWine}
               >
                 新しいワインを登録
