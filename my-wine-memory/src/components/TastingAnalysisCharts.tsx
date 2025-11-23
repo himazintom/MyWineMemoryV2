@@ -36,6 +36,13 @@ interface TastingAnalysisChartsProps {
 const TastingAnalysisCharts: React.FC<TastingAnalysisChartsProps> = ({ record }) => {
   const { detailedAnalysis } = record;
 
+  // CSS変数からテーマカラーを取得
+  const rootStyles = getComputedStyle(document.documentElement);
+  const primaryDarkFull = rootStyles.getPropertyValue('--primary-dark-full').trim() || 'rgba(114, 47, 55, 1)';
+  const primaryDarkAlpha20 = rootStyles.getPropertyValue('--primary-dark-alpha-20').trim() || 'rgba(114, 47, 55, 0.2)';
+  const primaryDarkAlpha10 = rootStyles.getPropertyValue('--primary-dark-alpha-10').trim() || 'rgba(114, 47, 55, 0.1)';
+  const textPrimary = rootStyles.getPropertyValue('--text-primary').trim() || '#fff';
+
   if (!detailedAnalysis) {
     return (
       <div className="no-detailed-analysis">
@@ -57,13 +64,13 @@ const TastingAnalysisCharts: React.FC<TastingAnalysisChartsProps> = ({ record })
           detailedAnalysis.structure?.body || 5,
           5 // アルコール感のデフォルト値
         ],
-        backgroundColor: 'rgba(114, 47, 55, 0.2)',
-        borderColor: 'rgba(114, 47, 55, 1)',
+        backgroundColor: primaryDarkAlpha20,
+        borderColor: primaryDarkFull,
         borderWidth: 2,
-        pointBackgroundColor: 'rgba(114, 47, 55, 1)',
-        pointBorderColor: getComputedStyle(document.documentElement).getPropertyValue('--btn-primary-text') || '#fff',
-        pointHoverBackgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--btn-primary-text') || '#fff',
-        pointHoverBorderColor: 'rgba(114, 47, 55, 1)',
+        pointBackgroundColor: primaryDarkFull,
+        pointBorderColor: textPrimary,
+        pointHoverBackgroundColor: textPrimary,
+        pointHoverBorderColor: primaryDarkFull,
       },
     ],
   };
@@ -77,7 +84,7 @@ const TastingAnalysisCharts: React.FC<TastingAnalysisChartsProps> = ({ record })
       title: {
         display: true,
         text: '成分バランス分析',
-        color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary') || '#722F37',
+        color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary') || '#ffffff',
         font: {
           size: 16,
           weight: 'bold' as const
@@ -152,7 +159,7 @@ const TastingAnalysisCharts: React.FC<TastingAnalysisChartsProps> = ({ record })
       title: {
         display: true,
         text: '香りカテゴリー分析',
-        color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary') || '#722F37',
+        color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary') || '#ffffff',
         font: {
           size: 16,
           weight: 'bold' as const
@@ -191,13 +198,13 @@ const TastingAnalysisCharts: React.FC<TastingAnalysisChartsProps> = ({ record })
           detailedAnalysis.taste?.development?.complexity || 5,
           detailedAnalysis.taste?.finish?.length || 5
         ],
-        borderColor: 'rgba(114, 47, 55, 1)',
-        backgroundColor: 'rgba(114, 47, 55, 0.1)',
+        borderColor: primaryDarkFull,
+        backgroundColor: primaryDarkAlpha10,
         borderWidth: 3,
         fill: true,
         tension: 0.4,
-        pointBackgroundColor: 'rgba(114, 47, 55, 1)',
-        pointBorderColor: getComputedStyle(document.documentElement).getPropertyValue('--btn-primary-text') || '#fff',
+        pointBackgroundColor: primaryDarkFull,
+        pointBorderColor: textPrimary,
         pointBorderWidth: 2,
         pointRadius: 6,
         pointHoverRadius: 8,
@@ -214,7 +221,7 @@ const TastingAnalysisCharts: React.FC<TastingAnalysisChartsProps> = ({ record })
       title: {
         display: true,
         text: '味わいの展開',
-        color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary') || '#722F37',
+        color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary') || '#ffffff',
         font: {
           size: 16,
           weight: 'bold' as const

@@ -1,58 +1,214 @@
 /**
  * CSS Custom Properties - Design Tokens
- * Single source of truth for all CSS variables
- * Based on design tokens from src/styles/tokens/
+ * Dark Mode Only - Single source of truth for all CSS variables
+ * Last updated: 2025-11-18 - Removed light mode for simplified maintenance
  */
 
 :root {
   /* ========================================
-     COLORS - Light Theme (Default)
+     COLORS - Dark Theme (Wine Bar Ambiance)
      ======================================== */
 
   /* Primary - Wine theme */
-  --color-primary-main: #722F37;
-  --color-primary-light: #d4636f;
-  --color-primary-dark: #5a2429;
+  --color-primary-main: #d4636f;
+  --color-primary-light: #e88d96;
+  --color-primary-dark: #722F37;
   --color-primary-contrast: #ffffff;
+
+  /* Primary RGB (for transparency) */
+  --color-primary-rgb: 212, 99, 111;
+  --color-primary-dark-rgb: 114, 47, 55;
 
   /* Semantic colors */
   --color-success: #28a745;
   --color-success-light: #34ce57;
   --color-success-dark: #1e7e34;
+  --color-success-bg: #d4edda;
+  --color-success-text: #155724;
+  --color-success-border: #4caf50;
 
   --color-error: #dc3545;
   --color-error-light: #e4606d;
   --color-error-dark: #bd2130;
+  --color-error-red: #f44336;
+  --color-error-bg: #f8d7da;
+  --color-error-border: #f5c6cb;
+  --color-error-text: #721c24;
 
   --color-warning: #ffc107;
   --color-warning-light: #ffd54f;
   --color-warning-dark: #c79100;
+  --color-warning-darker: #ffb300;
+  --color-warning-bg: #fff3cd;
+  --color-warning-text: #856404;
 
   --color-info: #17a2b8;
   --color-info-light: #58c4d4;
+  --color-info-lighter: #64b5f6;
   --color-info-dark: #117a8b;
+  --color-info-bg: #f5f5f5;
+  --color-info-bg-light: #d1ecf1;
+  --color-info-text: #6c757d;
+  --color-info-text-dark: #0c5460;
+  --color-info-dark-bg: #1a2a3a;
 
-  /* Background colors */
-  --bg-primary: #FFF8E1;
-  --bg-secondary: #FFFBF0;
-  --bg-tertiary: #F5F0E8;
-  --bg-card: #FFFFFF;
+  /* Neutral grays */
+  --color-gray-light: #ccc;
+  --color-gray-medium: #6b7280;
+  --color-gray-text: #6b7280;
+  --color-gray-dark: #333;
+  --color-gray-999: #999;
+  --color-gray-666: #666;
+
+  /* Additional colors */
+  --color-success-green: #22c55e;
+  --color-success-dark-green: #45a049;
+  --color-success-green-light: #66bb6a;
+  --color-success-green-darker: #16a34a;
+  --color-green-dark: #008000;
+  --color-dark-golden: #B8860B;
+  --color-red-dark: #dc2626;
+  --color-red-darker: #d32f2f;
+  --color-red-cc: #cc0000;
+  --color-red-light: #ff4444;
+  --color-red-lighter: #cc3333;
+  --color-coral-red: #ff6b6b;
+  --color-coral-red-light: #ff8787;
+  --color-cyan: #4ecdc4;
+  --color-orange-light: #ffb74d;
+  --color-orange: #ff9800;
+  --color-orange-dark: #ff6f00;
+  --color-orange-darker: #f57c00;
+  --color-deep-orange: #ff5722;
+  --color-deep-orange-dark: #d84315;
+  --color-blue: #2196f3;
+  --color-blue-dark: #1976d2;
+  --color-blue-purple: #646cff;
+  --color-blue-purple-dark: #535bf2;
+  --color-blue-purple-light: #667eea;
+  --color-purple-gradient: #764ba2;
+  --color-blue-gray: #607d8b;
+  --color-blue-gray-dark: #455a64;
+  --color-purple: #9c27b0;
+  --color-purple-dark: #7b1fa2;
+  --color-purple-very-dark: #2d1b69;
+  --color-pink: #f48fb1;
+  --color-gold-light: #ffed4e;
+  --color-gray: #9e9e9e;
+  --color-gray-light-2: #bdbdbd;
+  --bg-dark-brown: #3a2a1a;
+  --bg-dark-gray: #2d2d2d;
+  --bg-very-dark: #1e1e1e;
+  --bg-very-dark-blue: #1a1a2e;
+  --bg-dark-purple: #3a1f23;
+  --bg-very-dark-purple: #151012;
+
+  /* Background colors - Dark bar ambiance */
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2a2a2a;
+  --bg-tertiary: #3a3a3a;
+  --bg-quaternary: #3a3a2a;
+  --bg-quaternary-lighter: #4a4a3a;
+  --bg-card: #242424;
+  --bg-green-dark: #1b3a1b;
+  --bg-green-gray: #2a4a2a;
 
   /* Text colors */
-  --text-primary: #1a1a1a;
-  --text-secondary: #4a4a4a;
-  --text-tertiary: #757575;
-  --text-muted: #9e9e9e;
-  --text-inverse: #ffffff;
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
+  --text-tertiary: #b0b0b0;
+  --text-muted: #808080;
+  --text-inverse: #1a1a1a;
 
   /* Border & Divider */
-  --border-color: #e0e0e0;
-  --divider-color: #f0f0f0;
+  --border-color: #404040;
+  --border-gray: #555;
+  --divider-color: #333333;
 
   /* Special colors */
   --color-gold: #FFD700;
   --color-bronze: #CD7F32;
   --color-silver: #C0C0C0;
+  --color-xp-green: #4CAF50;
+
+  /* Wine type colors */
+  --wine-red: #722f37;
+  --wine-red-dark: #5a2529;
+  --wine-white: #f9f2e5;
+  --wine-rose: #e8a4a4;
+  --wine-sparkling: #fff9c4;
+  --wine-dessert: #d4a574;
+  --wine-fortified: #8b4513;
+
+  /* ========================================
+     ALIASES & LEGACY SUPPORT
+     ======================================== */
+
+  /* Button text colors */
+  --btn-primary-text: var(--text-primary);
+  --btn-secondary-text: var(--text-secondary);
+  --btn-tertiary-text: var(--text-tertiary);
+
+  /* Component aliases for backward compatibility */
+  --primary-color: var(--color-primary-main);
+  --card-bg: var(--bg-card);
+  --hover-bg: var(--bg-secondary);
+
+  /* Link colors */
+  --link-text: var(--color-blue-purple);
+  --link-hover-text: var(--color-blue-purple-dark);
+
+  /* Semantic text colors */
+  --error-text: var(--color-error-text);
+  --success-text: var(--color-success-text);
+  --warning-text: var(--color-warning-text);
+  --warning-color: var(--color-warning);
+
+  /* ========================================
+     GRADIENTS
+     ======================================== */
+
+  --gradient-primary: linear-gradient(135deg, #722F37, #8B4513);
+  --gradient-primary-90: linear-gradient(90deg, #722F37, #8B4513);
+  --gradient-primary-180: linear-gradient(180deg, #722F37, #8B4513);
+  --gradient-hero: linear-gradient(180deg, rgba(0, 0, 0, 0.28) 0%, rgba(0, 0, 0, 0.58) 100%);
+  --gradient-success: linear-gradient(90deg, #4CAF50, #8BC34A);
+  --gradient-success-135: linear-gradient(135deg, #4CAF50, #45a049);
+  --gradient-success-light: linear-gradient(135deg, var(--color-success-border), var(--color-success-green-light));
+  --gradient-success-darker: linear-gradient(135deg, var(--color-success-green), var(--color-success-green-darker));
+  --gradient-success-wine: linear-gradient(90deg, #722F37, #2E7D32);
+  --gradient-brown-warning: linear-gradient(135deg, var(--bg-quaternary), var(--bg-quaternary-lighter));
+  --gradient-green-dark: linear-gradient(135deg, var(--bg-green-dark), var(--bg-green-gray));
+  --gradient-gold: linear-gradient(135deg, var(--color-gold), var(--color-gold-light));
+  --gradient-coral: linear-gradient(135deg, var(--color-coral-red), var(--color-coral-red-light));
+  --gradient-gray: linear-gradient(135deg, var(--color-gray), var(--color-gray-light-2));
+  --gradient-red: linear-gradient(135deg, var(--color-red-light), var(--color-red-lighter));
+  --gradient-orange: linear-gradient(135deg, var(--color-orange), var(--color-orange-darker));
+  --gradient-purple: linear-gradient(135deg, var(--color-blue-purple-light), var(--color-purple-gradient));
+  --gradient-dark-purple: linear-gradient(135deg, var(--color-purple-very-dark), var(--bg-very-dark-blue));
+  --gradient-very-dark: linear-gradient(135deg, var(--bg-dark-purple), var(--bg-very-dark-purple));
+
+  /* ========================================
+     TRANSPARENCY VARIANTS
+     ======================================== */
+
+  --primary-alpha-10: rgba(212, 99, 111, 0.1);
+  --primary-alpha-20: rgba(212, 99, 111, 0.2);
+  --primary-alpha-30: rgba(212, 99, 111, 0.3);
+  --primary-alpha-50: rgba(212, 99, 111, 0.5);
+
+  --primary-dark-alpha-05: rgba(114, 47, 55, 0.05);
+  --primary-dark-alpha-10: rgba(114, 47, 55, 0.1);
+  --primary-dark-alpha-15: rgba(114, 47, 55, 0.15);
+  --primary-dark-alpha-20: rgba(114, 47, 55, 0.2);
+  --primary-dark-alpha-30: rgba(114, 47, 55, 0.3);
+  --primary-dark-alpha-40: rgba(114, 47, 55, 0.4);
+  --primary-dark-alpha-50: rgba(114, 47, 55, 0.5);
+  --primary-dark-alpha-60: rgba(114, 47, 55, 0.6);
+  --primary-dark-alpha-70: rgba(114, 47, 55, 0.7);
+  --primary-dark-alpha-80: rgba(114, 47, 55, 0.8);
+  --primary-dark-alpha-90: rgba(114, 47, 55, 0.9);
+  --primary-dark-full: rgba(114, 47, 55, 1);
 
   /* ========================================
      SPACING - 8px baseline grid
@@ -88,25 +244,28 @@
   --gap-xl: 2rem;
 
   /* ========================================
-     SHADOWS - Elevation system
+     SHADOWS - Elevation system (Dark theme optimized)
      ======================================== */
 
   --shadow-none: none;
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
-  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
-  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.18);
-  --shadow-xxl: 0 16px 32px rgba(0, 0, 0, 0.2);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.45);
+  --shadow-xxl: 0 16px 32px rgba(0, 0, 0, 0.5);
 
   /* Hover shadows */
-  --shadow-hover-sm: 0 4px 8px rgba(0, 0, 0, 0.15);
-  --shadow-hover-md: 0 6px 12px rgba(0, 0, 0, 0.18);
-  --shadow-hover-lg: 0 12px 20px rgba(0, 0, 0, 0.2);
+  --shadow-hover-sm: 0 4px 8px rgba(0, 0, 0, 0.4);
+  --shadow-hover-md: 0 6px 12px rgba(0, 0, 0, 0.45);
+  --shadow-hover-lg: 0 12px 20px rgba(0, 0, 0, 0.5);
 
   /* Inner shadows */
-  --shadow-inner-sm: inset 0 2px 4px rgba(0, 0, 0, 0.06);
-  --shadow-inner-md: inset 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-inner-sm: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-inner-md: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+
+  /* Primary color shadow (for emphasis) */
+  --shadow-primary: 0 4px 12px rgba(212, 99, 111, 0.3);
 
   /* ========================================
      TYPOGRAPHY
@@ -117,16 +276,16 @@
   --font-heading: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: "SF Mono", "Monaco", "Inconsolata", "Fira Mono", monospace;
 
-  /* Font sizes */
-  --font-size-xs: 0.75rem;    /* 12px */
-  --font-size-sm: 0.875rem;   /* 14px */
-  --font-size-base: 1rem;     /* 16px */
-  --font-size-lg: 1.125rem;   /* 18px */
-  --font-size-xl: 1.25rem;    /* 20px */
-  --font-size-2xl: 1.5rem;    /* 24px */
-  --font-size-3xl: 1.875rem;  /* 30px */
-  --font-size-4xl: 2.25rem;   /* 36px */
-  --font-size-5xl: 3rem;      /* 48px */
+  /* Font sizes - Fluid typography for responsive design */
+  --font-size-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);    /* 12-14px */
+  --font-size-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);      /* 14-16px */
+  --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);    /* 16-18px */
+  --font-size-lg: clamp(1.125rem, 1rem + 0.625vw, 1.25rem);     /* 18-20px */
+  --font-size-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);      /* 20-24px */
+  --font-size-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);           /* 24-32px */
+  --font-size-3xl: clamp(2rem, 1.5rem + 2.5vw, 3rem);           /* 32-48px */
+  --font-size-4xl: clamp(2.25rem, 1.75rem + 2.5vw, 3.5rem);     /* 36-56px */
+  --font-size-5xl: clamp(3rem, 2rem + 5vw, 4.5rem);             /* 48-72px */
 
   /* Font weights */
   --font-weight-light: 300;
@@ -187,9 +346,10 @@
   --transition-color: color 200ms ease;
 
   /* ========================================
-     Z-INDEX
+     Z-INDEX - Layering system
      ======================================== */
 
+  --z-index-base: 0;
   --z-index-dropdown: 1000;
   --z-index-sticky: 1020;
   --z-index-fixed: 1030;
@@ -197,49 +357,20 @@
   --z-index-modal: 1050;
   --z-index-popover: 1060;
   --z-index-tooltip: 1070;
-}
 
-/* ========================================
-   DARK THEME
-   ======================================== */
+  /* ========================================
+     RESPONSIVE BREAKPOINTS
+     ======================================== */
 
-[data-theme="dark"] {
-  /* Primary colors remain same, but use light variant for contrast */
-  --color-primary-main: #d4636f;
-  --color-primary-light: #e88d96;
-  --color-primary-dark: #722F37;
+  --breakpoint-mobile: 480px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-desktop: 1024px;
+  --breakpoint-wide: 1440px;
 
-  /* Background colors */
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #2a2a2a;
-  --bg-tertiary: #3a3a3a;
-  --bg-card: #242424;
-
-  /* Text colors */
-  --text-primary: #ffffff;
-  --text-secondary: #e0e0e0;
-  --text-tertiary: #b0b0b0;
-  --text-muted: #808080;
-  --text-inverse: #1a1a1a;
-
-  /* Border & Divider */
-  --border-color: #404040;
-  --divider-color: #333333;
-
-  /* Shadows - stronger for dark theme */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.4);
-  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.45);
-  --shadow-xxl: 0 16px 32px rgba(0, 0, 0, 0.5);
-
-  --shadow-hover-sm: 0 4px 8px rgba(0, 0, 0, 0.4);
-  --shadow-hover-md: 0 6px 12px rgba(0, 0, 0, 0.45);
-  --shadow-hover-lg: 0 12px 20px rgba(0, 0, 0, 0.5);
-
-  --shadow-inner-sm: inset 0 2px 4px rgba(0, 0, 0, 0.3);
-  --shadow-inner-md: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+  /* Responsive spacing */
+  --container-padding-mobile: var(--space-md);
+  --container-padding-tablet: var(--space-xl);
+  --container-padding-desktop: var(--space-xxl);
 }
 
 /* ========================================
@@ -248,19 +379,14 @@
 
 @media (prefers-contrast: high) {
   :root {
-    --color-primary-main: #5a2429;
-    --border-color: #000000;
-    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.5);
-  }
-
-  [data-theme="dark"] {
     --color-primary-main: #ffffff;
     --border-color: #ffffff;
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.8);
   }
 }
 
 /* ========================================
-   REDUCED MOTION
+   REDUCED MOTION - Accessibility
    ======================================== */
 
 @media (prefers-reduced-motion: reduce) {

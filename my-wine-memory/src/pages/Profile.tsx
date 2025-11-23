@@ -4,7 +4,6 @@ import { useAuth } from '../contexts/AuthHooks';
 import { badgeService } from '../services/badgeService';
 import { userService } from '../services/userService';
 import { gamificationService } from '../services/gamificationService';
-import ThemeToggle from '../components/ThemeToggle';
 import NotificationSettings from '../components/NotificationSettings';
 import BadgeDisplay, { EarnedBadges, LevelDisplay, StreakDisplay } from '../components/BadgeDisplay';
 import type { Badge, UserStats, DailyGoal } from '../types';
@@ -183,13 +182,13 @@ const Profile: React.FC = () => {
           </div>
         ) : (
           <div className="action-buttons">
-            <button 
-              className="public-profile-button" 
+            <button
+              className="btn btn-secondary"
               onClick={() => navigate(`/public-wines/${currentUser.uid}`)}
             >
               🌐 公開プロフィールを見る
             </button>
-            <button className="logout-button" onClick={handleLogout}>
+            <button className="btn btn-danger" onClick={handleLogout}>
               ログアウト
             </button>
           </div>
@@ -250,20 +249,20 @@ const Profile: React.FC = () => {
 
         {/* Tab Navigation */}
         <div className="profile-tabs">
-          <button 
-            className={`tab-button ${selectedTab === 'stats' ? 'active' : ''}`}
+          <button
+            className={`btn btn-tab ${selectedTab === 'stats' ? 'active' : ''}`}
             onClick={() => setSelectedTab('stats')}
           >
             統計
           </button>
-          <button 
-            className={`tab-button ${selectedTab === 'badges' ? 'active' : ''}`}
+          <button
+            className={`btn btn-tab ${selectedTab === 'badges' ? 'active' : ''}`}
             onClick={() => setSelectedTab('badges')}
           >
             獲得バッジ
           </button>
-          <button 
-            className={`tab-button ${selectedTab === 'achievements' ? 'active' : ''}`}
+          <button
+            className={`btn btn-tab ${selectedTab === 'achievements' ? 'active' : ''}`}
             onClick={() => setSelectedTab('achievements')}
           >
             全バッジ
@@ -382,8 +381,8 @@ const Profile: React.FC = () => {
               <div className="share-url-container">
                 <div className="share-url-box">
                   <span className="share-url-text">{generateShareUrl()}</span>
-                  <button 
-                    className={`copy-button ${copySuccess ? 'copied' : ''}`}
+                  <button
+                    className={`btn btn-icon ${copySuccess ? 'copied' : ''}`}
                     onClick={copyToClipboard}
                     title="クリップボードにコピー"
                   >
@@ -395,13 +394,6 @@ const Profile: React.FC = () => {
                 </p>
               </div>
             )}
-          </div>
-          
-          <div className="setting-item">
-            <div className="setting-label">
-              <span>テーマ</span>
-              <ThemeToggle />
-            </div>
           </div>
         </div>
       </main>

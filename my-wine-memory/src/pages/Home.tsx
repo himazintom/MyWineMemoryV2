@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthHooks';
-import { useTheme } from '../contexts/ThemeHooks';
 import type { WineDraft } from '../types';
 import WineCard from '../components/WineCard';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -11,13 +10,11 @@ import NotificationPrompt from '../components/NotificationPrompt';
 import { useAsyncOperation } from '../hooks/useAsyncOperation';
 import { useHomeData } from '../hooks/useHomeData';
 import heroDark from '../assets/images/hero/home-hero-desktop-dark.webp';
-import heroLight from '../assets/images/hero/home-hero-desktop-light.webp';
 import brandLogo from '../assets/images/logo-icon/logo-icon.svg';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser, userProfile, signInWithGoogle, loading: authInitializing } = useAuth();
-  const { theme } = useTheme();
   const [isMobile, setIsMobile] = useState<boolean>(() =>
     typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(max-width: 767px)').matches : false
   );
@@ -66,14 +63,11 @@ const Home: React.FC = () => {
     }
   };
 
-  // 可用ならモバイル用ヒーロー画像を使用（存在しない場合はデスクトップを流用）
+  // Dark mode only - use mobile-specific hero image if available
   const heroModules = import.meta.glob('../assets/images/hero/*', { eager: true }) as Record<string, { default: string }>;
   const getUrl = (p: string) => (heroModules[p]?.default as string | undefined);
   const mobileDark = getUrl('../assets/images/hero/home-hero-mobile-dark.webp');
-  const mobileLight = getUrl('../assets/images/hero/home-hero-mobile-light.webp');
-  const heroImage = theme === 'dark'
-    ? (isMobile && mobileDark ? mobileDark : heroDark)
-    : (isMobile && mobileLight ? mobileLight : heroLight);
+  const heroImage = isMobile && mobileDark ? mobileDark : heroDark;
   const heroStyle = { '--hero-image-url': `url(${heroImage})` } as React.CSSProperties & { '--hero-image-url': string };
 
   return (
@@ -87,10 +81,10 @@ const Home: React.FC = () => {
             </div>
             <p>写真で残す、あなただけのワイン体験</p>
             <div className="hero-actions">
-              <button className="action-button primary" onClick={() => navigate('/select-wine')}>
+              <button className="btn btn-primary" onClick={() => navigate('/select-wine')}>
                 🍷 ワインを記録する
               </button>
-              <button className="action-button secondary" onClick={() => navigate('/quiz')}>
+              <button className="btn btn-secondary" onClick={() => navigate('/quiz')}>
                 🧠 クイズに挑戦する
               </button>
             </div>
@@ -254,8 +248,8 @@ const Home: React.FC = () => {
                   />
                 ))}
               </div>
-              <button 
-                className="view-all-button"
+              <button
+                className="btn btn-secondary"
                 onClick={() => navigate('/records')}
               >
                 すべての記録を見る →
@@ -264,8 +258,8 @@ const Home: React.FC = () => {
           ) : (
             <div className="empty-state">
               <p>{currentUser ? 'まだワインの記録がありません' : 'まだワインの記録がありません（ゲストモード）'}</p>
-              <button 
-                className="get-started-button"
+              <button
+                className="btn btn-primary"
                 onClick={() => navigate('/select-wine')}
               >
                 最初の1本を記録する 🍷

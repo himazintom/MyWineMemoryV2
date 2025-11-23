@@ -76,13 +76,13 @@ export class ErrorBoundary extends Component<Props, State> {
 
             <div className="error-boundary-actions">
               <button
-                className="action-button primary"
+                className="btn btn-primary"
                 onClick={this.reset}
               >
                 リトライ
               </button>
               <button
-                className="action-button secondary"
+                className="btn btn-secondary"
                 onClick={() => window.location.href = '/'}
               >
                 ホームに戻る
@@ -111,11 +111,11 @@ export const ErrorFallback: React.FC<{
         <p>{error.message}</p>
 
         <div className="error-fallback-actions">
-          <button className="action-button primary" onClick={onReset}>
+          <button className="btn btn-primary" onClick={onReset}>
             リトライ
           </button>
           <button
-            className="action-button secondary"
+            className="btn btn-secondary"
             onClick={() => window.location.href = '/'}
           >
             ホームに戻る

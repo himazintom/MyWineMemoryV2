@@ -131,13 +131,13 @@ const Quiz: React.FC = () => {
         
         <div className="quiz-modes">
           <h2>クイズモード</h2>
-          <button className="mode-button" onClick={startGeneralQuiz}>
+          <button className="btn btn-mode" onClick={startGeneralQuiz}>
             📚 一般クイズ
           </button>
-          <button className="mode-button" onClick={startPersonalRecordQuiz}>
+          <button className="btn btn-mode" onClick={startPersonalRecordQuiz}>
             🍷 あなたの記録クイズ
           </button>
-          <button className="mode-button" onClick={startReviewQuiz}>
+          <button className="btn btn-mode" onClick={startReviewQuiz}>
             🔄 復習クイズ
           </button>
         </div>

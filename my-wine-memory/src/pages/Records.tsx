@@ -57,8 +57,8 @@ const Records: React.FC = () => {
             <h2>まだワインを記録していませんね</h2>
             <p>初めの一本を記録しましょう！</p>
             <p className="sub-message">ワインの記録を始めて、あなたの味覚の旅を保存しましょう。</p>
-            <button 
-              className="get-started-button primary"
+            <button
+              className="btn btn-primary"
               onClick={() => navigate('/select-wine')}
             >
               🍷 ワインを記録する
@@ -124,8 +124,8 @@ const Records: React.FC = () => {
           <div className="empty-state">
             <h2>まだ記録がありません</h2>
             <p>最初のワインを記録してみましょう！</p>
-            <button 
-              className="get-started-button"
+            <button
+              className="btn btn-primary"
               onClick={() => navigate('/select-wine')}
             >
               🍷 ワインを記録する

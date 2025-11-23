@@ -1,6 +1,6 @@
-export type Theme = 'light' | 'dark';
+// Dark mode only - simplified theme types
+export type Theme = 'dark';
 
 export interface ThemeContextType {
   theme: Theme;
-  toggleTheme: () => void;
 }

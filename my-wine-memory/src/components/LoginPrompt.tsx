@@ -48,7 +48,7 @@ const LoginPrompt: React.FC<LoginPromptProps> = ({
       <div className="login-prompt-modal">
         <div className="login-prompt-header">
           <h2>{title}</h2>
-          <button className="close-button" onClick={onClose}>
+          <button className="btn btn-icon" onClick={onClose}>
             ✕
           </button>
         </div>
@@ -81,7 +81,7 @@ const LoginPrompt: React.FC<LoginPromptProps> = ({
               )}
             </button>
             
-            <button className="cancel-button" onClick={onClose}>
+            <button className="btn btn-secondary" onClick={onClose}>
               キャンセル
             </button>
           </div>

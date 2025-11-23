@@ -37,13 +37,24 @@ interface WineFilterProps {
   };
 }
 
+// Wine type colors - corresponds to CSS variables in variables.css
+// --wine-red, --wine-white, --wine-rose, --wine-sparkling, --wine-dessert, --wine-fortified
+const WINE_TYPE_COLORS = {
+  red: 'var(--wine-red)',
+  white: 'var(--wine-white)',
+  rose: 'var(--wine-rose)',
+  sparkling: 'var(--wine-sparkling)',
+  dessert: 'var(--wine-dessert)',
+  fortified: 'var(--wine-fortified)'
+} as const;
+
 const WINE_TYPES = [
-  { value: 'red' as const, label: '赤ワイン', color: '#722f37' },
-  { value: 'white' as const, label: '白ワイン', color: '#f9f2e5' },
-  { value: 'rose' as const, label: 'ロゼ', color: '#e8a4a4' },
-  { value: 'sparkling' as const, label: 'スパークリング', color: '#fff9c4' },
-  { value: 'dessert' as const, label: 'デザートワイン', color: '#d4a574' },
-  { value: 'fortified' as const, label: '酒精強化ワイン', color: '#8b4513' }
+  { value: 'red' as const, label: '赤ワイン', color: WINE_TYPE_COLORS.red },
+  { value: 'white' as const, label: '白ワイン', color: WINE_TYPE_COLORS.white },
+  { value: 'rose' as const, label: 'ロゼ', color: WINE_TYPE_COLORS.rose },
+  { value: 'sparkling' as const, label: 'スパークリング', color: WINE_TYPE_COLORS.sparkling },
+  { value: 'dessert' as const, label: 'デザートワイン', color: WINE_TYPE_COLORS.dessert },
+  { value: 'fortified' as const, label: '酒精強化ワイン', color: WINE_TYPE_COLORS.fortified }
 ];
 
 const POPULAR_COUNTRIES = [

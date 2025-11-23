@@ -10,6 +10,7 @@
   z-index: 1000;
   padding: 12px 20px;
   border-radius: 24px;
+  border-bottom-color: rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(10px);
   font-size: 14px;
@@ -24,13 +25,13 @@
 
 /* Offline state */
 .offline-indicator.offline {
-  background: linear-gradient(135deg, #ff4444, #cc3333);
+  background: var(--gradient-red);
   color: white;
 }
 
 /* Online/reconnected state */
 .offline-indicator.online.reconnected {
-  background: linear-gradient(135deg, #4CAF50, #45a049);
+  background: var(--gradient-success-135);
   color: white;
   animation: slideInBounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
@@ -43,7 +44,7 @@
 
 /* Slow connection warning */
 .offline-indicator .slow-connection {
-  background: linear-gradient(135deg, #ff9800, #f57c00);
+  background: var(--gradient-orange);
   color: white;
 }
 
@@ -132,13 +133,6 @@
   }
 }
 
-/* Dark theme adjustments */
-@media (prefers-color-scheme: dark) {
-  .offline-indicator {
-    border-bottom-color: rgba(255, 255, 255, 0.1);
-  }
-}
-
 /* Reduce motion for accessibility */
 @media (prefers-reduced-motion: reduce) {
   .offline-indicator {
@@ -163,12 +157,12 @@
   }
   
   .offline-indicator.offline {
-    background: #cc0000;
-    border-color: #ffffff;
+    background: var(--color-red-cc);
+    border-color: var(--text-primary);
   }
   
   .offline-indicator.online.reconnected {
-    background: #008000;
-    border-color: #ffffff;
+    background: var(--color-green-dark);
+    border-color: var(--text-primary);
   }
 }

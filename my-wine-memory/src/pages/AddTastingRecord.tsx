@@ -478,7 +478,7 @@ const AddTastingRecord: React.FC = () => {
           <div className="insight-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="insight-modal-header">
               <h2>✅ 記録が保存されました！</h2>
-              <button className="close-button" onClick={() => setShowInsightModal(false)}>×</button>
+              <button className="btn btn-icon" onClick={() => setShowInsightModal(false)}>×</button>
             </div>
             <div className="insight-modal-body">
               {(learningInsight || isLoadingInsight) && (
@@ -512,14 +512,14 @@ const AddTastingRecord: React.FC = () => {
         <h1>テイスティング記録</h1>
         
         <div className="mode-toggle">
-          <button 
-            className={`mode-button ${recordMode === 'quick' ? 'active' : ''}`}
+          <button
+            className={`btn btn-toggle ${recordMode === 'quick' ? 'active' : ''}`}
             onClick={() => setRecordMode('quick')}
           >
             クイック
           </button>
-          <button 
-            className={`mode-button ${recordMode === 'detailed' ? 'active' : ''}`}
+          <button
+            className={`btn btn-toggle ${recordMode === 'detailed' ? 'active' : ''}`}
             onClick={() => setRecordMode('detailed')}
           >
             詳細

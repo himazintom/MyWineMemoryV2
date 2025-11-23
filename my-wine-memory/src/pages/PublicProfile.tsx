@@ -175,8 +175,8 @@ const PublicProfile: React.FC = () => {
           <div className="cta-card">
             <h3>🍷 MyWineMemory</h3>
             <p>あなたもワインの記録を始めませんか？</p>
-            <button 
-              className="cta-button"
+            <button
+              className="btn btn-primary"
               onClick={() => navigate('/')}
             >
               アプリを始める

@@ -426,15 +426,15 @@ const QuizGame: React.FC = () => {
           </div>
           
           {/* XP Earned Display */}
-          <div className="xp-earned" style={{ 
-            textAlign: 'center', 
-            fontSize: '1.2rem', 
-            color: '#4CAF50',
+          <div className="xp-earned" style={{
+            textAlign: 'center',
+            fontSize: '1.2rem',
+            color: 'var(--color-xp-green)',
             fontWeight: 'bold',
             margin: '1rem 0'
           }}>
             ✨ {score * 5 + (percentage === 100 ? 10 : 0)}XP 獲得しました！
-            {percentage === 100 && <span style={{ color: '#FFD700', marginLeft: '0.5rem' }}>🏆 パーフェクトボーナス!</span>}
+            {percentage === 100 && <span style={{ color: 'var(--color-gold)', marginLeft: '0.5rem' }}>🏆 パーフェクトボーナス!</span>}
           </div>
           
           {/* Learning Insight */}

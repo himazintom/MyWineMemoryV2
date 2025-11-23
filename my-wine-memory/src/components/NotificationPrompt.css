@@ -6,10 +6,10 @@
   transform: translateX(-50%);
   z-index: 1000;
   width: 90%;
-  max-width: 600px;
-  background: var(--card-bg);
+  max-width: 480px;
+  background: var(--bg-secondary);
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
   padding: 20px;
   animation: slideUp 0.3s ease-out;
 }
@@ -44,7 +44,7 @@
 
 .notification-prompt-text p {
   font-size: 14px;
-  color: var(--text-secondary);
+  color: var(--color-gray-light);
   margin: 0 0 12px 0;
 }
 
@@ -59,7 +59,7 @@
 
 .notification-benefits li {
   font-size: 14px;
-  color: var(--text-secondary);
+  color: var(--color-gray-light);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -93,12 +93,12 @@
 
 .notification-prompt-actions .btn-secondary {
   background: transparent;
-  color: var(--text-secondary);
-  border: 1px solid var(--border-color);
+  color: var(--color-gray-light);
+  border: 1px solid #444;
 }
 
 .notification-prompt-actions .btn-secondary:hover {
-  background: var(--bg-secondary);
+  background: var(--color-gray-dark);
 }
 
 .notification-prompt-warning {
@@ -110,18 +110,13 @@
 
 /* Important notice styling */
 .important-notice {
-  background: linear-gradient(135deg, #fff3cd, #ffe8a1);
-  border-left: 4px solid #ffc107;
+  background: var(--gradient-brown-warning);
+  border-left: 4px solid var(--color-warning);
   padding: 12px;
   margin: 12px 0;
   border-radius: 8px;
   font-size: 14px;
-  color: #856404;
-}
-
-[data-theme="dark"] .important-notice {
-  background: linear-gradient(135deg, #3a3a2a, #4a4a3a);
-  color: #ffc107;
+  color: var(--color-warning);
 }
 
 /* Comparison section */
@@ -139,23 +134,13 @@
 }
 
 .comparison-item.browser {
-  background: #f8f9fa;
-  border: 1px solid #dee2e6;
+  background: var(--bg-secondary);
+  border: 1px solid #444;
 }
 
 .comparison-item.pwa {
-  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  background: var(--gradient-green-dark);
   border: 1px solid #4caf50;
-}
-
-[data-theme="dark"] .comparison-item.browser {
-  background: #2a2a2a;
-  border-color: #444;
-}
-
-[data-theme="dark"] .comparison-item.pwa {
-  background: linear-gradient(135deg, #1b3a1b, #2a4a2a);
-  border-color: #4caf50;
 }
 
 .comparison-item h4 {
@@ -177,18 +162,13 @@
 }
 
 .install-guide {
-  background: #e3f2fd;
+  background: var(--color-info-dark-bg);
   padding: 12px;
   border-radius: 8px;
   font-size: 13px;
   text-align: center;
   margin-top: 16px;
-  color: #1976d2;
-}
-
-[data-theme="dark"] .install-guide {
-  background: #1a2a3a;
-  color: #64b5f6;
+  color: var(--color-info-lighter);
 }
 
 /* PWA Install Prompt */
@@ -201,7 +181,7 @@
   z-index: 999;
   width: 90%;
   max-width: 400px;
-  background: linear-gradient(135deg, #722F37, #8B4513);
+  background: var(--gradient-primary);
   color: white;
   border-radius: 12px;
   padding: 16px;
@@ -259,8 +239,8 @@
 }
 
 .pwa-install-actions .btn-primary {
-  background: white;
-  color: #722F37 !important;
+  background: var(--gradient-primary);
+  color: var(--color-primary-contrast) !important;
   padding: 8px 16px;
   border-radius: 6px;
   border: none;
@@ -271,7 +251,7 @@
 }
 
 .pwa-install-actions .btn-primary:hover {
-  background: #f5f5f5;
+  background: var(--color-info-bg);
   transform: scale(1.02);
 }
 
@@ -320,28 +300,4 @@
     top: 10px;
     width: 95%;
   }
-}
-
-/* Dark mode */
-[data-theme="dark"] .notification-prompt {
-  background: #2a2a2a;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-}
-
-[data-theme="dark"] .notification-prompt-text h3 {
-  color: #ffffff;
-}
-
-[data-theme="dark"] .notification-prompt-text p,
-[data-theme="dark"] .notification-benefits li {
-  color: #cccccc;
-}
-
-[data-theme="dark"] .notification-prompt-actions .btn-secondary {
-  border-color: #444;
-  color: #cccccc;
-}
-
-[data-theme="dark"] .notification-prompt-actions .btn-secondary:hover {
-  background: #333;
 }

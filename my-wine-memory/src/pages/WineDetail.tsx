@@ -250,21 +250,21 @@ const WineDetail: React.FC = () => {
 
         {/* Tab Navigation */}
         <div className="tab-navigation">
-          <button 
-            className={`tab-button ${activeTab === 'overview' ? 'active' : ''}`}
+          <button
+            className={`btn btn-tab ${activeTab === 'overview' ? 'active' : ''}`}
             onClick={() => setActiveTab('overview')}
           >
             概要
           </button>
-          <button 
-            className={`tab-button ${activeTab === 'records' ? 'active' : ''}`}
+          <button
+            className={`btn btn-tab ${activeTab === 'records' ? 'active' : ''}`}
             onClick={() => setActiveTab('records')}
           >
             記録一覧 ({tastingRecords.length})
           </button>
           {hasDetailedAnalysis() && (
-            <button 
-              className={`tab-button ${activeTab === 'analysis' ? 'active' : ''}`}
+            <button
+              className={`btn btn-tab ${activeTab === 'analysis' ? 'active' : ''}`}
               onClick={() => setActiveTab('analysis')}
             >
               詳細分析 ({getDetailedRecords().length})
@@ -332,8 +332,8 @@ const WineDetail: React.FC = () => {
                   ))}
                 </div>
                 {tastingRecords.length > 3 && (
-                  <button 
-                    className="view-all-records-button"
+                  <button
+                    className="btn btn-secondary"
                     onClick={() => setActiveTab('records')}
                   >
                     全ての記録を見る ({tastingRecords.length}件)
@@ -345,8 +345,8 @@ const WineDetail: React.FC = () => {
             {tastingRecords.length === 0 && (
               <div className="no-records">
                 <p>まだこのワインの記録がありません</p>
-                <button 
-                  className="add-first-record-button"
+                <button
+                  className="btn btn-primary"
                   onClick={handleAddTasting}
                 >
                   🍷 最初の記録を追加
@@ -434,8 +434,8 @@ const WineDetail: React.FC = () => {
                           )}
 
                           <div className="record-actions">
-                            <button 
-                              className="edit-record-button"
+                            <button
+                              className="btn btn-secondary btn-sm"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleEditRecord(record.id);
@@ -443,8 +443,8 @@ const WineDetail: React.FC = () => {
                             >
                               ✏️ 編集
                             </button>
-                            <button 
-                              className="delete-record-button"
+                            <button
+                              className="btn btn-danger btn-sm"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleDeleteRecord(record.id);
@@ -463,8 +463,8 @@ const WineDetail: React.FC = () => {
                               {record.isPublic ? '🌐 公開中' : '🔒 非公開'}
                             </button>
                             {record.detailedAnalysis && (
-                              <button 
-                                className="view-analysis-button"
+                              <button
+                                className="btn btn-secondary btn-sm"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setSelectedRecord(record);
@@ -494,8 +494,8 @@ const WineDetail: React.FC = () => {
                 <div className="no-detailed-analysis">
                   <p>詳細モードで記録されたテイスティングデータがありません</p>
                   <p>詳細モードで新しい記録を追加すると、グラフによる分析が表示されます。</p>
-                  <button 
-                    className="add-detailed-record-button"
+                  <button
+                    className="btn btn-primary"
                     onClick={handleAddTasting}
                   >
                     詳細記録を追加
