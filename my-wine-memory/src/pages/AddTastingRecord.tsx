@@ -19,8 +19,9 @@ import { useAsyncOperation } from '../hooks/useAsyncOperation';
 const AddTastingRecord: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { wineId } = useParams<{ wineId: string }>();
+  const { wineId, recordId } = useParams<{ wineId?: string; recordId?: string }>();
   const { currentUser } = useAuth();
+  const isEditMode = Boolean(recordId);
   
   // Wine state
   const [wine, setWine] = useState<WineMaster | null>(null);
@@ -88,7 +89,7 @@ const AddTastingRecord: React.FC = () => {
 
   const loadWineData = useCallback(async () => {
     if (!wineId || wineId === 'new' || !currentUser) return;
-    
+
     try {
       const wineData = await executeLoadWine(() => wineMasterService.getWineMaster(wineId, currentUser.uid));
       setWine(wineData);
@@ -97,14 +98,88 @@ const AddTastingRecord: React.FC = () => {
     }
   }, [wineId, currentUser, executeLoadWine]);
 
+  // Load existing record for edit mode
+  const loadExistingRecord = useCallback(async () => {
+    if (!recordId || !currentUser) return;
+
+    try {
+      const record = await tastingRecordService.getTastingRecord(recordId);
+
+      if (!record) {
+        console.error('Record not found');
+        navigate('/records');
+        return;
+      }
+
+      // Load wine data if not already loaded
+      if (record.wineId && !wine) {
+        const wineData = await wineMasterService.getWineMaster(record.wineId, currentUser.uid);
+        setWine(wineData);
+      }
+
+      // Set form data from existing record
+      setRecordMode(record.recordMode);
+      setFormData({
+        overallRating: record.overallRating,
+        notes: record.notes || '',
+        tastingDate: new Date(record.tastingDate).toISOString().split('T')[0],
+        images: [], // Images will be loaded as URLs, not Files
+        drawingDataUrl: '', // Cannot edit existing drawing
+        visualAnalysis: {
+          color: record.detailedAnalysis?.appearance?.color || '',
+          clarity: record.detailedAnalysis?.appearance?.clarity || '',
+          viscosity: record.detailedAnalysis?.appearance?.viscosity || ''
+        },
+        aromaAnalysis: {
+          firstImpression: record.detailedAnalysis?.aroma?.firstImpression?.notes || '',
+          afterSwirling: record.detailedAnalysis?.aroma?.afterSwirling?.notes || '',
+          aromaCategories: record.detailedAnalysis?.aroma?.specificAromas || [],
+          aromaIntensity: record.detailedAnalysis?.aroma?.firstImpression?.intensity || 0
+        },
+        tasteAnalysis: {
+          attack: record.detailedAnalysis?.taste?.attack?.notes || '',
+          development: record.detailedAnalysis?.taste?.development?.notes || '',
+          finish: record.detailedAnalysis?.taste?.finish?.notes || '',
+          finishLength: record.detailedAnalysis?.taste?.finish?.length || 0
+        },
+        componentAnalysis: {
+          acidity: record.detailedAnalysis?.structure?.acidity?.intensity || 0,
+          tannins: record.detailedAnalysis?.structure?.tannins?.intensity || 0,
+          sweetness: record.detailedAnalysis?.structure?.sweetness || 0,
+          body: record.detailedAnalysis?.structure?.body || 0,
+          alcohol: 0 // Not stored in current structure
+        },
+        environmentalFactors: {
+          temperature: record.environment?.temperature?.toString() || '',
+          glassware: record.environment?.glassType || '',
+          decantingTime: record.environment?.decanted ? 'あり' : 'なし'
+        },
+        foodPairings: record.environment?.occasion || '',
+        personalNotes: record.environment?.occasion || '',
+        referenceUrls: record.referenceUrls || [],
+        purchaseLocation: record.purchaseLocation || '',
+        price: record.price,
+        isPublic: record.isPublic || false
+      });
+
+    } catch (error) {
+      console.error('Failed to load existing record:', error);
+      navigate('/records');
+    }
+  }, [recordId, currentUser, wine, navigate]);
+
   useEffect(() => {
-    if (wineId) {
+    if (isEditMode && recordId) {
+      // Edit mode: load existing record
+      loadExistingRecord();
+    } else if (wineId) {
+      // Create mode: load wine data
       loadWineData();
-    } else if (!wineId) {
-      // No wine selected, navigate back to select wine
+    } else if (!wineId && !recordId) {
+      // No wine or record selected, navigate back to select wine
       navigate('/select-wine');
     }
-  }, [wineId, loadWineData, navigate]);
+  }, [wineId, recordId, isEditMode, loadWineData, loadExistingRecord, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -390,10 +465,16 @@ const AddTastingRecord: React.FC = () => {
         // Clean the data by removing undefined values
         const tastingData = removeUndefined(tastingDataRaw);
 
-        await tastingRecordService.createTastingRecord(currentUser.uid, tastingData);
+        // Create or update tasting record based on mode
+        if (isEditMode && recordId) {
+          await tastingRecordService.updateTastingRecord(recordId, tastingData);
+        } else {
+          await tastingRecordService.createTastingRecord(currentUser.uid, tastingData);
+        }
 
-        // Update user stats and add XP
-        await userService.updateStatsAfterWineRecord(currentUser.uid, {
+        // Update user stats and add XP (only for new records)
+        if (!isEditMode) {
+          await userService.updateStatsAfterWineRecord(currentUser.uid, {
           wineName: wine.wineName,
           producer: wine.producer,
           country: wine.country,
@@ -404,37 +485,46 @@ const AddTastingRecord: React.FC = () => {
           updatedAt: new Date()
         } as Parameters<typeof userService.updateStatsAfterWineRecord>[1]);
         
-        const xpToAdd = recordMode === 'detailed' ? 20 : 10;
-        await userService.addXP(currentUser.uid, xpToAdd);
-        
-        // Update daily goal progress
-        await goalService.updateGoalProgress(currentUser.uid, 'wine');
-        
-        // Generate learning insight
-        setIsLoadingInsight(true);
-        setShowInsightModal(true);
-        try {
-          const insight = await learningInsightService.generateWineInsight({
-            wineName: wine.wineName,
-            wineType: wine.wineType,
-            country: wine.country,
-            region: wine.region,
-            rating: formData.overallRating,
-            notes: formData.notes,
-            grapeVarieties: wine.grapeVarieties
-          });
-          setLearningInsight(insight);
-        } catch (error) {
-          console.error('Failed to generate insight:', error);
-        } finally {
-          setIsLoadingInsight(false);
+          const xpToAdd = recordMode === 'detailed' ? 20 : 10;
+          await userService.addXP(currentUser.uid, xpToAdd);
+
+          // Update daily goal progress
+          await goalService.updateGoalProgress(currentUser.uid, 'wine');
+        }
+
+        // Generate learning insight (only for new records)
+        if (!isEditMode) {
+          setIsLoadingInsight(true);
+          setShowInsightModal(true);
+          try {
+            const insight = await learningInsightService.generateWineInsight({
+              wineName: wine.wineName,
+              wineType: wine.wineType,
+              country: wine.country,
+              region: wine.region,
+              rating: formData.overallRating,
+              notes: formData.notes,
+              grapeVarieties: wine.grapeVarieties
+            });
+            setLearningInsight(insight);
+          } catch (error) {
+            console.error('Failed to generate insight:', error);
+          } finally {
+            setIsLoadingInsight(false);
+          }
         }
       });
 
-      // Show success message with insight modal
-      setTimeout(() => {
-        navigate('/records');
-      }, 5000); // Navigate after 5 seconds
+      // Show success message and navigate
+      if (isEditMode) {
+        alert('記録を更新しました');
+        navigate(-1); // Go back to previous page
+      } else {
+        // Show success message with insight modal for new records
+        setTimeout(() => {
+          navigate('/records');
+        }, 5000); // Navigate after 5 seconds
+      }
     } catch (error) {
       console.error('Failed to save tasting record:', error);
     }
@@ -509,7 +599,7 @@ const AddTastingRecord: React.FC = () => {
         <button className="back-button" onClick={() => navigate(-1)}>
           ← 戻る
         </button>
-        <h1>テイスティング記録</h1>
+        <h1>{isEditMode ? 'テイスティング記録を編集' : 'テイスティング記録'}</h1>
         
         <div className="mode-toggle">
           <button 
@@ -1233,7 +1323,7 @@ const AddTastingRecord: React.FC = () => {
                   <span className="loading-text">保存中...</span>
                 </span>
               ) : (
-                '記録を保存'
+                isEditMode ? '記録を更新' : '記録を保存'
               )}
             </button>
           </div>
