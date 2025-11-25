@@ -9,6 +9,12 @@
 /* Legacy CSS variables - DEPRECATED, use variables.css tokens instead */
 /* These are kept temporarily for backward compatibility during migration */
 :root {
+  /* Responsive breakpoints */
+  --breakpoint-mobile: 767px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-desktop: 1024px;
+  --breakpoint-wide: 1280px;
+
   /* Legacy typography - use --text-* from variables.css */
   --btn-primary-text: var(--color-primary-contrast);
   --btn-secondary-text: var(--text-secondary);
@@ -730,7 +736,7 @@ body {
 }
 
 /* Mobile Responsive for Gamification */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .daily-goal-grid {
     grid-template-columns: 1fr;
   }
@@ -6239,7 +6245,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Mobile responsive for detailed forms */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .aroma-categories {
     gap: 0.25rem;
   }
@@ -6986,7 +6992,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Responsive adjustments for drawing canvas */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .drawing-controls {
     flex-direction: column;
     align-items: stretch;
