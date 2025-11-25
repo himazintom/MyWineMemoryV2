@@ -144,15 +144,22 @@ body {
   box-sizing: border-box;
 }
 
-/* スマートフォン */
+/* スマートフォン - Base Layout & Components */
 @media (max-width: 767px) {
+  /* Main layout */
   .main-content {
     padding-bottom: 80px;
   }
-  
+
   .page-container {
     padding: 1rem;
   }
+
+  /* Home hero section */
+  .home-hero { height: 46vh; min-height: 260px; border-radius: 12px; }
+  .hero-overlay { padding: 1.25rem; }
+  .hero-actions { gap: 0.5rem; }
+  .brand-logo { width: 32px; height: 32px; }
 }
 
 /* タブレット */
@@ -351,13 +358,6 @@ body {
 @media (min-width: 1024px) {
   .home-hero { height: 60vh; }
   .hero-overlay h1 { font-size: 2.4rem; }
-}
-
-@media (max-width: 767px) {
-  .home-hero { height: 46vh; min-height: 260px; border-radius: 12px; }
-  .hero-overlay { padding: 1.25rem; }
-  .hero-actions { gap: 0.5rem; }
-  .brand-logo { width: 32px; height: 32px; }
 }
 
 /* モーション軽減対応 */
@@ -8704,5 +8704,48 @@ input[type='radio'] {
   gap: var(--gap-md);
   justify-content: center;
   margin-top: var(--space-lg);
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN INDEX
+   ============================================================================
+
+   This file contains 16 mobile breakpoint media queries (@media max-width: 767px)
+   distributed throughout the file. Future improvement: consolidate these into
+   a single section for better maintainability.
+
+   Current locations (line numbers):
+   - Line 148:  Base layout (main-content, page-container)
+   - Line 356:  Home hero section
+   - Line 739:  Gamification (daily goals)
+   - Line 2057: Wine cards and lists
+   - Line 2957: Quiz interface
+   - Line 3088: Statistics page
+   - Line 4282: Public profile
+   - Line 4383: Login section
+   - Line 4990: Wine group card
+   - Line 5372: Tasting record card
+   - Line 5825: Button groups
+   - Line 6248: Detailed forms (aroma categories)
+   - Line 6450: Form sections
+   - Line 6801: Image gallery
+   - Line 6995: Drawing canvas
+   - Line 8484: Error pages
+
+   Guidelines for future consolidation:
+   1. Group by feature/component (e.g., all wine card styles together)
+   2. Use single mobile media query section at end of file
+   3. Keep specificity low to avoid conflicts
+   4. Document any exceptions that must stay inline
+   ============================================================================ */
+
+/* ============================================================================
+   CONSOLIDATED MOBILE STYLES (Future)
+   ============================================================================
+   New mobile-specific styles should be added here instead of creating
+   new @media blocks throughout the file.
+   ============================================================================ */
+@media (max-width: 767px) {
+  /* Add new mobile styles here */
 }
 
