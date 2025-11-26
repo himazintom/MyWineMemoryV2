@@ -10,6 +10,7 @@
 /* These are kept temporarily for backward compatibility during migration */
 :root {
   /* Responsive breakpoints */
+  --breakpoint-small-mobile: 480px;
   --breakpoint-mobile: 767px;
   --breakpoint-tablet: 768px;
   --breakpoint-desktop: 1024px;
@@ -7470,23 +7471,6 @@ input[type="number"] {
   font-size: 0.85rem;
 }
 
-@media (max-width: 480px) {
-  .wine-list-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-  
-  .wine-list-item .wine-name {
-    width: 100%;
-  }
-  
-  .wine-list-item .wine-info {
-    width: 100%;
-    justify-content: space-between;
-  }
-}
-
 /* Grape Variety Input with Percentage Styles */
 .grape-variety-input-container {
   display: flex;
@@ -7749,35 +7733,6 @@ input[type="number"] {
   color: var(--primary-color);
 }
 
-/* Mobile responsive layout for wine selection */
-@media (max-width: 480px) {
-  .select-wine-content .wine-list-item {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  
-  .select-wine-content .wine-info {
-    width: 100%;
-  }
-  
-  .select-wine-content .wine-details-mobile {
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-  
-  .select-wine-content .wine-stats {
-    width: 100%;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .select-wine-content .wine-location,
-  .select-wine-content .wine-vintage {
-    display: block;
-  }
-}
-
 /* Quiz Page Compact Header and Fixed Footer */
 .quiz-header-compact {
   position: fixed;
@@ -7897,40 +7852,6 @@ input[type="number"] {
 .page-container:has(.quiz-header-compact) ~ .bottom-navigation,
 .page-container:has(.quiz-fixed-footer) ~ .bottom-navigation {
   display: none;
-}
-
-/* Mobile adjustments */
-@media (max-width: 480px) {
-  .quiz-header-compact {
-    padding: 0.5rem 0;
-  }
-  
-  .quiz-header-content {
-    padding: 0.5rem 0.75rem;
-  }
-  
-  .hearts-label,
-  .progress-label {
-    font-size: 0.85rem;
-  }
-  
-  .quiz-progress-text {
-    font-size: 1rem;
-  }
-  
-  .heart-icon {
-    font-size: 1rem;
-  }
-  
-  .quiz-fixed-footer {
-    padding: 0.75rem;
-  }
-  
-  .next-button-fixed {
-    padding: 0.75rem 2rem;
-    font-size: 0.95rem;
-    min-width: 180px;
-  }
 }
 
 /* Center align quiz-actions and user-stats-summary */
@@ -8629,6 +8550,103 @@ input[type='radio'] {
   .login-prompt-header,
   .login-prompt-content {
     padding: 1rem;
+  }
+}
+
+/* =============================================================================
+   SMALL MOBILE RESPONSIVE DESIGN (@media max-width: 480px)
+   =============================================================================
+   Consolidated section for extra-small mobile devices (≤480px)
+
+   Organization:
+   1. Wine Lists & Selection
+   2. Quiz Components
+
+   Note: This breakpoint is for very small screens that need additional
+   layout adjustments beyond the standard mobile breakpoint (767px)
+   ============================================================================= */
+
+@media (max-width: 480px) {
+  /* ==========================================================================
+     WINE LISTS & SELECTION
+     ========================================================================== */
+
+  /* General wine list items */
+  .wine-list-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .wine-list-item .wine-name {
+    width: 100%;
+  }
+
+  .wine-list-item .wine-info {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  /* Select wine page specific */
+  .select-wine-content .wine-list-item {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .select-wine-content .wine-info {
+    width: 100%;
+  }
+
+  .select-wine-content .wine-details-mobile {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .select-wine-content .wine-stats {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .select-wine-content .wine-location,
+  .select-wine-content .wine-vintage {
+    display: block;
+  }
+
+  /* ==========================================================================
+     QUIZ COMPONENTS
+     ========================================================================== */
+
+  .quiz-header-compact {
+    padding: 0.5rem 0;
+  }
+
+  .quiz-header-content {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .hearts-label,
+  .progress-label {
+    font-size: 0.85rem;
+  }
+
+  .quiz-progress-text {
+    font-size: 1rem;
+  }
+
+  .heart-icon {
+    font-size: 1rem;
+  }
+
+  .quiz-fixed-footer {
+    padding: 0.75rem;
+  }
+
+  .next-button-fixed {
+    padding: 0.75rem 2rem;
+    font-size: 0.95rem;
+    min-width: 180px;
   }
 }
 
