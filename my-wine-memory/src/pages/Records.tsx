@@ -32,7 +32,9 @@ const Records: React.FC = () => {
     navigate(`/add-tasting-record/${wineId}`);
   };
 
-  const handleTogglePrivacy = async (record: TastingRecord) => {
+  const handleTogglePrivacy = async (record?: TastingRecord) => {
+    if (!record) return;
+
     try {
       await tastingRecordService.updateTastingRecord(record.id, {
         isPublic: !record.isPublic

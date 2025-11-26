@@ -3,10 +3,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthHooks';
 import { wineMasterService } from '../services/wineMasterService';
 import { tastingRecordService } from '../services/tastingRecordService';
-import type { WineMaster, TastingRecord } from '../types';
+import type { WineMaster, TastingRecord, WineRecord } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import TastingAnalysisCharts from '../components/TastingAnalysisCharts';
+import WineCard from '../components/WineCard';
 import { useAsyncOperation } from '../hooks/useAsyncOperation';
 
 const WineDetail: React.FC = () => {
@@ -120,6 +121,26 @@ const WineDetail: React.FC = () => {
 
   const hasDetailedAnalysis = () => {
     return getDetailedRecords().length > 0;
+  };
+
+  // Helper function to combine WineMaster and TastingRecord into WineRecord
+  const createWineRecord = (wine: WineMaster, record: TastingRecord): WineRecord => {
+    return {
+      ...wine,
+      recordId: record.id,
+      overallRating: record.overallRating,
+      tastingDate: record.tastingDate,
+      recordMode: record.recordMode,
+      price: record.price,
+      purchaseLocation: record.purchaseLocation,
+      notes: record.notes,
+      detailedAnalysis: record.detailedAnalysis,
+      environment: record.environment,
+      images: record.images,
+      referenceUrls: record.referenceUrls,
+      isPublic: record.isPublic,
+      userId: record.userId
+    };
   };
 
   if (wineLoading) {
@@ -371,114 +392,47 @@ const WineDetail: React.FC = () => {
                 />
               )}
 
-              {!recordsLoading && !recordsError && tastingRecords.length > 0 && (
+              {!recordsLoading && !recordsError && tastingRecords.length > 0 && wine && (
                 <div className="records-list">
-                  {tastingRecords.map((record) => (
-                    <div 
-                      key={record.id} 
-                      className="tasting-record-card"
-                      onClick={() => setSelectedRecord(selectedRecord?.id === record.id ? null : record)}
-                    >
-                      <div className="record-header">
-                        <div className="record-date">
-                          {formatDate(new Date(record.tastingDate))}
-                        </div>
-                        <div 
-                          className="record-rating"
-                          style={{ color: getRatingColor(record.overallRating) }}
-                        >
-                          {record.overallRating.toFixed(1)}/10
-                        </div>
-                        <div className="record-mode-badge">
-                          {record.recordMode === 'quick' ? 'クイック' : '詳細'}
-                        </div>
-                      </div>
+                  {tastingRecords.map((record) => {
+                    const wineRecord = createWineRecord(wine, record);
+                    const isExpanded = selectedRecord?.id === record.id;
 
-                      {selectedRecord?.id === record.id && (
-                        <div className="record-details">
-                          {record.notes && (
-                            <div className="detail-section">
-                              <h4>テイスティングメモ</h4>
-                              <p>{record.notes}</p>
-                            </div>
-                          )}
-                          
-                          {record.price && (
-                            <div className="detail-section">
-                              <h4>購入価格</h4>
-                              <p>¥{record.price.toLocaleString()}</p>
-                            </div>
-                          )}
-                          
-                          {record.purchaseLocation && (
-                            <div className="detail-section">
-                              <h4>購入場所</h4>
-                              <p>{record.purchaseLocation}</p>
-                            </div>
-                          )}
-
-                          {record.images && record.images.length > 0 && (
-                            <div className="detail-section">
-                              <h4>写真</h4>
-                              <div className="record-images">
-                                {record.images.map((imageUrl, index) => (
-                                  <img 
-                                    key={index}
-                                    src={imageUrl} 
-                                    alt={`テイスティング写真 ${index + 1}`}
-                                    className="record-image"
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          <div className="record-actions">
-                            <button 
-                              className="edit-record-button"
+                    return (
+                      <div key={record.id}>
+                        <WineCard
+                          wine={wineRecord}
+                          variant="detail"
+                          onClick={() => setSelectedRecord(isExpanded ? null : record)}
+                          showRating={true}
+                          showRecordMode={true}
+                          showNotes={true}
+                          showPrice={true}
+                          showPurchaseLocation={true}
+                          showImage={true}
+                          showPrivacyToggle={true}
+                          isExpanded={isExpanded}
+                          onEdit={() => handleEditRecord(record.id)}
+                          onDelete={() => handleDeleteRecord(record.id)}
+                          onTogglePrivacy={() => handleTogglePrivacy(record)}
+                        />
+                        {isExpanded && record.detailedAnalysis && (
+                          <div className="record-extra-actions">
+                            <button
+                              className="view-analysis-button"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleEditRecord(record.id);
+                                setSelectedRecord(record);
+                                setActiveTab('analysis');
                               }}
                             >
-                              ✏️ 編集
+                              📊 詳細分析を見る
                             </button>
-                            <button 
-                              className="delete-record-button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteRecord(record.id);
-                              }}
-                            >
-                              🗑️ 削除
-                            </button>
-                            <button 
-                              className={`privacy-toggle-button ${record.isPublic ? 'public' : 'private'}`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleTogglePrivacy(record);
-                              }}
-                              title={record.isPublic ? '非公開にする' : '公開する'}
-                            >
-                              {record.isPublic ? '🌐 公開中' : '🔒 非公開'}
-                            </button>
-                            {record.detailedAnalysis && (
-                              <button 
-                                className="view-analysis-button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedRecord(record);
-                                  setActiveTab('analysis');
-                                }}
-                              >
-                                📊 詳細分析を見る
-                              </button>
-                            )}
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>

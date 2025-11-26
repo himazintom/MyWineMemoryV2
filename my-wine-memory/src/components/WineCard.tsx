@@ -23,7 +23,10 @@ export interface WineCardProps {
   showPurchaseLocation?: boolean;
   showRecordMode?: boolean;
   showPrivacyToggle?: boolean;
-  showActions?: boolean;
+  showNotes?: boolean;
+
+  // Detail variant specific
+  isExpanded?: boolean;
 
   // グループ統計（variant="group"用）
   groupStats?: {
@@ -36,7 +39,7 @@ export interface WineCardProps {
   // カスタムアクション
   onEdit?: () => void;
   onDelete?: () => void;
-  onTogglePrivacy?: (record: TastingRecord) => void;
+  onTogglePrivacy?: (record?: TastingRecord) => void;
   onAddTasting?: (wineId: string) => void;
 }
 
@@ -53,7 +56,8 @@ const WineCard: React.FC<WineCardProps> = ({
   showPurchaseLocation = false,
   showRecordMode = true,
   showPrivacyToggle = false,
-  showActions = false,
+  showNotes = false,
+  isExpanded = false,
   groupStats,
   onEdit,
   onDelete,
@@ -379,30 +383,80 @@ const WineCard: React.FC<WineCardProps> = ({
           )}
         </div>
 
-        {showActions && (
-          <div className="record-actions">
-            {onEdit && (
-              <button
-                className="edit-record-button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit();
-                }}
-              >
-                ✏️ 編集
-              </button>
+        {isExpanded && (
+          <div className="record-details">
+            {showNotes && record.notes && (
+              <div className="detail-section">
+                <h4>テイスティングメモ</h4>
+                <p>{record.notes}</p>
+              </div>
             )}
-            {onDelete && (
-              <button
-                className="delete-record-button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete();
-                }}
-              >
-                🗑️ 削除
-              </button>
+
+            {showPrice && record.price && (
+              <div className="detail-section">
+                <h4>購入価格</h4>
+                <p>¥{record.price.toLocaleString()}</p>
+              </div>
             )}
+
+            {showPurchaseLocation && record.purchaseLocation && (
+              <div className="detail-section">
+                <h4>購入場所</h4>
+                <p>{record.purchaseLocation}</p>
+              </div>
+            )}
+
+            {showImage && hasImages && (
+              <div className="detail-section">
+                <h4>写真</h4>
+                <div className="record-images">
+                  {record.images!.map((imageUrl, imgIndex) => (
+                    <img
+                      key={imgIndex}
+                      src={imageUrl}
+                      alt={`テイスティング写真 ${imgIndex + 1}`}
+                      className="record-image"
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="record-actions">
+              {onEdit && (
+                <button
+                  className="edit-record-button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit();
+                  }}
+                >
+                  ✏️ 編集
+                </button>
+              )}
+              {onDelete && (
+                <button
+                  className="delete-record-button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete();
+                  }}
+                >
+                  🗑️ 削除
+                </button>
+              )}
+              {showPrivacyToggle && onTogglePrivacy && (
+                <button
+                  className={`privacy-toggle-button ${record.isPublic ? 'public' : 'private'}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onTogglePrivacy();
+                  }}
+                >
+                  {record.isPublic ? '🌐 公開中' : '🔒 非公開'}
+                </button>
+              )}
+            </div>
           </div>
         )}
       </motion.div>
