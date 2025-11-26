@@ -736,41 +736,6 @@ body {
 }
 
 /* Mobile Responsive for Gamification */
-@media (max-width: 767px) {
-  .daily-goal-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .stats-row {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: stretch;
-  }
-  
-  .profile-tabs {
-    overflow-x: auto;
-    white-space: nowrap;
-  }
-  
-  .tab-button {
-    flex: none;
-    min-width: 120px;
-  }
-  
-  .dashboard-header {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: stretch;
-  }
-  
-  .user-level-streak {
-    justify-content: center;
-  }
-  
-  .goals-grid {
-    grid-template-columns: 1fr;
-  }
-}
 
 /* Draft Styles */
 .drafts-section {
@@ -2054,54 +2019,6 @@ body {
 }
 
 /* スマートフォン (767px以下) - 全画面使用 */
-@media (max-width: 767px) {
-  .app {
-    width: 100vw;
-    box-shadow: none;
-  }
-  
-  .add-wine-content {
-    padding: 0 1rem 2rem;
-    width: 100%;
-  }
-  
-  .form-row {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  
-  .level-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
-  
-  .stats-overview {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
-  
-  /* Quiz actions responsive */
-  .quiz-action-button {
-    padding: 1rem;
-  }
-  
-  .action-icon {
-    font-size: 1.5rem;
-  }
-  
-  .action-title {
-    font-size: 1rem;
-  }
-  
-  .action-subtitle {
-    font-size: 0.8rem;
-  }
-  
-  /* User stats responsive */
-  .user-stats-summary {
-    gap: 1rem;
-  }
-}
 
 /* Loading Spinner Styles */
 .loading-spinner {
@@ -2954,30 +2871,6 @@ body {
 }
 
 /* Responsive Login Styles */
-@media (max-width: 767px) {
-  .login-section {
-    margin: 1rem 0;
-    padding: 2rem 1rem;
-  }
-  
-  .login-section h2 {
-    font-size: 1.3rem;
-  }
-  
-  .google-signin-button {
-    padding: 0.75rem 1.5rem;
-    font-size: 0.95rem;
-  }
-  
-  .login-prompt-modal {
-    width: 95%;
-  }
-  
-  .login-prompt-header,
-  .login-prompt-content {
-    padding: 1rem;
-  }
-}
 
 /* Wine Card Styles */
 .wine-card {
@@ -3085,37 +2978,6 @@ body {
 }
 
 /* レスポンシブWineCard */
-@media (max-width: 767px) {
-  .wine-card {
-    padding: 1rem;
-    margin-bottom: 0.75rem;
-  }
-  
-  .wine-card-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-  
-  .wine-rating {
-    align-items: flex-start;
-    min-width: auto;
-  }
-  
-  .wine-name {
-    font-size: 1.1rem;
-  }
-  
-  .rating-score {
-    font-size: 1.1rem;
-  }
-  
-  .wine-card-footer {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-}
 
 @media (min-width: 768px) and (max-width: 1023px) {
   .wine-card {
@@ -4279,19 +4141,6 @@ body {
 }
 
 /* Responsive Design */
-@media (max-width: 767px) {
-  .public-records-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .public-wines h1 {
-    font-size: 1.5rem;
-  }
-  
-  .filter-controls {
-    flex-direction: column;
-  }
-}
 
 /* Rating Slider Styles */
 .rating-container {
@@ -4380,23 +4229,6 @@ body {
 }
 
 /* Responsive Rating Styles */
-@media (max-width: 767px) {
-  .rating-slider-container {
-    margin: 1rem 0;
-  }
-  
-  .rating-display {
-    padding: 0.75rem;
-  }
-  
-  .rating-value {
-    font-size: 1.5rem;
-  }
-  
-  .rating-display .rating-scale {
-    font-size: 1rem;
-  }
-}
 
 /* New Workflow Pages Styles */
 
@@ -4987,56 +4819,6 @@ body {
 }
 
 /* Responsive design for wine-group-card */
-@media (max-width: 767px) {
-  .wine-group-card {
-    padding: 0.8rem;
-  }
-  
-  .wine-group-header {
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 0.6rem;
-  }
-  
-  .wine-group-header .wine-info {
-    width: 100%;
-  }
-  
-  .rating-info {
-    align-items: flex-start;
-    flex-direction: row;
-    gap: 0.5rem;
-    justify-content: space-between;
-    width: 100%;
-  }
-  
-  .average-rating {
-    font-size: 1rem;
-  }
-  
-  .rating-label {
-    font-size: 0.7rem;
-  }
-  
-  .tasting-summary {
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  
-  .add-tasting-btn {
-    font-size: 0.8rem;
-    padding: 0.3rem 0.5rem;
-    min-width: 32px;
-  }
-  
-  .recent-tastings {
-    margin-top: 0.5rem;
-  }
-  
-  .recent-tastings h4 {
-    font-size: 0.85rem;
-  }
-}
 
 @media (min-width: 768px) {
   .wine-groups-list {
@@ -5369,42 +5151,6 @@ body {
   }
 }
 
-@media (max-width: 767px) {
-  .wine-group-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-  
-  .rating-info {
-    align-items: flex-start;
-  }
-  
-  .tasting-summary {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-  
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-  }
-  
-  .record-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-  
-  .modal-content {
-    width: 100%;
-    max-width: 100%;
-    margin: 0;
-    border-radius: 0;
-    max-height: 100vh;
-  }
-}
 
 /* Tablet modal styles */
 @media (min-width: 768px) and (max-width: 1023px) {
@@ -5822,46 +5568,6 @@ h1, h2, h3, h4, h5, h6 {
    MOBILE IMPROVEMENTS
    =============================== */
 
-@media (max-width: 767px) {
-  /* Single column layout for mobile */
-  .form-actions {
-    grid-template-columns: 1fr;
-  }
-  
-  .quick-actions {
-    grid-template-columns: 1fr;
-  }
-  
-  .quiz .answer-options {
-    grid-template-columns: 1fr;
-  }
-  
-  /* Better touch targets */
-  .nav-item {
-    min-height: 60px;
-    padding: 12px 8px;
-  }
-  
-  .action-button,
-  .btn-primary,
-  .btn-secondary {
-    min-height: 50px;
-    font-size: 1rem;
-  }
-  
-  /* Better spacing on mobile */
-  .wine-list-item,
-  .wine-group-card {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    text-align: left;
-  }
-  
-  .wine-stats {
-    text-align: left;
-    min-width: auto;
-  }
-}
 
 /* ===============================
    ACCESSIBILITY IMPROVEMENTS
@@ -6245,46 +5951,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Mobile responsive for detailed forms */
-@media (max-width: 767px) {
-  .aroma-categories {
-    gap: 0.25rem;
-  }
-  
-  .category-button {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.8rem;
-  }
-  
-  .reference-url-item {
-    flex-direction: column;
-  }
-  
-  .remove-url-button {
-    align-self: flex-start;
-    width: fit-content;
-  }
-  
-  .tab-button {
-    padding: 0.75rem 0.5rem;
-    font-size: 0.8rem;
-  }
-  
-  .charts-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  
-  .detailed-text-analysis {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  
-  .recent-record-item {
-    grid-template-columns: 1fr;
-    text-align: center;
-    gap: 0.5rem;
-  }
-}
 
 /* Image Preview Styles */
 .image-preview {
@@ -6447,22 +6113,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Mobile adjustments for form actions */
-@media (max-width: 767px) {
-  .form-actions {
-    position: fixed;
-    bottom: 70px; /* Space for bottom navigation */
-    left: 0;
-    right: 0;
-    padding: 1rem;
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
-  }
-  
-  .form-actions .btn-secondary,
-  .form-actions .btn-primary {
-    flex: 1;
-    max-width: none;
-  }
-}
 
 /* Settings Styles */
 .settings {
@@ -6798,59 +6448,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Responsive adjustments */
-@media (max-width: 767px) {
-  .image-gallery {
-    display: flex;
-    flex-direction: column;
-    max-width: 100%;
-    gap: 1rem;
-  }
-
-  /* 1枚目は大きく表示 */
-  .image-gallery-item:first-child {
-    height: 280px;
-    width: 100%;
-  }
-
-  /* 2枚目以降は2列グリッドで表示 */
-  .image-gallery-item:nth-child(n+2) {
-    height: 140px;
-    width: calc(50% - 0.5rem);
-    display: inline-block;
-    vertical-align: top;
-  }
-
-  .image-gallery-item:nth-child(2n) {
-    margin-right: 1rem;
-  }
-
-  /* Add button positioning for mobile */
-  .image-gallery-add.pos-1 {
-    height: 280px;
-    width: 100%;
-  }
-
-  .image-gallery-add.pos-2,
-  .image-gallery-add.pos-3,
-  .image-gallery-add.pos-4,
-  .image-gallery-add.pos-5 {
-    height: 140px;
-    width: calc(50% - 0.5rem);
-    display: inline-block;
-    vertical-align: top;
-  }
-
-  .image-gallery-add.pos-2,
-  .image-gallery-add.pos-4 {
-    margin-right: 1rem;
-  }
-
-  .remove-image-button {
-    width: 20px;
-    height: 20px;
-    font-size: 14px;
-  }
-}
 
 /* Drawing Canvas Styles */
 .drawing-canvas-container {
@@ -6992,34 +6589,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Responsive adjustments for drawing canvas */
-@media (max-width: 767px) {
-  .drawing-controls {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 1rem;
-  }
-  
-  .tool-controls {
-    justify-content: center;
-  }
-  
-  .color-controls {
-    justify-content: center;
-  }
-  
-  .size-controls {
-    align-items: center;
-  }
-  
-  .drawing-canvas {
-    max-width: 100%;
-    height: auto;
-  }
-  
-  .canvas-actions {
-    flex-direction: column;
-  }
-}
 
 /* Hide number input spinner arrows */
 input[type="number"]::-webkit-outer-spin-button,
@@ -8481,33 +8050,6 @@ input[type="number"] {
 }
 
 /* Mobile adjustments for centered elements */
-@media (max-width: 767px) {
-  .quiz-action-button {
-    padding: 1rem;
-    max-width: 100%;
-  }
-  
-  .quiz-action-button .action-icon {
-    font-size: 1.5rem;
-  }
-  
-  .quiz-action-button .action-title {
-    font-size: 1rem;
-  }
-  
-  .quiz-action-button .action-subtitle {
-    font-size: 0.85rem;
-  }
-  
-  .quiz-modes .mode-button {
-    padding: 0.875rem 1.25rem;
-    max-width: 100%;
-  }
-  
-  .user-stats-summary .stats-row {
-    gap: 1rem;
-  }
-}
 
 
 /* ========================================
@@ -8740,12 +8282,353 @@ input[type='radio'] {
    ============================================================================ */
 
 /* ============================================================================
-   CONSOLIDATED MOBILE STYLES (Future)
+   CONSOLIDATED MOBILE STYLES
    ============================================================================
-   New mobile-specific styles should be added here instead of creating
-   new @media blocks throughout the file.
+   All mobile-specific styles (max-width: 767px) are consolidated here for
+   better maintainability. Organized by category for easy navigation.
    ============================================================================ */
 @media (max-width: 767px) {
-  /* Add new mobile styles here */
+  /* ==========================================================================
+     LAYOUT & STRUCTURE
+     ========================================================================== */
+
+  /* Base layout */
+  .main-content {
+    padding-bottom: 80px;
+  }
+
+  .page-container {
+    padding: 1rem;
+  }
+
+  .app {
+    width: 100vw;
+    box-shadow: none;
+  }
+
+  /* ==========================================================================
+     HOME & HERO
+     ========================================================================== */
+
+  .home-hero {
+    height: 46vh;
+    min-height: 260px;
+    border-radius: 12px;
+  }
+
+  .hero-overlay {
+    padding: 1.25rem;
+  }
+
+  .hero-actions {
+    gap: 0.5rem;
+  }
+
+  .brand-logo {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* ==========================================================================
+     WINE CARDS & LISTS
+     ========================================================================== */
+
+  .wine-card {
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .wine-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .wine-rating {
+    align-items: flex-start;
+    min-width: auto;
+  }
+
+  .wine-name {
+    font-size: 1.1rem;
+  }
+
+  .rating-score {
+    font-size: 1.1rem;
+  }
+
+  .wine-card-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .wine-group-card {
+    padding: 0.8rem;
+  }
+
+  .wine-group-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  /* ==========================================================================
+     FORMS & INPUTS
+     ========================================================================== */
+
+  .add-wine-content {
+    padding: 0 1rem 2rem;
+    width: 100%;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .form-actions {
+    grid-template-columns: 1fr;
+    position: fixed;
+    bottom: 70px;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+    background: var(--bg-primary);
+    z-index: 10;
+  }
+
+  .aroma-categories {
+    gap: 0.25rem;
+  }
+
+  .rating-slider-container {
+    margin: 1rem 0;
+  }
+
+  .rating-display {
+    padding: 0.75rem;
+  }
+
+  .rating-value {
+    font-size: 1.5rem;
+  }
+
+  /* ==========================================================================
+     IMAGES & MEDIA
+     ========================================================================== */
+
+  .image-gallery {
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+    gap: 1rem;
+  }
+
+  .image-gallery-item:first-child {
+    height: 280px;
+    width: 100%;
+  }
+
+  .image-gallery-item:nth-child(n+2) {
+    height: 140px;
+    width: calc(50% - 0.5rem);
+    display: inline-block;
+    vertical-align: top;
+  }
+
+  .image-gallery-item:nth-child(2n) {
+    margin-right: 1rem;
+  }
+
+  .image-gallery-add.pos-1 {
+    height: 280px;
+    width: 100%;
+  }
+
+  .image-gallery-add.pos-2,
+  .image-gallery-add.pos-3,
+  .image-gallery-add.pos-4,
+  .image-gallery-add.pos-5 {
+    height: 140px;
+    width: calc(50% - 0.5rem);
+    display: inline-block;
+    vertical-align: top;
+  }
+
+  .image-gallery-add.pos-2,
+  .image-gallery-add.pos-4 {
+    margin-right: 1rem;
+  }
+
+  .remove-image-button {
+    width: 20px;
+    height: 20px;
+    font-size: 14px;
+  }
+
+  /* ==========================================================================
+     DRAWING CANVAS
+     ========================================================================== */
+
+  .drawing-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .tool-controls {
+    justify-content: center;
+  }
+
+  .color-controls {
+    justify-content: center;
+  }
+
+  .size-controls {
+    align-items: center;
+  }
+
+  .drawing-canvas {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .canvas-actions {
+    flex-direction: column;
+  }
+
+  /* ==========================================================================
+     NAVIGATION & TABS
+     ========================================================================== */
+
+  .profile-tabs {
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .tab-button {
+    flex: none;
+    min-width: 120px;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  /* ==========================================================================
+     STATS & GAMIFICATION
+     ========================================================================== */
+
+  .daily-goal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-row {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .user-level-streak {
+    justify-content: center;
+  }
+
+  .goals-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .level-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .stats-overview {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .user-stats-summary {
+    gap: 1rem;
+  }
+
+  .user-stats-summary .stats-row {
+    gap: 1rem;
+  }
+
+  /* ==========================================================================
+     QUIZ & ACTIONS
+     ========================================================================== */
+
+  .quiz-action-button {
+    padding: 1rem;
+    max-width: 100%;
+  }
+
+  .action-icon,
+  .quiz-action-button .action-icon {
+    font-size: 1.5rem;
+  }
+
+  .action-title,
+  .quiz-action-button .action-title {
+    font-size: 1rem;
+  }
+
+  .action-subtitle,
+  .quiz-action-button .action-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .quiz-modes .mode-button {
+    padding: 0.875rem 1.25rem;
+    max-width: 100%;
+  }
+
+  /* ==========================================================================
+     PUBLIC PROFILE & RECORDS
+     ========================================================================== */
+
+  .public-records-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .public-wines h1 {
+    font-size: 1.5rem;
+  }
+
+  .filter-controls {
+    flex-direction: column;
+  }
+
+  /* ==========================================================================
+     LOGIN & AUTH
+     ========================================================================== */
+
+  .login-section {
+    margin: 1rem 0;
+    padding: 2rem 1rem;
+  }
+
+  .login-section h2 {
+    font-size: 1.3rem;
+  }
+
+  .google-signin-button {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .login-prompt-modal {
+    width: 95%;
+  }
+
+  .login-prompt-header,
+  .login-prompt-content {
+    padding: 1rem;
+  }
 }
 
